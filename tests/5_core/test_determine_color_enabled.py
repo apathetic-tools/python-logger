@@ -6,7 +6,7 @@ import types
 
 import pytest
 
-import apathetic_logger.logger as mod_alogs
+import apathetic_logger as mod_alogs
 
 
 # ---------------------------------------------------------------------------

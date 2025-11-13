@@ -1,6 +1,6 @@
 """Apathetic Logger implementation."""
 
-from .logger import ApatheticLogger as _ApatheticLoggerNamespace
+from .namespace import ApatheticLogger as _ApatheticLoggerNamespace
 
 
 # Ensure logging module is extended with TRACE and SILENT levels
