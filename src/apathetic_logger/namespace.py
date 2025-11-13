@@ -12,6 +12,9 @@ from .dual_stream_handler import (
     _ApatheticLogger_DualStreamHandler,  # pyright: ignore[reportPrivateUsage]
 )
 from .logger import _ApatheticLogger_Logger  # pyright: ignore[reportPrivateUsage]
+from .register_default_log_level import (
+    _ApatheticLogger_RegisterDefaultLogLevel,  # pyright: ignore[reportPrivateUsage]
+)
 from .register_log_level_env_vars import (
     _ApatheticLogger_RegisterLogLevelEnvVars,  # pyright: ignore[reportPrivateUsage]
 )
@@ -40,6 +43,7 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     _ApatheticLogger_Constants,
     _ApatheticLogger_DualStreamHandler,
     _ApatheticLogger_Logger,
+    _ApatheticLogger_RegisterDefaultLogLevel,
     _ApatheticLogger_RegisterLogLevelEnvVars,
     _ApatheticLogger_SafeLog,
     _ApatheticLogger_TagFormatter,
@@ -54,6 +58,8 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     The TagFormatter class is provided via the _ApatheticLogger_TagFormatter mixin.
     The DualStreamHandler class is provided via the
     _ApatheticLogger_DualStreamHandler mixin.
+    The register_default_log_level static method is provided via the
+    _ApatheticLogger_RegisterDefaultLogLevel mixin.
     The register_log_level_env_vars static method is provided via the
     _ApatheticLogger_RegisterLogLevelEnvVars mixin.
     The safe_log static method is provided via the _ApatheticLogger_SafeLog mixin.
@@ -78,24 +84,6 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
         if "." in package_name:
             return package_name.split(".", 1)[0]
         return package_name
-
-    @staticmethod
-    def register_default_log_level(default_level: str) -> None:
-        """Register the default log level to use when no other source is found.
-
-        Args:
-            default_level: Default log level name (e.g., "info", "warning")
-
-        Example:
-            >>> from apathetic_logger import ApatheticLogger
-            >>> ApatheticLogger.register_default_log_level("warning")
-        """
-        global _registered_default_log_level  # noqa: PLW0603
-        _registered_default_log_level = default_level
-        ApatheticLogger.TEST_TRACE(
-            "register_default_log_level() called",
-            f"default_level={default_level}",
-        )
 
     @staticmethod
     def register_logger_name(logger_name: str | None = None) -> None:
