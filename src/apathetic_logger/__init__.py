@@ -14,22 +14,19 @@ ApatheticLogger = _ApatheticLoggerNamespace
 
 # Export all namespace items for convenience
 # These are aliases to ApatheticLogger.*
-CYAN = _ApatheticLoggerNamespace.CYAN
 DEFAULT_APATHETIC_LOG_LEVEL = _ApatheticLoggerNamespace.DEFAULT_APATHETIC_LOG_LEVEL
 DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS = (
     _ApatheticLoggerNamespace.DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS
 )
-GRAY = _ApatheticLoggerNamespace.GRAY
-GREEN = _ApatheticLoggerNamespace.GREEN
 LEVEL_ORDER = _ApatheticLoggerNamespace.LEVEL_ORDER
-RED = _ApatheticLoggerNamespace.RED
-RESET = _ApatheticLoggerNamespace.RESET
 SILENT_LEVEL = _ApatheticLoggerNamespace.SILENT_LEVEL
 TAG_STYLES = _ApatheticLoggerNamespace.TAG_STYLES
 TEST_TRACE = _ApatheticLoggerNamespace.TEST_TRACE
 TEST_TRACE_ENABLED = _ApatheticLoggerNamespace.TEST_TRACE_ENABLED
 TRACE_LEVEL = _ApatheticLoggerNamespace.TRACE_LEVEL
-YELLOW = _ApatheticLoggerNamespace.YELLOW
+
+# ANSI Colors
+ANSIColors = _ApatheticLoggerNamespace.ANSIColors
 
 # Classes
 DualStreamHandler = _ApatheticLoggerNamespace.DualStreamHandler
@@ -45,20 +42,15 @@ safe_log = _ApatheticLoggerNamespace.safe_log
 
 
 __all__ = [
-    "CYAN",
     "DEFAULT_APATHETIC_LOG_LEVEL",
     "DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS",
-    "GRAY",
-    "GREEN",
     "LEVEL_ORDER",
-    "RED",
-    "RESET",
     "SILENT_LEVEL",
     "TAG_STYLES",
     "TEST_TRACE",
     "TEST_TRACE_ENABLED",
     "TRACE_LEVEL",
-    "YELLOW",
+    "ANSIColors",
     "ApatheticLogger",
     "DualStreamHandler",
     "TagFormatter",

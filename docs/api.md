@@ -222,7 +222,7 @@ Apply ANSI color codes to text.
 
 **Parameters:**
 - `text` (str): Text to colorize
-- `color` (str): ANSI color code (e.g., `CYAN`, `RED`)
+- `color` (str): ANSI color code (e.g., `ANSIColors.CYAN`, `ANSIColors.RED`)
 - `enable_color` (bool | None): Override color enablement. If None, uses instance setting.
 
 **Returns:**
@@ -334,12 +334,21 @@ Whether to enable colorized output for this handler.
 
 ### ANSI Colors
 
-- `RESET` — ANSI reset code (`\033[0m`)
-- `CYAN` — Cyan color (`\033[36m`)
-- `YELLOW` — Yellow color (`\033[93m`)
-- `RED` — Red color (`\033[91m`)
-- `GREEN` — Green color (`\033[92m`)
-- `GRAY` — Gray color (`\033[90m`)
+Access via `ANSIColors` class:
+
+- `ANSIColors.RESET` — ANSI reset code (`\033[0m`)
+- `ANSIColors.CYAN` — Cyan color (`\033[36m`)
+- `ANSIColors.YELLOW` — Yellow color (`\033[93m`)
+- `ANSIColors.RED` — Red color (`\033[91m`)
+- `ANSIColors.GREEN` — Green color (`\033[92m`)
+- `ANSIColors.GRAY` — Gray color (`\033[90m`)
+
+**Example:**
+```python
+from apathetic_logger import ANSIColors
+
+message = f"{ANSIColors.CYAN}Colored text{ANSIColors.RESET}"
+```
 
 ### Tag Styles
 

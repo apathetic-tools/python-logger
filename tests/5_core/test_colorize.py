@@ -33,12 +33,20 @@ def test_colorize_explicit_true_false(
 
     # --- execute and verify ---
     assert (
-        direct_logger.colorize(text, mod_alogs.ApatheticLogger.GREEN, enable_color=True)
-    ) == f"{mod_alogs.ApatheticLogger.GREEN}{text}{mod_alogs.ApatheticLogger.RESET}"
+        direct_logger.colorize(
+            text,
+            mod_alogs.ApatheticLogger.ANSIColors.GREEN,
+            enable_color=True,
+        )
+    ) == (
+        f"{mod_alogs.ApatheticLogger.ANSIColors.GREEN}"
+        f"{text}"
+        f"{mod_alogs.ApatheticLogger.ANSIColors.RESET}"
+    )
     assert (
         direct_logger.colorize(
             text,
-            mod_alogs.ApatheticLogger.GREEN,
+            mod_alogs.ApatheticLogger.ANSIColors.GREEN,
             enable_color=False,
         )
     ) == text
@@ -53,13 +61,16 @@ def test_colorize_respects_instance_flag(
 
     # --- execute and verify ---
     direct_logger.enable_color = True
-    assert (
-        direct_logger.colorize(text, mod_alogs.ApatheticLogger.GREEN)
-        == f"{mod_alogs.ApatheticLogger.GREEN}{text}{mod_alogs.ApatheticLogger.RESET}"
+    assert direct_logger.colorize(text, mod_alogs.ApatheticLogger.ANSIColors.GREEN) == (
+        f"{mod_alogs.ApatheticLogger.ANSIColors.GREEN}"
+        f"{text}"
+        f"{mod_alogs.ApatheticLogger.ANSIColors.RESET}"
     )
 
     direct_logger.enable_color = False
-    assert direct_logger.colorize(text, mod_alogs.ApatheticLogger.GREEN) == text
+    assert (
+        direct_logger.colorize(text, mod_alogs.ApatheticLogger.ANSIColors.GREEN) == text
+    )
 
 
 def test_colorize_does_not_mutate_text(
@@ -68,10 +79,10 @@ def test_colorize_does_not_mutate_text(
     """colorize() should not alter text content aside from color codes."""
     text = "safe!"
     direct_logger.enable_color = True
-    result = direct_logger.colorize(text, mod_alogs.ApatheticLogger.GREEN)
+    result = direct_logger.colorize(text, mod_alogs.ApatheticLogger.ANSIColors.GREEN)
     assert text in result
-    assert result.startswith(mod_alogs.ApatheticLogger.GREEN)
-    assert result.endswith(mod_alogs.ApatheticLogger.RESET)
+    assert result.startswith(mod_alogs.ApatheticLogger.ANSIColors.GREEN)
+    assert result.endswith(mod_alogs.ApatheticLogger.ANSIColors.RESET)
     # ensure text object itself wasn't modified
     assert text == "safe!"
 
@@ -81,9 +92,9 @@ def test_colorize_empty_text(
 ) -> None:
     """Empty strings should still produce proper output."""
     direct_logger.enable_color = True
-    assert (
-        direct_logger.colorize("", mod_alogs.ApatheticLogger.GREEN)
-        == f"{mod_alogs.ApatheticLogger.GREEN}{mod_alogs.ApatheticLogger.RESET}"
+    assert direct_logger.colorize("", mod_alogs.ApatheticLogger.ANSIColors.GREEN) == (
+        f"{mod_alogs.ApatheticLogger.ANSIColors.GREEN}"
+        f"{mod_alogs.ApatheticLogger.ANSIColors.RESET}"
     )
     direct_logger.enable_color = False
-    assert direct_logger.colorize("", mod_alogs.ApatheticLogger.GREEN) == ""
+    assert direct_logger.colorize("", mod_alogs.ApatheticLogger.ANSIColors.GREEN) == ""

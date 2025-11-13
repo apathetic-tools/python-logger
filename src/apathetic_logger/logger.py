@@ -50,14 +50,6 @@ class ApatheticLogger:
         "yes",
     }
 
-    # ANSI Colors
-    RESET: str = "\033[0m"
-    CYAN: str = "\033[36m"
-    YELLOW: str = "\033[93m"  # or \033[33m
-    RED: str = "\033[91m"  # or \033[31m # or background \033[41m
-    GREEN: str = "\033[92m"  # or \033[32m
-    GRAY: str = "\033[90m"
-
     # Logger levels
     TRACE_LEVEL: int = logging.DEBUG - 5
     # DEBUG      - builtin # verbose
@@ -77,15 +69,25 @@ class ApatheticLogger:
         "silent",  # disables all logging
     ]
 
+    # --- Nested Classes ----------------------------------------------------
+
+    class ANSIColors:
+        """ANSI color code constants."""
+
+        RESET: str = "\033[0m"
+        CYAN: str = "\033[36m"
+        YELLOW: str = "\033[93m"  # or \033[33m
+        RED: str = "\033[91m"  # or \033[31m # or background \033[41m
+        GREEN: str = "\033[92m"  # or \033[32m
+        GRAY: str = "\033[90m"
+
     TAG_STYLES: ClassVar[dict[str, tuple[str, str]]] = {
-        "TRACE": (GRAY, "[TRACE]"),
-        "DEBUG": (CYAN, "[DEBUG]"),
+        "TRACE": (ANSIColors.GRAY, "[TRACE]"),
+        "DEBUG": (ANSIColors.CYAN, "[DEBUG]"),
         "WARNING": ("", "⚠️ "),
         "ERROR": ("", "❌ "),
         "CRITICAL": ("", "💥 "),
     }
-
-    # --- Nested Classes ----------------------------------------------------
 
     class Logger(logging.Logger):
         """Logger for all Apathetic tools."""
@@ -266,7 +268,11 @@ class ApatheticLogger:
         ) -> str:
             if enable_color is None:
                 enable_color = self.enable_color
-            return f"{color}{text}{ApatheticLogger.RESET}" if enable_color else text
+            return (
+                f"{color}{text}{ApatheticLogger.ANSIColors.RESET}"
+                if enable_color
+                else text
+            )
 
         def trace(self, msg: str, *args: Any, **kwargs: Any) -> None:
             if self.isEnabledFor(ApatheticLogger.TRACE_LEVEL):
@@ -351,7 +357,7 @@ class ApatheticLogger:
             msg = super().format(record)
             if tag_text:
                 if getattr(record, "enable_color", False) and tag_color:
-                    prefix = f"{tag_color}{tag_text}{ApatheticLogger.RESET}"
+                    prefix = f"{tag_color}{tag_text}{ApatheticLogger.ANSIColors.RESET}"
                 else:
                     prefix = tag_text
                 return f"{prefix} {msg}"
