@@ -3,13 +3,9 @@
 
 from __future__ import annotations
 
-import builtins
-import importlib
 import inspect
 import logging
-import sys
-from collections.abc import Callable
-from typing import Any, cast
+from typing import cast
 
 from .constants import _ApatheticLogger_Constants  # pyright: ignore[reportPrivateUsage]
 from .dual_stream_handler import (
@@ -19,6 +15,9 @@ from .logger import _ApatheticLogger_Logger  # pyright: ignore[reportPrivateUsag
 from .safe_log import _ApatheticLogger_SafeLog  # pyright: ignore[reportPrivateUsage]
 from .tag_formatter import (
     _ApatheticLogger_TagFormatter,  # pyright: ignore[reportPrivateUsage]
+)
+from .test_trace import (
+    _ApatheticLogger_TestTrace,  # pyright: ignore[reportPrivateUsage]
 )
 
 
@@ -30,10 +29,6 @@ _registered_log_level_env_vars: list[str] | None = None
 _registered_default_log_level: str | None = None
 _registered_logger_name: str | None = None
 
-# Lazy, safe import — avoids patched time modules
-#   in environments like pytest or eventlet
-_real_time = importlib.import_module("time")
-
 
 # --- Apathetic Logger Namespace -------------------------------------------
 
@@ -44,6 +39,7 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     _ApatheticLogger_Logger,
     _ApatheticLogger_SafeLog,
     _ApatheticLogger_TagFormatter,
+    _ApatheticLogger_TestTrace,
 ):
     """Namespace for apathetic logger functionality.
 
@@ -55,38 +51,11 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     The DualStreamHandler class is provided via the
     _ApatheticLogger_DualStreamHandler mixin.
     The safe_log static method is provided via the _ApatheticLogger_SafeLog mixin.
+    The TEST_TRACE and make_test_trace static methods are provided via the
+    _ApatheticLogger_TestTrace mixin.
     """
 
     # --- Static Methods ----------------------------------------------------
-
-    @staticmethod
-    def make_test_trace(icon: str = "🧪") -> Callable[..., Any]:
-        def local_trace(label: str, *args: Any) -> Any:
-            return ApatheticLogger.TEST_TRACE(label, *args, icon=icon)
-
-        return local_trace
-
-    @staticmethod
-    def TEST_TRACE(label: str, *args: Any, icon: str = "🧪") -> None:  # noqa: N802
-        """Emit a synchronized, flush-safe diagnostic line.
-
-        Args:
-            label: Short identifier or context string.
-            *args: Optional values to append.
-            icon: Emoji prefix/suffix for easier visual scanning.
-
-        """
-        if not ApatheticLogger.TEST_TRACE_ENABLED:
-            return
-
-        ts = _real_time.monotonic()
-        # builtins.print more reliable than sys.stdout.write + sys.stdout.flush
-        builtins.print(
-            f"{icon} [TEST TRACE {ts:.6f}] {label}",
-            *args,
-            file=sys.__stderr__,
-            flush=True,
-        )
 
     @staticmethod
     def _extract_top_level_package(package_name: str | None) -> str | None:
