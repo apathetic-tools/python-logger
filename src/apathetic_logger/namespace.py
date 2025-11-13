@@ -12,6 +12,9 @@ from .dual_stream_handler import (
     _ApatheticLogger_DualStreamHandler,  # pyright: ignore[reportPrivateUsage]
 )
 from .logger import _ApatheticLogger_Logger  # pyright: ignore[reportPrivateUsage]
+from .register_log_level_env_vars import (
+    _ApatheticLogger_RegisterLogLevelEnvVars,  # pyright: ignore[reportPrivateUsage]
+)
 from .safe_log import _ApatheticLogger_SafeLog  # pyright: ignore[reportPrivateUsage]
 from .tag_formatter import (
     _ApatheticLogger_TagFormatter,  # pyright: ignore[reportPrivateUsage]
@@ -37,6 +40,7 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     _ApatheticLogger_Constants,
     _ApatheticLogger_DualStreamHandler,
     _ApatheticLogger_Logger,
+    _ApatheticLogger_RegisterLogLevelEnvVars,
     _ApatheticLogger_SafeLog,
     _ApatheticLogger_TagFormatter,
     _ApatheticLogger_TestTrace,
@@ -50,6 +54,8 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     The TagFormatter class is provided via the _ApatheticLogger_TagFormatter mixin.
     The DualStreamHandler class is provided via the
     _ApatheticLogger_DualStreamHandler mixin.
+    The register_log_level_env_vars static method is provided via the
+    _ApatheticLogger_RegisterLogLevelEnvVars mixin.
     The safe_log static method is provided via the _ApatheticLogger_SafeLog mixin.
     The TEST_TRACE and make_test_trace static methods are provided via the
     _ApatheticLogger_TestTrace mixin.
@@ -72,30 +78,6 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
         if "." in package_name:
             return package_name.split(".", 1)[0]
         return package_name
-
-    @staticmethod
-    def register_log_level_env_vars(env_vars: list[str]) -> None:
-        """Register environment variable names to check for log level.
-
-        The environment variables will be checked in order, and the first
-        non-empty value found will be used.
-
-        Args:
-            env_vars: List of environment variable names to check
-                (e.g., ["SERGER_LOG_LEVEL", "LOG_LEVEL"])
-
-        Example:
-            >>> from apathetic_logger import ApatheticLogger
-            >>> ApatheticLogger.register_log_level_env_vars(
-            ...     ["MYAPP_LOG_LEVEL", "LOG_LEVEL"]
-            ... )
-        """
-        global _registered_log_level_env_vars  # noqa: PLW0603
-        _registered_log_level_env_vars = env_vars
-        ApatheticLogger.TEST_TRACE(
-            "register_log_level_env_vars() called",
-            f"env_vars={env_vars}",
-        )
 
     @staticmethod
     def register_default_log_level(default_level: str) -> None:
