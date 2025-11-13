@@ -18,6 +18,9 @@ from .register_default_log_level import (
 from .register_log_level_env_vars import (
     _ApatheticLogger_RegisterLogLevelEnvVars,  # pyright: ignore[reportPrivateUsage]
 )
+from .register_logger_name import (
+    _ApatheticLogger_RegisterLoggerName,  # pyright: ignore[reportPrivateUsage]
+)
 from .safe_log import _ApatheticLogger_SafeLog  # pyright: ignore[reportPrivateUsage]
 from .tag_formatter import (
     _ApatheticLogger_TagFormatter,  # pyright: ignore[reportPrivateUsage]
@@ -45,6 +48,7 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     _ApatheticLogger_Logger,
     _ApatheticLogger_RegisterDefaultLogLevel,
     _ApatheticLogger_RegisterLogLevelEnvVars,
+    _ApatheticLogger_RegisterLoggerName,
     _ApatheticLogger_SafeLog,
     _ApatheticLogger_TagFormatter,
     _ApatheticLogger_TestTrace,
@@ -62,76 +66,14 @@ class ApatheticLogger(  # pyright: ignore[reportPrivateUsage]
     _ApatheticLogger_RegisterDefaultLogLevel mixin.
     The register_log_level_env_vars static method is provided via the
     _ApatheticLogger_RegisterLogLevelEnvVars mixin.
+    The register_logger_name static method is provided via the
+    _ApatheticLogger_RegisterLoggerName mixin.
     The safe_log static method is provided via the _ApatheticLogger_SafeLog mixin.
     The TEST_TRACE and make_test_trace static methods are provided via the
     _ApatheticLogger_TestTrace mixin.
     """
 
     # --- Static Methods ----------------------------------------------------
-
-    @staticmethod
-    def _extract_top_level_package(package_name: str | None) -> str | None:
-        """Extract the top-level package name from a full package path.
-
-        Args:
-            package_name: Full package name (e.g., "serger.logs")
-
-        Returns:
-            Top-level package name (e.g., "serger") or None if package_name is None
-        """
-        if package_name is None:
-            return None
-        if "." in package_name:
-            return package_name.split(".", 1)[0]
-        return package_name
-
-    @staticmethod
-    def register_logger_name(logger_name: str | None = None) -> None:
-        """Register a logger name for use by get_logger().
-
-        This allows applications to specify which logger name to use.
-        The actual logger instance is stored by Python's logging module
-        via logging.getLogger(), so we only need to store the name.
-
-        If logger_name is not provided, the top-level package is automatically
-        extracted from this module's __package__ attribute. For example, if
-        this module is in "serger.logs", it will default to "serger".
-
-        Args:
-            logger_name: The name of the logger to retrieve (e.g., "serger").
-                If None, extracts the top-level package from __package__.
-
-        Example:
-            >>> # Explicit registration
-            >>> from apathetic_logger import ApatheticLogger
-            >>> ApatheticLogger.register_logger_name("myapp")
-
-            >>> # Auto-infer from __package__
-            >>> ApatheticLogger.register_logger_name()
-            ...     # Uses top-level package from __package__
-        """
-        global _registered_logger_name  # noqa: PLW0603
-
-        auto_inferred = False
-        if logger_name is None:
-            # Extract top-level package from this module's __package__
-            package = globals().get("__package__")
-            if package:
-                logger_name = ApatheticLogger._extract_top_level_package(package)
-                auto_inferred = True
-            if logger_name is None:
-                _msg = (
-                    "Cannot auto-infer logger name: __package__ is not set. "
-                    "Please call register_logger_name() with an explicit logger name."
-                )
-                raise RuntimeError(_msg)
-
-        _registered_logger_name = logger_name
-        ApatheticLogger.TEST_TRACE(
-            "register_logger_name() called",
-            f"name={logger_name}",
-            f"auto_inferred={auto_inferred}",
-        )
 
     @staticmethod
     def get_logger() -> ApatheticLogger.Logger:

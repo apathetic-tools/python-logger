@@ -1,0 +1,96 @@
+"""RegisterLoggerName functionality for Apathetic Logger."""
+
+from __future__ import annotations
+
+import sys
+from typing import Any
+
+
+def _get_namespace_module() -> Any:
+    """Get the namespace module at runtime.
+
+    This avoids circular import issues by accessing the namespace
+    through the module system after it's been created.
+    """
+    # Access through sys.modules to avoid circular import
+    namespace_module = sys.modules.get("apathetic_logger.namespace")
+    if namespace_module is None:
+        # Fallback: import if not yet loaded
+        namespace_module = sys.modules["apathetic_logger.namespace"]
+    return namespace_module
+
+
+class _ApatheticLogger_RegisterLoggerName:  # noqa: N801  # pyright: ignore[reportUnusedClass]
+    """Mixin class that provides the register_logger_name static method.
+
+    This class contains the register_logger_name implementation as a static
+    method. When mixed into ApatheticLogger, it provides
+    ApatheticLogger.register_logger_name.
+    """
+
+    @staticmethod
+    def _extract_top_level_package(package_name: str | None) -> str | None:
+        """Extract the top-level package name from a full package path.
+
+        Args:
+            package_name: Full package name (e.g., "serger.logs")
+
+        Returns:
+            Top-level package name (e.g., "serger") or None if package_name is None
+        """
+        if package_name is None:
+            return None
+        if "." in package_name:
+            return package_name.split(".", 1)[0]
+        return package_name
+
+    @staticmethod
+    def register_logger_name(logger_name: str | None = None) -> None:
+        """Register a logger name for use by get_logger().
+
+        This allows applications to specify which logger name to use.
+        The actual logger instance is stored by Python's logging module
+        via logging.getLogger(), so we only need to store the name.
+
+        If logger_name is not provided, the top-level package is automatically
+        extracted from this module's __package__ attribute. For example, if
+        this module is in "serger.logs", it will default to "serger".
+
+        Args:
+            logger_name: The name of the logger to retrieve (e.g., "serger").
+                If None, extracts the top-level package from __package__.
+
+        Example:
+            >>> # Explicit registration
+            >>> from apathetic_logger import ApatheticLogger
+            >>> ApatheticLogger.register_logger_name("myapp")
+
+            >>> # Auto-infer from __package__
+            >>> ApatheticLogger.register_logger_name()
+            ...     # Uses top-level package from __package__
+        """
+        namespace_module = _get_namespace_module()
+        auto_inferred = False
+        if logger_name is None:
+            # Extract top-level package from the namespace module's __package__
+            package = getattr(namespace_module, "__package__", None)
+            if package:
+                # Access _extract_top_level_package via the namespace class
+                namespace = namespace_module.ApatheticLogger
+                logger_name = namespace._extract_top_level_package(package)  # noqa: SLF001
+                auto_inferred = True
+            if logger_name is None:
+                _msg = (
+                    "Cannot auto-infer logger name: __package__ is not set. "
+                    "Please call register_logger_name() with an explicit logger name."
+                )
+                raise RuntimeError(_msg)
+
+        namespace_module._registered_logger_name = logger_name  # noqa: SLF001
+        # Access TEST_TRACE via the namespace class
+        namespace = namespace_module.ApatheticLogger
+        namespace.TEST_TRACE(
+            "register_logger_name() called",
+            f"name={logger_name}",
+            f"auto_inferred={auto_inferred}",
+        )
