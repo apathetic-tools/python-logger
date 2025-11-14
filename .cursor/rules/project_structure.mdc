@@ -14,3 +14,8 @@ alwaysApply: true
 - `src/serger/` - Main source code
 - `tests/` - Test suite
 - `dev/` - Development scripts
+
+### Test Directory Structure
+- **`__init__.py` files in tests**: Only `tests/` and `tests/utils/` should have `__init__.py` files
+- **Do NOT add `__init__.py`** to test subdirectories (e.g., `tests/0_tooling/`, `tests/3_independant/`, `tests/5_core/`, `tests/9_integration/`, `tests/10_app_integration/`)
+- Test subdirectories are not Python packages and should not be treated as such by type checkers

@@ -246,6 +246,11 @@ Serger is a Python module stitcher that combines multiple source files into a si
 - `tests/` - Test suite
 - `dev/` - Development scripts
 
+### Test Directory Structure
+- **`__init__.py` files in tests**: Only `tests/` and `tests/utils/` should have `__init__.py` files
+- **Do NOT add `__init__.py`** to test subdirectories (e.g., `tests/0_tooling/`, `tests/3_independant/`, `tests/5_core/`, `tests/9_integration/`, `tests/10_app_integration/`)
+- Test subdirectories are not Python packages and should not be treated as such by type checkers
+
 # Type Checking
 
 ### Type Checking and Linting Best Practices
@@ -277,7 +282,24 @@ Serger is a Python module stitcher that combines multiple source files into a si
     - **Example**: `from typing import cast; result = cast(PathResolved, dict_obj)`
 - **Defensive checks**: Runtime checks like `isinstance()` with ignore comments are only acceptable as defensive checks when data comes from external sources (function parameters, config files, user input). Do NOT use for constants or values that are known and can be typed properly within the function.
   - **Acceptable**: `if not isinstance(package, str):  # pyright: ignore[reportUnnecessaryIsInstance]` when `package` comes from parsed config file
-  - **Not acceptable**: `if isinstance(CONSTANT_VALUE, str):` when `CONSTANT_VALUE` is a module-level constant that can be properly typed
+  - **Not acceptable**: `if isinstance(CONSTANT_VALUE, str):` when `CONSTANT_VALUE` is a module-level constant that can be typed properly
+
+#### Configuration File Changes
+
+- **NEVER modify linter/formatter/type checker configuration files to "fix" errors**
+- **Forbidden changes**: Do NOT modify these files to suppress or work around errors:
+  - `pyproject.toml` (ruff, mypy, pyright, pytest configuration)
+  - `pytest.ini` (pytest configuration)
+  - Any new configuration files for these tools
+- **Required action**: If you believe changing configuration is the correct solution:
+  1. **STOP** and do NOT make the change
+  2. **PROMPT the developer** explaining:
+     - What error you encountered
+     - Why you think a configuration change might be needed
+     - What specific change you're proposing
+     - Ask for explicit approval before proceeding
+- **Rationale**: Configuration changes affect the entire project and may hide real issues. The developer should make these decisions intentionally.
+- **Exception**: You may modify configuration if the user explicitly requests it in their query
 
 # Workflow
 
