@@ -10,20 +10,6 @@ from .test_trace import (
 )
 
 
-def _get_namespace_module() -> Any:
-    """Get the namespace module at runtime.
-
-    This avoids circular import issues by accessing the namespace
-    through the module system after it's been created.
-    """
-    # Access through sys.modules to avoid circular import
-    namespace_module = sys.modules.get("apathetic_logging.namespace")
-    if namespace_module is None:
-        # Fallback: import if not yet loaded
-        namespace_module = sys.modules["apathetic_logging.namespace"]
-    return namespace_module
-
-
 class ApatheticLogging_Priv_RegisterLogLevelEnvVars:  # noqa: N801  # pyright: ignore[reportUnusedClass]
     """Mixin class that provides the register_log_level_env_vars static method.
 
@@ -31,6 +17,20 @@ class ApatheticLogging_Priv_RegisterLogLevelEnvVars:  # noqa: N801  # pyright: i
     method. When mixed into ApatheticLogging, it provides
     ApatheticLogging.register_log_level_env_vars.
     """
+
+    @staticmethod
+    def _RegisterLogLevelEnvVars_get_nsmodule() -> Any:  # noqa: N802
+        """Get the namespace module at runtime.
+
+        This avoids circular import issues by accessing the namespace
+        through the module system after it's been created.
+        """
+        # Access through sys.modules to avoid circular import
+        namespace_module = sys.modules.get("apathetic_logging.namespace")
+        if namespace_module is None:
+            # Fallback: import if not yet loaded
+            namespace_module = sys.modules["apathetic_logging.namespace"]
+        return namespace_module
 
     @staticmethod
     def register_log_level_env_vars(env_vars: list[str]) -> None:
@@ -49,7 +49,8 @@ class ApatheticLogging_Priv_RegisterLogLevelEnvVars:  # noqa: N801  # pyright: i
             ...     ["MYAPP_LOG_LEVEL", "LOG_LEVEL"]
             ... )
         """
-        namespace_module = _get_namespace_module()
+        cls = ApatheticLogging_Priv_RegisterLogLevelEnvVars
+        namespace_module = cls._RegisterLogLevelEnvVars_get_nsmodule()
         namespace_module._registered_log_level_env_vars = env_vars  # noqa: SLF001
         ApatheticLogging_Priv_TestTrace.TEST_TRACE(
             "register_log_level_env_vars() called",

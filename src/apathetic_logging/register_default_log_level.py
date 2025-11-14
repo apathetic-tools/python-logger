@@ -10,20 +10,6 @@ from .test_trace import (
 )
 
 
-def _get_namespace_module() -> Any:
-    """Get the namespace module at runtime.
-
-    This avoids circular import issues by accessing the namespace
-    through the module system after it's been created.
-    """
-    # Access through sys.modules to avoid circular import
-    namespace_module = sys.modules.get("apathetic_logging.namespace")
-    if namespace_module is None:
-        # Fallback: import if not yet loaded
-        namespace_module = sys.modules["apathetic_logging.namespace"]
-    return namespace_module
-
-
 class ApatheticLogging_Priv_RegisterDefaultLogLevel:  # noqa: N801  # pyright: ignore[reportUnusedClass]
     """Mixin class that provides the register_default_log_level static method.
 
@@ -31,6 +17,20 @@ class ApatheticLogging_Priv_RegisterDefaultLogLevel:  # noqa: N801  # pyright: i
     method. When mixed into ApatheticLogging, it provides
     ApatheticLogging.register_default_log_level.
     """
+
+    @staticmethod
+    def _RegisterDefaultLogLevel_get_nsmodule() -> Any:  # noqa: N802
+        """Get the namespace module at runtime.
+
+        This avoids circular import issues by accessing the namespace
+        through the module system after it's been created.
+        """
+        # Access through sys.modules to avoid circular import
+        namespace_module = sys.modules.get("apathetic_logging.namespace")
+        if namespace_module is None:
+            # Fallback: import if not yet loaded
+            namespace_module = sys.modules["apathetic_logging.namespace"]
+        return namespace_module
 
     @staticmethod
     def register_default_log_level(default_level: str) -> None:
@@ -43,7 +43,8 @@ class ApatheticLogging_Priv_RegisterDefaultLogLevel:  # noqa: N801  # pyright: i
             >>> from apathetic_logging import ApatheticLogging
             >>> ApatheticLogging.register_default_log_level("warning")
         """
-        namespace_module = _get_namespace_module()
+        cls = ApatheticLogging_Priv_RegisterDefaultLogLevel
+        namespace_module = cls._RegisterDefaultLogLevel_get_nsmodule()
         namespace_module._registered_default_log_level = default_level  # noqa: SLF001
         ApatheticLogging_Priv_TestTrace.TEST_TRACE(
             "register_default_log_level() called",
