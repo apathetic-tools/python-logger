@@ -4,7 +4,7 @@
 # Full text: https://github.com/apathetic-tools/serger/blob/main/LICENSE
 # Version: 0.1.0
 # Commit: unknown (local build)
-# Build Date: 2025-11-13 17:58:07 UTC
+# Build Date: 2025-11-14 07:24:39 UTC
 # Repo: https://github.com/apathetic-tools/serger
 
 # ruff: noqa: E402
@@ -17,7 +17,7 @@ Serger — Stitch your module into a single file.
 This single-file version is auto-generated from modular sources.
 Version: 0.1.0
 Commit: unknown (local build)
-Built: 2025-11-13 17:58:07 UTC
+Built: 2025-11-14 07:24:39 UTC
 """
 
 import argparse
@@ -69,7 +69,7 @@ from typing_extensions import NotRequired
 
 __version__ = "0.1.0"
 __commit__ = "unknown (local build)"
-__build_date__ = "2025-11-13 17:58:07 UTC"
+__build_date__ = "2025-11-14 07:24:39 UTC"
 __STANDALONE__ = True
 __STITCH_SOURCE__ = "serger"
 __package__ = "serger"
@@ -1517,6 +1517,44 @@ def safe_isinstance(value: Any, expected_type: Any) -> bool:  # noqa: PLR0911
         return False
 
 
+# === serger.meta ===
+# src/serger/meta.py
+
+"""Centralized program identity constants for Serger."""
+
+
+_BASE = "serger"
+
+# CLI script name (the executable or `poetry run` entrypoint)
+PROGRAM_SCRIPT = _BASE
+
+# config file name
+PROGRAM_CONFIG = _BASE
+
+# Human-readable name for banners, help text, etc.
+PROGRAM_DISPLAY = _BASE.replace("-", " ").title()
+
+# Python package / import name
+PROGRAM_PACKAGE = _BASE.replace("-", "_")
+
+# Environment variable prefix (used for <APP>_BUILD_LOG_LEVEL, etc.)
+PROGRAM_ENV = _BASE.replace("-", "_").upper()
+
+# Short tagline or __DESCRIPTION for help screens and metadata
+DESCRIPTION = "Stitch your module into a single file."
+
+
+@dataclass(frozen=True)
+class Metadata:
+    """Lightweight result from get_metadata(), containing version and commit info."""
+
+    version: str
+    commit: str
+
+    def __str__(self) -> str:
+        return f"{self.version} ({self.commit})"
+
+
 # === serger.config.config_types ===
 # src/serger/config/config_types.py
 
@@ -1741,44 +1779,6 @@ DEFAULT_CATEGORIES: dict[str, dict[str, Any]] = {
         },
     },
 }
-
-
-# === serger.meta ===
-# src/serger/meta.py
-
-"""Centralized program identity constants for Serger."""
-
-
-_BASE = "serger"
-
-# CLI script name (the executable or `poetry run` entrypoint)
-PROGRAM_SCRIPT = _BASE
-
-# config file name
-PROGRAM_CONFIG = _BASE
-
-# Human-readable name for banners, help text, etc.
-PROGRAM_DISPLAY = _BASE.replace("-", " ").title()
-
-# Python package / import name
-PROGRAM_PACKAGE = _BASE.replace("-", "_")
-
-# Environment variable prefix (used for <APP>_BUILD_LOG_LEVEL, etc.)
-PROGRAM_ENV = _BASE.replace("-", "_").upper()
-
-# Short tagline or __DESCRIPTION for help screens and metadata
-DESCRIPTION = "Stitch your module into a single file."
-
-
-@dataclass(frozen=True)
-class Metadata:
-    """Lightweight result from get_metadata(), containing version and commit info."""
-
-    version: str
-    commit: str
-
-    def __str__(self) -> str:
-        return f"{self.version} ({self.commit})"
 
 
 # === apathetic_utils.files ===
@@ -2126,7 +2126,7 @@ def fnmatchcase_portable(path: str, pattern: str) -> bool:
     return bool(_compile_glob_recursive(pattern).match(path))
 
 
-def is_excluded_raw(  # noqa: PLR0911
+def is_excluded_raw(  # noqa: PLR0911, PLR0912, PLR0915, C901
     path: Path | str,
     exclude_patterns: list[str],
     root: Path | str,
@@ -2136,6 +2136,14 @@ def is_excluded_raw(  # noqa: PLR0911
     - Treats 'path' as relative to 'root' unless already absolute.
     - If 'root' is a file, match directly.
     - Handles absolute or relative glob patterns.
+
+    Special behavior for patterns with '../':
+    Unlike rsync/ruff (which don't support '../' in exclude patterns),
+    serger allows patterns with '../' to explicitly match files outside
+    the exclude root. This enables config files in subdirectories to
+    exclude files elsewhere in the project. Patterns containing '../'
+    are resolved relative to the exclude root, then matched against
+    the absolute file path.
 
     Note:
     The function does not require `root` to exist; if it does not,
@@ -2166,15 +2174,109 @@ def is_excluded_raw(  # noqa: PLR0911
 
     # Otherwise, treat as directory root.
     full_path = path if path.is_absolute() else (root / path)
+    full_path = full_path.resolve()
 
+    # Try to get relative path for standard matching
     try:
         rel = str(full_path.relative_to(root)).replace("\\", "/")
+        path_outside_root = False
     except ValueError:
-        # Path lies outside the root; skip matching
-        return False
+        # Path lies outside the root
+        path_outside_root = True
+        # For patterns starting with **/, we can still match against filename
+        # or absolute path. For other patterns, we need rel, so use empty string
+        # as fallback (won't match non-**/ patterns)
+        rel = ""
 
     for pattern in exclude_patterns:
         pat = pattern.replace("\\", "/")
+
+        # Handle patterns starting with **/ - these should match even for files
+        # outside the exclude root (matching rsync/ruff behavior)
+        if pat.startswith("**/"):
+            # For **/ patterns, match against:
+            # 1. The file's name (e.g., **/__init__.py matches any __init__.py)
+            # 2. The absolute path (for more complex patterns)
+            file_name = full_path.name
+            abs_path_str = str(full_path).replace("\\", "/")
+
+            # Remove **/ prefix and match against filename
+            pattern_suffix = pat[3:]  # Remove "**/" prefix
+            if fnmatchcase_portable(file_name, pattern_suffix):
+                logger.trace(
+                    f"[is_excluded_raw] MATCHED **/ pattern {pattern!r} "
+                    f"against filename {file_name}"
+                )
+                return True
+
+            # Also try matching against absolute path
+            # (for patterns like **/subdir/file.py)
+            if fnmatchcase_portable(abs_path_str, pat):
+                logger.trace(
+                    f"[is_excluded_raw] MATCHED **/ pattern {pattern!r} "
+                    f"against absolute path"
+                )
+                return True
+
+            # Continue to next pattern if we're outside root and **/ didn't match
+            if path_outside_root:
+                continue
+
+        # Handle patterns with ../ - serger-specific behavior to allow
+        # patterns that explicitly navigate outside the exclude root
+        if "../" in pat or pat.startswith("../"):
+            # Resolve the pattern relative to the exclude root
+            # We need to handle glob patterns (with **) by resolving the base
+            # path and preserving the glob part
+            try:
+                abs_path_str = str(full_path).replace("\\", "/")
+
+                # If pattern contains glob chars, split and resolve carefully
+                if "*" in pat or "?" in pat or "[" in pat:
+                    # Find the first glob character to split base from pattern
+                    glob_chars = ["*", "?", "["]
+                    first_glob_pos = min(
+                        (pat.find(c) for c in glob_chars if c in pat),
+                        default=len(pat),
+                    )
+
+                    # Split into base path (before glob) and pattern part
+                    base_part = pat[:first_glob_pos].rstrip("/")
+                    pattern_part = pat[first_glob_pos:]
+
+                    # Resolve the base part relative to root
+                    if base_part:
+                        resolved_base = (root / base_part).resolve()
+                        resolved_pattern_str = (
+                            str(resolved_base).replace("\\", "/") + "/" + pattern_part
+                        )
+                    else:
+                        # Pattern starts with glob, resolve root and prepend pattern
+                        resolved_pattern_str = (
+                            str(root).replace("\\", "/") + "/" + pattern_part
+                        )
+                else:
+                    # No glob chars, resolve normally
+                    resolved_pattern = (root / pat).resolve()
+                    resolved_pattern_str = str(resolved_pattern).replace("\\", "/")
+
+                # Match the resolved pattern against the absolute file path
+                if fnmatchcase_portable(abs_path_str, resolved_pattern_str):
+                    logger.trace(
+                        f"[is_excluded_raw] MATCHED ../ pattern {pattern!r} "
+                        f"(resolved to {resolved_pattern_str})"
+                    )
+                    return True
+            except (ValueError, RuntimeError):
+                # Pattern resolves outside filesystem or invalid, skip
+                logger.trace(
+                    f"[is_excluded_raw] Could not resolve ../ pattern {pattern!r}"
+                )
+
+        # If path is outside root and pattern doesn't start with **/ or
+        # contain ../, skip
+        if path_outside_root:
+            continue
 
         logger.trace(f"[is_excluded_raw] Testing pattern {pattern!r} against {rel}")
 
@@ -5051,7 +5153,11 @@ def compute_module_order(  # noqa: C901, PLR0912, PLR0915
         except SyntaxError:
             continue
 
-        for node in tree.body:
+        # Use ast.walk() to find ALL imports, including those inside
+        # if/else blocks, functions, etc. This is necessary because
+        # imports inside conditionals (like "if not __STANDALONE__: from .x import y")
+        # still represent dependencies that affect module ordering.
+        for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom):
                 # Handle relative imports (node.level > 0)
                 if node.level > 0:
@@ -7983,17 +8089,17 @@ def _setup_pkg_modules(pkg_name: str, module_names: list[str]) -> None:
 
 
 _create_pkg_module("serger")
+_create_pkg_module("apathetic_utils")
 _create_pkg_module("apathetic_schema")
 _create_pkg_module("apathetic_logs")
-_create_pkg_module("apathetic_utils")
-_create_pkg_module("serger.utils")
 _create_pkg_module("serger.config")
+_create_pkg_module("serger.utils")
 
 _setup_pkg_modules(
     "serger",
     [
-        "serger.constants",
         "serger.meta",
+        "serger.constants",
         "serger.logs",
         "serger.verify_script",
         "serger.stitch",
@@ -8003,8 +8109,6 @@ _setup_pkg_modules(
         "serger.cli",
     ],
 )
-_setup_pkg_modules("apathetic_schema", ["apathetic_schema.schema"])
-_setup_pkg_modules("apathetic_logs", ["apathetic_logs.logs"])
 _setup_pkg_modules(
     "apathetic_utils",
     [
@@ -8016,14 +8120,8 @@ _setup_pkg_modules(
         "apathetic_utils.matching",
     ],
 )
-_setup_pkg_modules(
-    "serger.utils",
-    [
-        "serger.utils.utils_types",
-        "serger.utils.utils_matching",
-        "serger.utils.utils_modules",
-    ],
-)
+_setup_pkg_modules("apathetic_schema", ["apathetic_schema.schema"])
+_setup_pkg_modules("apathetic_logs", ["apathetic_logs.logs"])
 _setup_pkg_modules(
     "serger.config",
     [
@@ -8031,6 +8129,14 @@ _setup_pkg_modules(
         "serger.config.config_validate",
         "serger.config.config_loader",
         "serger.config.config_resolve",
+    ],
+)
+_setup_pkg_modules(
+    "serger.utils",
+    [
+        "serger.utils.utils_types",
+        "serger.utils.utils_matching",
+        "serger.utils.utils_modules",
     ],
 )
 

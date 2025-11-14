@@ -83,3 +83,14 @@ class apathetic_logging(  # pyright: ignore[reportPrivateUsage] # noqa: N801
     - ``ANSIColors`` → ``ApatheticLogging_Priv_Constants``
     - ``TAG_STYLES`` → ``ApatheticLogging_Priv_Constants``
     """
+
+
+# Ensure logging module is extended with TRACE and SILENT levels
+# This must be called before any loggers are created
+# This runs when namespace.py is executed (both installed and stitched modes)
+# The method is idempotent, so safe to call multiple times if needed
+apathetic_logging.Logger.extend_logging_module()
+
+# Note: All exports are handled in __init__.py
+# - For library builds (installed/singlefile): __init__.py is included, exports happen
+# - For embedded builds: __init__.py is excluded, no exports (only class available)

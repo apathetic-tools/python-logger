@@ -10,7 +10,7 @@ Complete API documentation for Apathetic Python Logger.
 
 ## Core Functions
 
-### `get_logger() -> ApatheticLogging`
+### `get_logger() -> Logger`
 
 Return the registered logger instance.
 
