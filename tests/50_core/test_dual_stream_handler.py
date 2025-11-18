@@ -125,10 +125,10 @@ def test_dual_stream_handler_critical_goes_to_stderr(
     assert "test critical message" in err_buf.getvalue()
 
 
-def test_dual_stream_handler_detail_goes_to_stderr(
+def test_dual_stream_handler_detail_goes_to_stdout(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """DualStreamHandler should route DETAIL level to stderr."""
+    """DualStreamHandler should route DETAIL level to stdout."""
     # --- setup ---
     handler = mod_alogs.apathetic_logging.DualStreamHandler()
     logger = mod_alogs.Logger("test_detail")
@@ -144,8 +144,8 @@ def test_dual_stream_handler_detail_goes_to_stderr(
     logger.detail("test detail message")
 
     # --- verify ---
-    assert "test detail message" not in out_buf.getvalue()
-    assert "test detail message" in err_buf.getvalue()
+    assert "test detail message" in out_buf.getvalue()
+    assert "test detail message" not in err_buf.getvalue()
 
 
 def test_dual_stream_handler_minimal_goes_to_stdout(
@@ -192,9 +192,10 @@ def test_dual_stream_handler_test_level_bypasses_capture(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """TEST/TRACE/DEBUG/DETAIL bypass capsys via __stderr__ when logger level is TEST.
+    """TEST/TRACE/DEBUG bypass capsys via __stderr__ when logger level is TEST.
 
-    When logger level is set to TEST, TEST/TRACE/DEBUG/DETAIL messages bypass capture.
+    When logger level is set to TEST, TEST/TRACE/DEBUG messages bypass capture.
+    DETAIL goes to stdout (like INFO) and is captured normally.
     """
     # --- setup ---
     # Use a unique logger name to avoid conflicts
@@ -221,16 +222,17 @@ def test_dual_stream_handler_test_level_bypasses_capture(
     logger.warning("warning level message")  # Should still go to normal stderr
 
     # --- verify ---
-    # Check capsys - TEST/TRACE/DEBUG/DETAIL messages should NOT be captured here
+    # Check capsys - TEST/TRACE/DEBUG messages should NOT be captured here
     # (they bypass via __stderr__)
+    # DETAIL goes to stdout and IS captured normally
     captured = capsys.readouterr()
     out = captured.out.lower()
     err = captured.err.lower()
 
-    # Check bypass buffer - TEST/TRACE/DEBUG/DETAIL messages SHOULD be written here
+    # Check bypass buffer - TEST/TRACE/DEBUG messages SHOULD be written here
     bypass_output = bypass_buf.getvalue().lower()
 
-    # Verify TEST/TRACE/DEBUG/DETAIL messages are NOT in capsys (they bypass capture)
+    # Verify TEST/TRACE/DEBUG messages are NOT in capsys (they bypass capture)
     assert "[test" not in out, (
         "TEST messages should bypass capsys and write to sys.__stderr__ instead. "
         f"Found in capsys.out: {out[:200]}"
@@ -255,16 +257,18 @@ def test_dual_stream_handler_test_level_bypasses_capture(
         "DEBUG messages should bypass capsys and write to sys.__stderr__ instead. "
         f"Found in capsys.err: {err[:200]}"
     )
-    assert "[detail" not in out, (
-        "DETAIL messages should bypass capsys and write to sys.__stderr__ instead. "
+
+    # Verify DETAIL goes to stdout (captured normally, not bypassed)
+    assert "detail level message" in out, (
+        "DETAIL messages should go to stdout and be captured by capsys. "
         f"Found in capsys.out: {out[:200]}"
     )
-    assert "[detail" not in err, (
-        "DETAIL messages should bypass capsys and write to sys.__stderr__ instead. "
-        f"Found in capsys.err: {err[:200]}"
+    assert "detail level message" not in bypass_output, (
+        "DETAIL messages should not be in bypass buffer (they go to stdout). "
+        f"Bypass buffer: {bypass_output[:200]}"
     )
 
-    # Verify TEST/TRACE/DEBUG/DETAIL messages ARE in the bypass buffer (sys.__stderr__)
+    # Verify TEST/TRACE/DEBUG messages ARE in the bypass buffer (sys.__stderr__)
     assert "test level message" in bypass_output, (
         "TEST messages should appear in sys.__stderr__ bypass buffer. "
         f"Bypass buffer length: {len(bypass_output)} chars"
@@ -275,10 +279,6 @@ def test_dual_stream_handler_test_level_bypasses_capture(
     )
     assert "debug level message" in bypass_output, (
         "DEBUG messages should appear in sys.__stderr__ bypass buffer. "
-        f"Bypass buffer length: {len(bypass_output)} chars"
-    )
-    assert "detail level message" in bypass_output, (
-        "DETAIL messages should appear in sys.__stderr__ bypass buffer. "
         f"Bypass buffer length: {len(bypass_output)} chars"
     )
 

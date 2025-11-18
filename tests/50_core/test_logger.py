@@ -78,7 +78,7 @@ def capture_log_output(
     ("msg_level", "expected_stream"),
     [
         ("debug", "stderr"),
-        ("detail", "stderr"),
+        ("detail", "stdout"),
         ("info", "stdout"),
         ("minimal", "stdout"),
         ("warning", "stderr"),

@@ -17,10 +17,10 @@ class ApatheticLogging_Priv_DualStreamHandler:  # noqa: N801  # pyright: ignore[
     class DualStreamHandler(logging.StreamHandler):  # type: ignore[type-arg]
         """Send info to stdout, everything else to stderr.
 
-        INFO and MINIMAL go to stdout (normal program output).
-        TRACE, DEBUG, DETAIL, WARNING, ERROR, and CRITICAL go to stderr
+        INFO, MINIMAL, and DETAIL go to stdout (normal program output).
+        TRACE, DEBUG, WARNING, ERROR, and CRITICAL go to stderr
         (diagnostic/error output).
-        When logger level is TEST, TEST/TRACE/DEBUG/DETAIL messages bypass capture
+        When logger level is TEST, TEST/TRACE/DEBUG messages bypass capture
         by writing to sys.__stderr__ instead of sys.stderr. This allows
         debugging tests without breaking output assertions while still being
         capturable by subprocess.run(capture_output=True).
@@ -59,18 +59,17 @@ class ApatheticLogging_Priv_DualStreamHandler:  # noqa: N801  # pyright: ignore[
                 # WARNING, ERROR, CRITICAL → stderr (always, even in TEST mode)
                 # This ensures they still break tests as expected
                 self.stream = sys.stderr
-            elif (
-                level <= logging.DEBUG
-                or level == ApatheticLogging_Priv_Constants.DETAIL_LEVEL
-            ):
-                # TEST, TRACE, DEBUG, DETAIL → stderr (normal) or __stderr__
-                # (TEST mode bypass)
+            elif level <= logging.DEBUG:
+                # TEST, TRACE, DEBUG → stderr (normal) or __stderr__ (TEST mode bypass)
                 # Use __stderr__ so they bypass pytest capsys but are still
                 # capturable by subprocess.run(capture_output=True)
                 if is_test_mode:
                     self.stream = sys.__stderr__
                 else:
                     self.stream = sys.stderr
+            elif level == ApatheticLogging_Priv_Constants.DETAIL_LEVEL:
+                # DETAIL → stdout (normal program output, like INFO)
+                self.stream = sys.stdout
             elif level == ApatheticLogging_Priv_Constants.MINIMAL_LEVEL:
                 # MINIMAL → stdout (normal program output)
                 self.stream = sys.stdout
