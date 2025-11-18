@@ -45,4 +45,3 @@ def if_ci(ci_value: T, local_value: T) -> T:
         )
     """
     return ci_value if is_ci() else local_value
-

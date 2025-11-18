@@ -297,4 +297,3 @@ def test_set_level_validates_custom_level_string(
 
     direct_logger.setLevel("SILENT")
     assert direct_logger.level == mod_alogs.SILENT_LEVEL
-

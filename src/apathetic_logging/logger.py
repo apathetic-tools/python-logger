@@ -266,21 +266,11 @@ class ApatheticLogging_Priv_Logger:  # noqa: N801  # pyright: ignore[reportUnuse
 
             # Register custom levels with validation
             # addLevelName() also sets logging.TEST, logging.TRACE, etc. attributes
-            cls.addLevelName(
-                ApatheticLogging_Priv_Constants.TEST_LEVEL, "TEST"
-            )
-            cls.addLevelName(
-                ApatheticLogging_Priv_Constants.TRACE_LEVEL, "TRACE"
-            )
-            cls.addLevelName(
-                ApatheticLogging_Priv_Constants.DETAIL_LEVEL, "DETAIL"
-            )
-            cls.addLevelName(
-                ApatheticLogging_Priv_Constants.MINIMAL_LEVEL, "MINIMAL"
-            )
-            cls.addLevelName(
-                ApatheticLogging_Priv_Constants.SILENT_LEVEL, "SILENT"
-            )
+            cls.addLevelName(ApatheticLogging_Priv_Constants.TEST_LEVEL, "TEST")
+            cls.addLevelName(ApatheticLogging_Priv_Constants.TRACE_LEVEL, "TRACE")
+            cls.addLevelName(ApatheticLogging_Priv_Constants.DETAIL_LEVEL, "DETAIL")
+            cls.addLevelName(ApatheticLogging_Priv_Constants.MINIMAL_LEVEL, "MINIMAL")
+            cls.addLevelName(ApatheticLogging_Priv_Constants.SILENT_LEVEL, "SILENT")
 
             return True
 

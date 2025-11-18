@@ -107,4 +107,3 @@ def find_all_packages_under_path(root_path: Path) -> set[str]:
                 pass
 
     return detected
-
