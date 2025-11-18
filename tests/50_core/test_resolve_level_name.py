@@ -2,10 +2,17 @@
 """Tests for Logger.resolve_level_name() method."""
 
 import logging
+from typing import TYPE_CHECKING
 
 import pytest
 
 import apathetic_logging as mod_alogs
+
+
+if TYPE_CHECKING:
+    from apathetic_logging import Logger  # noqa: ICN003
+else:
+    Logger = mod_alogs.Logger
 
 
 @pytest.mark.parametrize(
@@ -19,7 +26,7 @@ import apathetic_logging as mod_alogs
     ],
 )
 def test_resolve_level_name_standard_levels(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
     level_name: str,
     expected: int,
 ) -> None:
@@ -32,7 +39,7 @@ def test_resolve_level_name_standard_levels(
 
 
 def test_resolve_level_name_case_insensitive(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """resolve_level_name() should handle case-insensitive level names."""
     # --- execute ---
@@ -47,7 +54,7 @@ def test_resolve_level_name_case_insensitive(
 
 
 def test_resolve_level_name_unknown_level(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """resolve_level_name() should return None for unknown level names."""
     # --- execute ---
@@ -58,7 +65,7 @@ def test_resolve_level_name_unknown_level(
 
 
 def test_resolve_level_name_custom_levels_resolved(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """resolve_level_name() resolves TRACE/DETAIL/MINIMAL/SILENT after extend.
 

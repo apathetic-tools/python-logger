@@ -2,10 +2,17 @@
 """Tests for addLevelName() and level validation features."""
 
 import logging
+from typing import TYPE_CHECKING
 
 import pytest
 
 import apathetic_logging as mod_alogs
+
+
+if TYPE_CHECKING:
+    from apathetic_logging import Logger  # noqa: ICN003
+else:
+    Logger = mod_alogs.Logger
 
 
 # ---------------------------------------------------------------------------
@@ -240,7 +247,7 @@ def test_add_level_name_matches_builtin_level_pattern() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_set_level_validates_custom_levels(direct_logger: mod_alogs.Logger) -> None:
+def test_set_level_validates_custom_levels(direct_logger: Logger) -> None:
     """setLevel() should validate custom levels are not <= 0."""
     # Valid custom levels should work
     direct_logger.setLevel(mod_alogs.TEST_LEVEL)
@@ -253,7 +260,7 @@ def test_set_level_validates_custom_levels(direct_logger: mod_alogs.Logger) -> N
     assert direct_logger.level == mod_alogs.SILENT_LEVEL
 
 
-def test_set_level_allows_builtin_levels(direct_logger: mod_alogs.Logger) -> None:
+def test_set_level_allows_builtin_levels(direct_logger: Logger) -> None:
     """setLevel() should allow built-in levels (all are > 0)."""
     # Built-in levels should work (they're all > 0, so pass validation)
     direct_logger.setLevel(logging.DEBUG)
@@ -267,7 +274,7 @@ def test_set_level_allows_builtin_levels(direct_logger: mod_alogs.Logger) -> Non
 
 
 def test_set_level_rejects_any_level_zero_or_negative(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """setLevel() should reject ANY level <= 0, not just our custom levels."""
     # Should reject level 0 (NOTSET)
@@ -285,7 +292,7 @@ def test_set_level_rejects_any_level_zero_or_negative(
 
 
 def test_set_level_validates_custom_level_string(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """setLevel() should validate custom levels when passed as string."""
     # Valid custom level strings should work

@@ -1,11 +1,11 @@
 # src/apathetic_logging/__init__.py
 """Apathetic Logging implementation."""
 
-import logging
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, TypeAlias, cast
 
 
 if TYPE_CHECKING:
+    from .logger import ApatheticLogging_Priv_Logger
     from .namespace import apathetic_logging as _apathetic_logging_class
 
 # Get reference to the namespace class
@@ -55,10 +55,13 @@ ANSIColors = apathetic_logging.ANSIColors
 # Classes
 DualStreamHandler = apathetic_logging.DualStreamHandler
 TagFormatter = apathetic_logging.TagFormatter
-# Type cast to help mypy understand Logger is a proper class type
 # Logger is a nested class in ApatheticLogging_Priv_Logger that
-# inherits from logging.Logger
-Logger = cast("type[logging.Logger]", apathetic_logging.Logger)
+# inherits from logging.Logger.
+# Use TypeAlias to help mypy understand this is a class type.
+if TYPE_CHECKING:
+    Logger: TypeAlias = ApatheticLogging_Priv_Logger.Logger
+else:
+    Logger = apathetic_logging.Logger
 
 # Functions
 get_logger = apathetic_logging.get_logger

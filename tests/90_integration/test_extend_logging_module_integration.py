@@ -39,8 +39,8 @@ def test_extend_logging_module_called_twice_is_safe() -> None:
     assert hasattr(logging, "MINIMAL")
     assert hasattr(logging, "SILENT")
     assert logging.TRACE == mod_alogs.apathetic_logging.TRACE_LEVEL  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
-    assert logging.DETAIL == mod_alogs.apathetic_logging.DETAIL_LEVEL  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
-    assert logging.MINIMAL == mod_alogs.apathetic_logging.MINIMAL_LEVEL  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
+    assert logging.DETAIL == mod_alogs.apathetic_logging.DETAIL_LEVEL  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
+    assert logging.MINIMAL == mod_alogs.apathetic_logging.MINIMAL_LEVEL  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
     assert logging.SILENT == mod_alogs.apathetic_logging.SILENT_LEVEL  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
 
 

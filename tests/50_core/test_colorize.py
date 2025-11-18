@@ -1,9 +1,17 @@
 # tests/50_core/test_colorize.py
 """Tests for color utility helpers in module.utils."""
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 import apathetic_logging as mod_alogs
+
+
+if TYPE_CHECKING:
+    from apathetic_logging import Logger  # noqa: ICN003
+else:
+    Logger = mod_alogs.Logger
 
 
 # ---------------------------------------------------------------------------
@@ -25,7 +33,7 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_colorize_explicit_true_false(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """Explicit enable_color argument forces color on or off."""
     # --- setup ---
@@ -53,7 +61,7 @@ def test_colorize_explicit_true_false(
 
 
 def test_colorize_respects_instance_flag(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """colorize() should honor logger.enable_color."""
     # --- setup ---
@@ -77,7 +85,7 @@ def test_colorize_respects_instance_flag(
 
 
 def test_colorize_does_not_mutate_text(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """colorize() should not alter text content aside from color codes."""
     text = "safe!"
@@ -91,7 +99,7 @@ def test_colorize_does_not_mutate_text(
 
 
 def test_colorize_empty_text(
-    direct_logger: mod_alogs.Logger,
+    direct_logger: Logger,
 ) -> None:
     """Empty strings should still produce proper output."""
     direct_logger.enable_color = True

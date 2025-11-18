@@ -2,11 +2,18 @@
 """Reusable fixtures for testing the Apathetic logger system."""
 
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 
 import apathetic_logging as mod_alogs
 from tests.utils import make_test_trace, patch_everywhere
+
+
+if TYPE_CHECKING:
+    from apathetic_logging import Logger  # noqa: ICN003  # noqa: ICN003
+else:
+    Logger = mod_alogs.Logger
 
 
 TEST_TRACE = make_test_trace(icon="📏")
@@ -17,7 +24,7 @@ def _suffix() -> str:
 
 
 @pytest.fixture
-def direct_logger() -> mod_alogs.Logger:
+def direct_logger() -> Logger:
     """Create a brand-new ApatheticLogger with no shared state.
 
     Only for testing the logger itself.
@@ -35,7 +42,7 @@ def direct_logger() -> mod_alogs.Logger:
 
 
 @pytest.fixture
-def module_logger(monkeypatch: pytest.MonkeyPatch) -> mod_alogs.Logger:
+def module_logger(monkeypatch: pytest.MonkeyPatch) -> Logger:
     """Replace get_logger() everywhere with a new isolated instance.
 
     Ensures all modules calling get_logger()

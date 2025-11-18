@@ -3,12 +3,18 @@
 
 import logging
 import os
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 # Import from conftest in same directory
 import conftest
 
 import apathetic_logging as mod_alogs
+
+
+if TYPE_CHECKING:
+    from apathetic_logging import Logger  # noqa: ICN003
+else:
+    Logger = mod_alogs.Logger
 
 
 AppLoggerForTest = conftest.AppLoggerForTest
@@ -240,11 +246,11 @@ def test_multiple_child_classes_independent() -> None:
     """Test that multiple child classes can coexist independently."""
 
     # --- setup ---
-    class LoggerA(mod_alogs.Logger):
+    class LoggerA(Logger):
         def determine_log_level(self, **_kwargs: object) -> str:
             return "DEBUG"
 
-    class LoggerB(mod_alogs.Logger):
+    class LoggerB(Logger):
         def determine_log_level(self, **_kwargs: object) -> str:
             return "WARNING"
 

@@ -5,11 +5,18 @@ import argparse
 import logging
 import os
 from collections.abc import Generator
+from typing import TYPE_CHECKING
 
 import pytest
 
 import apathetic_logging as mod_alogs
 import apathetic_logging.registry as mod_registry
+
+
+if TYPE_CHECKING:
+    from apathetic_logging import Logger  # noqa: ICN003
+else:
+    Logger = mod_alogs.Logger
 
 
 # ----------------------------------------------------------------------
@@ -54,7 +61,7 @@ def reset_registry_and_env() -> Generator[None, None, None]:
 # ----------------------------------------------------------------------
 
 
-class AppLoggerForTest(mod_alogs.Logger):
+class AppLoggerForTest(Logger):
     """Test application logger with custom log level resolution."""
 
     def determine_log_level(
@@ -85,7 +92,7 @@ class AppLoggerForTest(mod_alogs.Logger):
         return "INFO"
 
 
-class AppLoggerWithCustomMethodForTest(mod_alogs.Logger):
+class AppLoggerWithCustomMethodForTest(Logger):
     """Test logger with custom application-specific methods."""
 
     def log_operation(self, operation: str, status: str) -> None:
