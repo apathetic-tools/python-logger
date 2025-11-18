@@ -140,12 +140,13 @@ def test_formatter_adds_ansi_when_color_enabled(
 ) -> None:
     """When color is enabled, ANSI codes should appear in output."""
     # --- patch and execute ---
-    out, _ = capture_log_output(
+    _out, err = capture_log_output(
         monkeypatch, direct_logger, "debug", enable_color=True, msg="colored"
     )
 
     # --- verify ---
-    assert "\033[" in out
+    # DEBUG messages go to stderr, not stdout
+    assert "\033[" in err
 
 
 def test_log_dynamic_unknown_level(

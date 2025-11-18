@@ -31,14 +31,10 @@ def test_disable_build_timestamp_produces_identical_outputs(
     # Create serger config with disable_build_timestamp
     config = tmp_path / ".serger.jsonc"
     config_data = {
-        "builds": [
-            {
-                "package": "testpkg",
-                "include": ["src/testpkg/**/*.py"],
-                "out": "dist/testpkg.py",
-                "disable_build_timestamp": True,
-            }
-        ]
+        "package": "testpkg",
+        "include": ["src/testpkg/**/*.py"],
+        "out": "dist/testpkg.py",
+        "disable_build_timestamp": True,
     }
     config.write_text(json.dumps(config_data, indent=2))
 
@@ -99,14 +95,10 @@ def test_disable_build_timestamp_cli_produces_identical_outputs(
     # Create config WITHOUT disable_build_timestamp (will use CLI flag instead)
     config = tmp_path / ".serger.jsonc"
     config_data = {
-        "builds": [
-            {
-                "package": "testpkg",
-                "include": ["src/testpkg/**/*.py"],
-                "out": "dist/testpkg.py",
-                # No disable_build_timestamp in config - will use CLI flag
-            }
-        ]
+        "package": "testpkg",
+        "include": ["src/testpkg/**/*.py"],
+        "out": "dist/testpkg.py",
+        # No disable_build_timestamp in config - will use CLI flag
     }
     config.write_text(json.dumps(config_data, indent=2))
 
