@@ -6,12 +6,12 @@ alwaysApply: true
 ---
 
 ### Important Files
-- `dist/serger.py` is **generated** - never edit directly
+- `dist/apathetic_logging.py` is **generated** - never edit directly
 - Generate it using `poetry run poe build:script`
 - `dist/` contains build outputs - do not edit
 
 ### Project Structure
-- `src/serger/` - Main source code
+- `src/package_name/` - Main source code (replace `package_name` with actual package name)
 - `tests/` - Test suite
 - `dev/` - Development scripts
 

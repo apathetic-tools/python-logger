@@ -23,18 +23,36 @@ alwaysApply: true
 #### Common Patterns
 - **Unused arguments**: Prefix with `_` (e.g., `_unused_param`) unless signature must match exactly (pytest hooks, interfaces) - then use ignore comments
 - **Complexity/parameter warnings**: Consider refactoring only if it improves readability; otherwise add ignore comments
-- **Type inference**: Use `cast_hint()` from `serger.utils` or `typing.cast()` when possible (not in tests); mypy can often infer types better than pyright
-  - **`cast_hint()`**: Import from `serger.utils`. Use when:
+- **Type inference**: Use `cast_hint()` from project utilities (if available) or `typing.cast()` when possible (not in tests); mypy can often infer types better than pyright
+  - **`cast_hint()`**: Import from project utilities if available. Use when:
     - You want to silence mypy's redundant-cast warnings
     - You want to signal "this narrowing is intentional"
     - You need IDEs (like Pylance) to retain strong inference on a value
     - **Do NOT use** for Union, Optional, or nested generics - use `cast()` for those
-    - **Example**: `from serger.utils import cast_hint; items = cast_hint(list[Any], value)`
+    - **Example**: `from project.utils import cast_hint; items = cast_hint(list[Any], value)`
   - **`typing.cast()`**: Use for Union, Optional, or nested generics where type narrowing is meaningful
-    - **Example**: `from typing import cast; result = cast(PathResolved, dict_obj)`
+    - **Example**: `from typing import cast; result = cast(ResolvedType, dict_obj)`
 - **Defensive checks**: Runtime checks like `isinstance()` with ignore comments are only acceptable as defensive checks when data comes from external sources (function parameters, config files, user input). Do NOT use for constants or values that are known and can be typed properly within the function.
   - **Acceptable**: `if not isinstance(package, str):  # pyright: ignore[reportUnnecessaryIsInstance]` when `package` comes from parsed config file
-  - **Not acceptable**: `if isinstance(CONSTANT_VALUE, str):` when `CONSTANT_VALUE` is a module-level constant that can be typed properly
+  - **Not acceptable**: `if isinstance(CONSTANT_VALUE, str):` when `CONSTANT_VALUE` is a module-level constant that can be properly typed
+
+#### TypedDict Maintenance
+- **Always update TypedDict definitions when adding properties**: When adding a new property to a dictionary that is typed as a TypedDict (or should be), **always** update the corresponding TypedDict class definition to include that property. This ensures type safety and prevents runtime errors.
+  - **Required**: If you add a field like `config["_new_field"] = value`, you must add `_new_field: NotRequired[Type]` (or `_new_field: Type` if required) to the TypedDict definition
+  - **Never use `type: ignore` comments** to bypass missing TypedDict fields - instead, add the field to the type definition
+  - **Example**: If adding `resolved_cfg["_new_field"] = value`, add `_new_field: NotRequired[Type]` to the corresponding TypedDict
+  - This applies to all TypedDict classes in the project
+
+#### Resolved TypedDict Pattern
+- **"Resolved" TypedDicts should not use `NotRequired` for fields that can be resolved**: TypedDicts with "Resolved" suffix (e.g., `ConfigResolved`, `SettingsResolved`) represent fully resolved configurations. Fields that can be resolved (even to "empty" defaults) should **always be present**, not marked as `NotRequired`.
+  - **Use `NotRequired` only for**: Fields that are truly optional throughout the entire resolution process and may never be set (e.g., optional feature flags, conditional settings)
+  - **Do NOT use `NotRequired` for**: Fields that can be resolved to a default value (empty list `[]`, empty dict `{}`, `False`, empty string `""`, etc.) - these should always be present in the resolved config
+  - **Rationale**: A "Resolved" TypedDict represents a fully resolved state. If a field can be resolved (even to an empty default), it should be present to maintain the "fully resolved" contract and simplify usage (no need to check `if "field" in config`)
+  - **Examples**:
+    - ✅ **Correct**: `items: list[Item]` in `ConfigResolved` (always set to `[]` if not provided)
+    - ✅ **Correct**: `settings: SettingsResolved` in `ConfigResolved` (always resolved with defaults)
+    - ✅ **Correct**: `optional_feature: NotRequired[str]` in `ConfigResolved` (only present when feature is enabled)
+    - ❌ **Incorrect**: `items: NotRequired[list[Item]]` in `ConfigResolved` (can be resolved to `[]`)
 
 #### Configuration File Changes
 

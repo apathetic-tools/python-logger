@@ -157,11 +157,11 @@ You can run individual tools using `poetry run poe <command>` (including `poetry
 - `poetry run poe test:pytest:script` - Run tests in singlefile runtime mode
 
 **Running tools on specific files:**
-- Format a single file: `poetry run ruff format src/serger/build.py`
-- Check a single file: `poetry run ruff check src/serger/build.py`
-- Fix a single file: `poetry run ruff check --fix src/serger/build.py`
-- Run a specific test (installed mode): `poetry run pytest tests/9_integration/test_log_level.py::test_specific_function`
-- Run a specific test (singlefile mode): `RUNTIME_MODE=singlefile poetry run pytest tests/9_integration/test_log_level.py::test_specific_function`
+- Format a single file: `poetry run ruff format src/package/module.py`
+- Check a single file: `poetry run ruff check src/package/module.py`
+- Fix a single file: `poetry run ruff check --fix src/package/module.py`
+- Run a specific test (installed mode): `poetry run pytest tests/path/to/test_file.py::test_function_name`
+- Run a specific test (singlefile mode): `RUNTIME_MODE=singlefile poetry run pytest tests/path/to/test_file.py::test_function_name`
 
 #### Checkpoint Commits
 

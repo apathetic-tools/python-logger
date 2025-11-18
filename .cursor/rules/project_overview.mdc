@@ -1,15 +1,14 @@
 ---
-description: Serger project overview and context
+description: Apathetic Python Logger project overview and context
 globs:
-  - "**/*.py"
-  - "**/*.md"
+  - "**/*"
 alwaysApply: true
 ---
 
-## Serger Project Context
+## Apathetic Python Logger Project Context
 
 ### Project Overview
-Serger is a Python module stitcher that combines multiple source files into a single executable script.
+Apathetic Python Logger is a minimal wrapper for the Python standard library logger. It provides a lightweight, dependency-free logging solution designed for CLI tools with colorized output, dual-stream handling (stdout/stderr), and seamless integration with Apathetic Tools projects.
 
 ### See Also
 - `pyproject.toml` - All tool configurations and poe tasks
