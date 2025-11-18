@@ -309,8 +309,8 @@ The formatter automatically adds tags based on log level:
 
 Stream handler that routes messages to stdout or stderr based on log level.
 
-- **stdout**: Used for TRACE, DEBUG, and INFO messages
-- **stderr**: Used for WARNING, ERROR, and CRITICAL messages
+- **stdout**: Used for INFO messages
+- **stderr**: Used for TRACE, DEBUG, WARNING, ERROR, and CRITICAL messages
 
 #### Constructor
 

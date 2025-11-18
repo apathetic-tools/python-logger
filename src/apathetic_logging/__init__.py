@@ -46,6 +46,8 @@ TEST_LEVEL = apathetic_logging.TEST_LEVEL
 TEST_TRACE = apathetic_logging.TEST_TRACE
 TEST_TRACE_ENABLED = apathetic_logging.TEST_TRACE_ENABLED
 TRACE_LEVEL = apathetic_logging.TRACE_LEVEL
+MINIMAL_LEVEL = apathetic_logging.MINIMAL_LEVEL
+DETAIL_LEVEL = apathetic_logging.DETAIL_LEVEL
 
 # ANSI Colors
 ANSIColors = apathetic_logging.ANSIColors
@@ -70,7 +72,9 @@ safe_log = apathetic_logging.safe_log
 __all__ = [
     "DEFAULT_APATHETIC_LOG_LEVEL",
     "DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS",
+    "DETAIL_LEVEL",
     "LEVEL_ORDER",
+    "MINIMAL_LEVEL",
     "SILENT_LEVEL",
     "TAG_STYLES",
     "TEST_LEVEL",

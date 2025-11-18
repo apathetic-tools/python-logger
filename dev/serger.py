@@ -103,7 +103,9 @@ GRAY = "\033[90m"
 # Logger levels
 TRACE_LEVEL = logging.DEBUG - 5
 # DEBUG      - builtin # verbose
+DETAIL_LEVEL = logging.INFO - 5
 # INFO       - builtin
+MINIMAL_LEVEL = logging.INFO + 5
 # WARNING    - builtin
 # ERROR      - builtin
 # CRITICAL   - builtin # quiet mode
@@ -112,7 +114,9 @@ SILENT_LEVEL = logging.CRITICAL + 1  # one above the highest builtin level
 LEVEL_ORDER = [
     "trace",
     "debug",
+    "detail",
     "info",
+    "minimal",
     "warning",
     "error",
     "critical",
@@ -122,6 +126,8 @@ LEVEL_ORDER = [
 TAG_STYLES = {
     "TRACE": (GRAY, "[TRACE]"),
     "DEBUG": (CYAN, "[DEBUG]"),
+    "DETAIL": (CYAN, "[DETAIL]"),
+    "MINIMAL": (GREEN, "[MINIMAL]"),
     "WARNING": ("", "⚠️ "),
     "ERROR": ("", "❌ "),
     "CRITICAL": ("", "💥 "),
@@ -285,9 +291,13 @@ class ApatheticCLILogger(logging.Logger):
         logging.setLoggerClass(cls)
 
         logging.addLevelName(TRACE_LEVEL, "TRACE")
+        logging.addLevelName(DETAIL_LEVEL, "DETAIL")
+        logging.addLevelName(MINIMAL_LEVEL, "MINIMAL")
         logging.addLevelName(SILENT_LEVEL, "SILENT")
 
         logging.TRACE = TRACE_LEVEL  # type: ignore[attr-defined]
+        logging.DETAIL = DETAIL_LEVEL  # type: ignore[attr-defined]
+        logging.MINIMAL = MINIMAL_LEVEL  # type: ignore[attr-defined]
         logging.SILENT = SILENT_LEVEL  # type: ignore[attr-defined]
 
         return True
@@ -356,6 +366,16 @@ class ApatheticCLILogger(logging.Logger):
     def trace(self, msg: str, *args: Any, **kwargs: Any) -> None:
         if self.isEnabledFor(TRACE_LEVEL):
             self._log(TRACE_LEVEL, msg, args, **kwargs)
+
+    def detail(self, msg: str, *args: Any, **kwargs: Any) -> None:
+        """Log a detail-level message (more detailed than INFO)."""
+        if self.isEnabledFor(DETAIL_LEVEL):
+            self._log(DETAIL_LEVEL, msg, args, **kwargs)
+
+    def minimal(self, msg: str, *args: Any, **kwargs: Any) -> None:
+        """Log a minimal-level message (less detailed than INFO)."""
+        if self.isEnabledFor(MINIMAL_LEVEL):
+            self._log(MINIMAL_LEVEL, msg, args, **kwargs)
 
     def resolve_level_name(self, level_name: str) -> int | None:
         """logging.getLevelNamesMapping() is only introduced in 3.11"""
@@ -446,7 +466,11 @@ class TagFormatter(logging.Formatter):
 
 
 class DualStreamHandler(logging.StreamHandler):  # type: ignore[type-arg]
-    """Send info/debug/trace to stdout, everything else to stderr."""
+    """Send info to stdout, everything else to stderr.
+
+    TRACE, DEBUG, and DETAIL always go to stderr.
+    INFO and MINIMAL go to stdout.
+    """
 
     enable_color: bool = False
 
@@ -458,7 +482,11 @@ class DualStreamHandler(logging.StreamHandler):  # type: ignore[type-arg]
         level = record.levelno
         if level >= logging.WARNING:
             self.stream = sys.stderr
+        elif level in {logging.DEBUG, TRACE_LEVEL, DETAIL_LEVEL}:
+            # TRACE, DEBUG, and DETAIL always go to stderr
+            self.stream = sys.stderr
         else:
+            # INFO, MINIMAL, and other levels go to stdout
             self.stream = sys.stdout
 
         # used by TagFormatter

@@ -71,12 +71,14 @@ def capture_log_output(
 @pytest.mark.parametrize(
     ("msg_level", "expected_stream"),
     [
-        ("debug", "stdout"),
+        ("debug", "stderr"),
+        ("detail", "stderr"),
         ("info", "stdout"),
+        ("minimal", "stdout"),
         ("warning", "stderr"),
         ("error", "stderr"),
         ("critical", "stderr"),
-        ("trace", "stdout"),
+        ("trace", "stderr"),
     ],
 )
 def test_log_routes_correct_stream(

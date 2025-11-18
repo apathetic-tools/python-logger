@@ -30,7 +30,9 @@ class ApatheticLogging_Priv_Constants:  # noqa: N801  # pyright: ignore[reportUn
     TEST_LEVEL: int = logging.DEBUG - 8
     TRACE_LEVEL: int = logging.DEBUG - 5
     # DEBUG      - builtin # verbose
+    DETAIL_LEVEL: int = logging.INFO - 5
     # INFO       - builtin
+    MINIMAL_LEVEL: int = logging.INFO + 5
     # WARNING    - builtin
     # ERROR      - builtin
     # CRITICAL   - builtin # quiet mode
@@ -40,7 +42,9 @@ class ApatheticLogging_Priv_Constants:  # noqa: N801  # pyright: ignore[reportUn
         "test",  # most verbose, bypasses capture for debugging tests
         "trace",
         "debug",
+        "detail",
         "info",
+        "minimal",
         "warning",
         "error",
         "critical",
@@ -61,6 +65,8 @@ class ApatheticLogging_Priv_Constants:  # noqa: N801  # pyright: ignore[reportUn
         "TEST": (ANSIColors.GRAY, "[TEST]"),
         "TRACE": (ANSIColors.GRAY, "[TRACE]"),
         "DEBUG": (ANSIColors.CYAN, "[DEBUG]"),
+        "DETAIL": (ANSIColors.CYAN, "[DETAIL]"),
+        "MINIMAL": (ANSIColors.GREEN, "[MINIMAL]"),
         "WARNING": ("", "⚠️ "),
         "ERROR": ("", "❌ "),
         "CRITICAL": ("", "💥 "),

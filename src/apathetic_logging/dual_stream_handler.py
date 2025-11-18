@@ -15,10 +15,12 @@ class ApatheticLogging_Priv_DualStreamHandler:  # noqa: N801  # pyright: ignore[
     """
 
     class DualStreamHandler(logging.StreamHandler):  # type: ignore[type-arg]
-        """Send info/debug/trace to stdout, everything else to stderr.
+        """Send info to stdout, everything else to stderr.
 
-        When logger level is TEST, TRACE/DEBUG/TEST messages bypass capture
-        by writing to sys.__stderr__ instead of sys.stderr.
+        TRACE, DEBUG, and DETAIL go to stderr normally.
+        INFO and MINIMAL go to stdout.
+        When logger level is TEST, TEST/TRACE/DEBUG/DETAIL messages bypass
+        capture by writing to sys.__stderr__ instead of sys.stderr.
         This allows debugging tests without breaking output assertions while
         still being capturable by subprocess.run(capture_output=True).
         """
@@ -56,15 +58,20 @@ class ApatheticLogging_Priv_DualStreamHandler:  # noqa: N801  # pyright: ignore[
                 # This ensures they still break tests as expected
                 # Even in TEST mode, warnings/errors use normal stderr
                 self.stream = sys.stderr
-            # TRACE, DEBUG, TEST, INFO go to stdout
-            # If in TEST mode, bypass capture for verbose levels (TEST/TRACE/DEBUG)
-            elif is_test_mode and level < logging.INFO:
-                # Use bypass stream for TEST/TRACE/DEBUG in test mode
+            # In TEST mode, TEST/TRACE/DEBUG/DETAIL bypass capture via __stderr__
+            elif (
+                level <= logging.DEBUG
+                or level == ApatheticLogging_Priv_Constants.DETAIL_LEVEL
+            ):
+                # Use bypass stream for TEST/TRACE/DEBUG/DETAIL in test mode
                 # Use __stderr__ so they bypass pytest capsys but are still
                 # capturable by subprocess.run(capture_output=True)
-                self.stream = sys.__stderr__
+                if is_test_mode:
+                    self.stream = sys.__stderr__
+                else:
+                    self.stream = sys.stderr
             else:
-                # Normal behavior: use regular stdout
+                # INFO, MINIMAL, and other levels go to stdout
                 self.stream = sys.stdout
 
             # used by TagFormatter

@@ -108,17 +108,22 @@ class ApatheticLogging_Priv_Logger:  # noqa: N801  # pyright: ignore[reportUnuse
         def setLevel(self, level: int | str) -> None:  # noqa: N802
             """Case insensitive version that resolves string level names.
 
-            Validates that custom levels (TEST, TRACE, SILENT) are not set to 0,
-            which would cause NOTSET inheritance from root logger.
+            Validates that custom levels (TEST, TRACE, MINIMAL, DETAIL, SILENT) are
+            not set to 0, which would cause NOTSET inheritance from root logger.
             """
             # Resolve string to integer if needed
             if isinstance(level, str):
                 level_str = level.upper()
-                # Handle custom level names (TEST, TRACE, SILENT) directly
+                # Handle custom level names (TEST, TRACE, MINIMAL, DETAIL, SILENT)
+                # directly
                 if level_str == "TEST":
                     level = ApatheticLogging_Priv_Constants.TEST_LEVEL
                 elif level_str == "TRACE":
                     level = ApatheticLogging_Priv_Constants.TRACE_LEVEL
+                elif level_str == "DETAIL":
+                    level = ApatheticLogging_Priv_Constants.DETAIL_LEVEL
+                elif level_str == "MINIMAL":
+                    level = ApatheticLogging_Priv_Constants.MINIMAL_LEVEL
                 elif level_str == "SILENT":
                     level = ApatheticLogging_Priv_Constants.SILENT_LEVEL
                 else:
@@ -268,6 +273,12 @@ class ApatheticLogging_Priv_Logger:  # noqa: N801  # pyright: ignore[reportUnuse
                 ApatheticLogging_Priv_Constants.TRACE_LEVEL, "TRACE"
             )
             cls.addLevelName(
+                ApatheticLogging_Priv_Constants.DETAIL_LEVEL, "DETAIL"
+            )
+            cls.addLevelName(
+                ApatheticLogging_Priv_Constants.MINIMAL_LEVEL, "MINIMAL"
+            )
+            cls.addLevelName(
                 ApatheticLogging_Priv_Constants.SILENT_LEVEL, "SILENT"
             )
 
@@ -352,6 +363,20 @@ class ApatheticLogging_Priv_Logger:  # noqa: N801  # pyright: ignore[reportUnuse
             if self.isEnabledFor(ApatheticLogging_Priv_Constants.TRACE_LEVEL):
                 self._log(
                     ApatheticLogging_Priv_Constants.TRACE_LEVEL, msg, args, **kwargs
+                )
+
+        def detail(self, msg: str, *args: Any, **kwargs: Any) -> None:
+            """Log a detail-level message (more detailed than INFO)."""
+            if self.isEnabledFor(ApatheticLogging_Priv_Constants.DETAIL_LEVEL):
+                self._log(
+                    ApatheticLogging_Priv_Constants.DETAIL_LEVEL, msg, args, **kwargs
+                )
+
+        def minimal(self, msg: str, *args: Any, **kwargs: Any) -> None:
+            """Log a minimal-level message (less detailed than INFO)."""
+            if self.isEnabledFor(ApatheticLogging_Priv_Constants.MINIMAL_LEVEL):
+                self._log(
+                    ApatheticLogging_Priv_Constants.MINIMAL_LEVEL, msg, args, **kwargs
                 )
 
         def test(self, msg: str, *args: Any, **kwargs: Any) -> None:

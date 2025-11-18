@@ -60,15 +60,23 @@ def test_resolve_level_name_unknown_level(
 def test_resolve_level_name_custom_levels_resolved(
     direct_logger: mod_alogs.Logger,
 ) -> None:
-    """resolve_level_name() resolves TRACE/SILENT after extend_logging_module()."""
+    """resolve_level_name() resolves TRACE/DETAIL/MINIMAL/SILENT after extend.
+
+    After extend_logging_module() is called, these custom levels should be
+    resolvable.
+    """
     # --- execute ---
-    # extend_logging_module() is called at import time, so TRACE and SILENT
-    # should be available in the logging module
+    # extend_logging_module() is called at import time, so TRACE, DETAIL, MINIMAL,
+    # and SILENT should be available in the logging module
     trace_result = direct_logger.resolve_level_name("TRACE")
+    detail_result = direct_logger.resolve_level_name("DETAIL")
+    minimal_result = direct_logger.resolve_level_name("MINIMAL")
     silent_result = direct_logger.resolve_level_name("SILENT")
 
     # --- verify ---
     # These custom levels are added to logging module by extend_logging_module()
     # So resolve_level_name should find them
     assert trace_result == mod_alogs.apathetic_logging.TRACE_LEVEL
+    assert detail_result == mod_alogs.apathetic_logging.DETAIL_LEVEL
+    assert minimal_result == mod_alogs.apathetic_logging.MINIMAL_LEVEL
     assert silent_result == mod_alogs.apathetic_logging.SILENT_LEVEL

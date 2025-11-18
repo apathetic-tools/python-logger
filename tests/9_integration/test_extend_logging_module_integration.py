@@ -33,10 +33,14 @@ def test_extend_logging_module_called_twice_is_safe() -> None:
     # --- verify ---
     # Second call should return False (already extended)
     assert result2 is False
-    # TRACE and SILENT should still be available
+    # TRACE, DETAIL, MINIMAL, and SILENT should still be available
     assert hasattr(logging, "TRACE")
+    assert hasattr(logging, "DETAIL")
+    assert hasattr(logging, "MINIMAL")
     assert hasattr(logging, "SILENT")
     assert logging.TRACE == mod_alogs.apathetic_logging.TRACE_LEVEL  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
+    assert logging.DETAIL == mod_alogs.apathetic_logging.DETAIL_LEVEL  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
+    assert logging.MINIMAL == mod_alogs.apathetic_logging.MINIMAL_LEVEL  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
     assert logging.SILENT == mod_alogs.apathetic_logging.SILENT_LEVEL  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
 
 
@@ -53,9 +57,13 @@ def test_extend_logging_module_before_get_logger_works() -> None:
     # --- verify ---
     assert logger is not None
     assert logger.name == "test_integration"
-    # Logger should be able to use TRACE and SILENT levels
+    # Logger should be able to use TRACE, DETAIL, MINIMAL, and SILENT levels
     logger.setLevel("TRACE")
     assert logger.level_name == "TRACE"
+    logger.setLevel("DETAIL")
+    assert logger.level_name == "DETAIL"
+    logger.setLevel("MINIMAL")
+    assert logger.level_name == "MINIMAL"
     logger.setLevel("SILENT")
     assert logger.level_name == "SILENT"
 
@@ -74,6 +82,10 @@ def test_get_logger_works_after_extend_logging_module() -> None:
     # Should be able to use custom levels
     logger.setLevel(logging.TRACE)  # type: ignore[attr-defined]
     assert logger.level == mod_alogs.apathetic_logging.TRACE_LEVEL
+    logger.setLevel(logging.DETAIL)  # type: ignore[attr-defined]
+    assert logger.level == mod_alogs.apathetic_logging.DETAIL_LEVEL
+    logger.setLevel(logging.MINIMAL)  # type: ignore[attr-defined]
+    assert logger.level == mod_alogs.apathetic_logging.MINIMAL_LEVEL
     logger.setLevel(logging.SILENT)  # type: ignore[attr-defined]
     assert logger.level == mod_alogs.apathetic_logging.SILENT_LEVEL
 
@@ -88,6 +100,32 @@ def test_logger_can_use_trace_level_after_extend() -> None:
     # Should be able to call trace() method
     assert hasattr(logger, "trace")
     assert callable(logger.trace)
+
+
+def test_logger_can_use_detail_level_after_extend() -> None:
+    """Logger should be able to use DETAIL level after extend_logging_module()."""
+    # --- setup ---
+    logger = mod_alogs.Logger("test_detail_logger")
+    logger.setLevel("DETAIL")
+
+    # --- verify ---
+    # Should be able to call detail() method
+    assert hasattr(logger, "detail")
+    assert callable(logger.detail)
+    assert logger.level_name == "DETAIL"
+
+
+def test_logger_can_use_minimal_level_after_extend() -> None:
+    """Logger should be able to use MINIMAL level after extend_logging_module()."""
+    # --- setup ---
+    logger = mod_alogs.Logger("test_minimal_logger")
+    logger.setLevel("MINIMAL")
+
+    # --- verify ---
+    # Should be able to call minimal() method
+    assert hasattr(logger, "minimal")
+    assert callable(logger.minimal)
+    assert logger.level_name == "MINIMAL"
 
 
 def test_logger_can_use_silent_level_after_extend() -> None:
@@ -134,8 +172,10 @@ def test_multiple_calls_to_extend_logging_module() -> None:
     # First call should return True (or False if already called at import)
     # Subsequent calls should all return False
     assert all(r is False for r in results[1:])  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
-    # TRACE and SILENT should still be available
+    # TRACE, DETAIL, MINIMAL, and SILENT should still be available
     assert hasattr(logging, "TRACE")
+    assert hasattr(logging, "DETAIL")
+    assert hasattr(logging, "MINIMAL")
     assert hasattr(logging, "SILENT")
 
 
