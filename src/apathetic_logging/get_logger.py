@@ -5,8 +5,11 @@ from __future__ import annotations
 
 import inspect
 import logging
-from typing import TYPE_CHECKING, cast
+from typing import TypeVar, cast
 
+from .logger import (
+    ApatheticLogging_Priv_Logger,  # pyright: ignore[reportPrivateUsage]
+)
 from .register_logger_name import (
     ApatheticLogging_Priv_RegisterLoggerName,  # pyright: ignore[reportPrivateUsage]
 )
@@ -15,13 +18,7 @@ from .registry import (
 )
 
 
-if TYPE_CHECKING:
-    from .logger import (
-        ApatheticLogging_Priv_Logger,  # pyright: ignore[reportPrivateUsage]
-    )
-
-
-# _T = TypeVar("_T", bound=logging.Logger)
+_T = TypeVar("_T", bound=logging.Logger)
 
 
 class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUnusedClass]
@@ -51,20 +48,35 @@ class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUn
         )
         logger = logging.getLogger(registered_logger_name)
 
-        # Check if the logger is the correct type. If a logger was created before
-        # extend_logging_module() was called, it might be a standard logging.Logger.
-        # In that case, we need to delete it and create a new one with the correct type.
-        # We check for the presence of 'level_name' attribute which is specific to
-        # apathetic_logging.Logger, rather than relying on getLoggerClass() which
-        # might not be set correctly in all scenarios.
         if not hasattr(logger, "level_name"):
-            # Remove the existing logger from the manager so we can create a new one
             if registered_logger_name in logging.Logger.manager.loggerDict:
                 logging.Logger.manager.loggerDict.pop(registered_logger_name, None)
-            # Now get a new logger, which will be created with the correct class
             logger = logging.getLogger(registered_logger_name)
 
         typed_logger = cast("ApatheticLogging_Priv_Logger.Logger", logger)
+        return typed_logger
+
+    @staticmethod
+    def get_logger_b(
+        logger_name: str | None = None,
+    ) -> ApatheticLogging_Priv_Logger.Logger:
+        return ApatheticLogging_Priv_GetLogger.get_logger_of_type(
+            logger_name, ApatheticLogging_Priv_Logger.Logger
+        )
+
+    @staticmethod
+    def get_logger_of_type(logger_name: str | None, _logger_class: type[_T]) -> _T:
+        registered_logger_name = ApatheticLogging_Priv_GetLogger._resolve_logger_name(
+            logger_name
+        )
+        logger = logging.getLogger(registered_logger_name)
+
+        if not hasattr(logger, "level_name"):
+            if registered_logger_name in logging.Logger.manager.loggerDict:
+                logging.Logger.manager.loggerDict.pop(registered_logger_name, None)
+            logger = logging.getLogger(registered_logger_name)
+
+        typed_logger = cast("_T", logger)
         return typed_logger
 
     @staticmethod
@@ -109,18 +121,3 @@ class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUn
             raise RuntimeError(_msg)
 
         return registered_logger_name
-
-    # @staticmethod
-    # def get_logger_of_type(logger_name: str | None, logger_class: type[_T]) -> _T:
-    #     registered_logger_name = ApatheticLogging_Priv_GetLogger._resolve_logger_name(
-    #         logger_name
-    #     )
-    #     logger = logging.getLogger(registered_logger_name)
-
-    #     if not hasattr(logger, "level_name"):
-    #         if registered_logger_name in logging.Logger.manager.loggerDict:
-    #             logging.Logger.manager.loggerDict.pop(registered_logger_name, None)
-    #         logger = logging.getLogger(registered_logger_name)
-
-    #     typed_logger = cast("Any", logger)  # apathetic_logging.Logger
-    #     return typed_logger
