@@ -258,3 +258,5 @@ Desktop.ini
 
 # AI files
 .claude/settings.local.json
+.plan/
+.plans/
