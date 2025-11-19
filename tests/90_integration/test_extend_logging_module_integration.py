@@ -7,17 +7,17 @@ from collections.abc import Generator
 import pytest
 
 import apathetic_logging as mod_alogs
-import apathetic_logging.registry as mod_registry
+import apathetic_logging.registry_data as mod_registry
 
 
 @pytest.fixture(autouse=True)
 def reset_registry() -> Generator[None, None, None]:
     """Reset registry state before and after each test."""
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    original_name = _registry.registered_priv_logger_name
-    _registry.registered_priv_logger_name = None
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    original_name = _registry.registered_internal_logger_name
+    _registry.registered_internal_logger_name = None
     yield
-    _registry.registered_priv_logger_name = original_name
+    _registry.registered_internal_logger_name = original_name
 
 
 def test_extend_logging_module_called_twice_is_safe() -> None:

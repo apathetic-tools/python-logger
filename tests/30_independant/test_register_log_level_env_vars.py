@@ -6,29 +6,29 @@ from collections.abc import Generator
 import pytest
 
 import apathetic_logging as mod_alogs
-import apathetic_logging.registry as mod_registry
+import apathetic_logging.registry_data as mod_registry
 
 
 @pytest.fixture(autouse=True)
 def reset_registry() -> Generator[None, None, None]:
     """Reset registry state before and after each test."""
     # Save original values
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    original_env_vars = _registry.registered_priv_log_level_env_vars
-    original_default = _registry.registered_priv_default_log_level
-    original_name = _registry.registered_priv_logger_name
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    original_env_vars = _registry.registered_internal_log_level_env_vars
+    original_default = _registry.registered_internal_default_log_level
+    original_name = _registry.registered_internal_logger_name
 
     # Reset to None
-    _registry.registered_priv_log_level_env_vars = None
-    _registry.registered_priv_default_log_level = None
-    _registry.registered_priv_logger_name = None
+    _registry.registered_internal_log_level_env_vars = None
+    _registry.registered_internal_default_log_level = None
+    _registry.registered_internal_logger_name = None
 
     yield
 
     # Restore original values
-    _registry.registered_priv_log_level_env_vars = original_env_vars
-    _registry.registered_priv_default_log_level = original_default
-    _registry.registered_priv_logger_name = original_name
+    _registry.registered_internal_log_level_env_vars = original_env_vars
+    _registry.registered_internal_default_log_level = original_default
+    _registry.registered_internal_logger_name = original_name
 
 
 def test_register_log_level_env_vars_stores_list() -> None:
@@ -40,8 +40,8 @@ def test_register_log_level_env_vars_stores_list() -> None:
     mod_alogs.register_log_level_env_vars(env_vars)
 
     # --- verify ---
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    assert _registry.registered_priv_log_level_env_vars == env_vars
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    assert _registry.registered_internal_log_level_env_vars == env_vars
 
 
 def test_register_log_level_env_vars_overwrites_previous() -> None:
@@ -54,8 +54,8 @@ def test_register_log_level_env_vars_overwrites_previous() -> None:
     mod_alogs.register_log_level_env_vars(new_vars)
 
     # --- verify ---
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    assert _registry.registered_priv_log_level_env_vars == new_vars
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    assert _registry.registered_internal_log_level_env_vars == new_vars
 
 
 def test_register_log_level_env_vars_empty_list() -> None:
@@ -64,8 +64,8 @@ def test_register_log_level_env_vars_empty_list() -> None:
     mod_alogs.register_log_level_env_vars([])
 
     # --- verify ---
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    assert _registry.registered_priv_log_level_env_vars == []
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    assert _registry.registered_internal_log_level_env_vars == []
 
 
 def test_register_log_level_env_vars_single_var() -> None:
@@ -77,5 +77,5 @@ def test_register_log_level_env_vars_single_var() -> None:
     mod_alogs.register_log_level_env_vars(env_vars)
 
     # --- verify ---
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    assert _registry.registered_priv_log_level_env_vars == env_vars
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    assert _registry.registered_internal_log_level_env_vars == env_vars

@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import sys
 
-from .registry import (
-    ApatheticLogging_Internal_Registry,
+from .registry_data import (
+    ApatheticLogging_Internal_RegistryData,
 )
 from .safe_logging import (
     ApatheticLogging_Internal_SafeLogging,
@@ -63,7 +63,7 @@ class ApatheticLogging_Internal_RegisterLoggerName:  # noqa: N801  # pyright: ig
             ...     # Uses top-level package from __package__
         """
         _register_logger_name = ApatheticLogging_Internal_RegisterLoggerName
-        _registry = ApatheticLogging_Internal_Registry
+        _registry = ApatheticLogging_Internal_RegistryData
         _safe_logging = ApatheticLogging_Internal_SafeLogging
         auto_inferred = False
         if logger_name is None:
@@ -82,7 +82,7 @@ class ApatheticLogging_Internal_RegisterLoggerName:  # noqa: N801  # pyright: ig
                 )
                 raise RuntimeError(_msg)
 
-        _registry.registered_priv_logger_name = logger_name
+        _registry.registered_internal_logger_name = logger_name
         _safe_logging.safe_trace(
             "register_logger_name() called",
             f"name={logger_name}",

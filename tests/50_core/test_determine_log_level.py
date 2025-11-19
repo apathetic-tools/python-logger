@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 import apathetic_logging as mod_alogs
-import apathetic_logging.registry as mod_registry
+import apathetic_logging.registry_data as mod_registry
 
 
 if TYPE_CHECKING:
@@ -21,26 +21,26 @@ else:
 def reset_registry(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, None]:
     """Reset registry state and environment before and after each test."""
     # Save original values (copy list if present to avoid mutating shared state)
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
     _ns = mod_alogs.apathetic_logging
-    original_env_vars = _registry.registered_priv_log_level_env_vars
-    original_default = _registry.registered_priv_default_log_level
+    original_env_vars = _registry.registered_internal_log_level_env_vars
+    original_default = _registry.registered_internal_default_log_level
     # Copy list if present to avoid mutating shared reference
     original_env_vars_copy = (
         list(original_env_vars) if original_env_vars is not None else None
     )
 
     # Reset to None on registry class
-    _registry.registered_priv_log_level_env_vars = None
-    _registry.registered_priv_default_log_level = None
+    _registry.registered_internal_log_level_env_vars = None
+    _registry.registered_internal_default_log_level = None
 
     # Also reset any shadow attributes on namespace class (in case a previous
     # test set them directly on the namespace class)
     # Check __dict__ directly to avoid MRO lookup
-    if "registered_priv_log_level_env_vars" in _ns.__dict__:
-        delattr(_ns, "registered_priv_log_level_env_vars")
-    if "registered_priv_default_log_level" in _ns.__dict__:
-        delattr(_ns, "registered_priv_default_log_level")
+    if "registered_internal_log_level_env_vars" in _ns.__dict__:
+        delattr(_ns, "registered_internal_log_level_env_vars")
+    if "registered_internal_default_log_level" in _ns.__dict__:
+        delattr(_ns, "registered_internal_default_log_level")
 
     # Clear environment variables
     monkeypatch.delenv("LOG_LEVEL", raising=False)
@@ -49,8 +49,8 @@ def reset_registry(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, Non
     yield
 
     # Restore original values
-    _registry.registered_priv_log_level_env_vars = original_env_vars_copy
-    _registry.registered_priv_default_log_level = original_default
+    _registry.registered_internal_log_level_env_vars = original_env_vars_copy
+    _registry.registered_internal_default_log_level = original_default
 
 
 def test_determine_log_level_from_args(

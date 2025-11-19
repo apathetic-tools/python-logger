@@ -17,8 +17,8 @@ from .constants import (
 from .dual_stream_handler import (
     ApatheticLogging_Internal_DualStreamHandler,
 )
-from .registry import (
-    ApatheticLogging_Internal_Registry,
+from .registry_data import (
+    ApatheticLogging_Internal_RegistryData,
 )
 from .safe_logging import (
     ApatheticLogging_Internal_SafeLogging,
@@ -289,7 +289,7 @@ class ApatheticLogging_Internal_Logger:  # noqa: N801  # pyright: ignore[reportU
             root_log_level: str | None = None,
         ) -> str:
             """Resolve log level from CLI → env → root config → default."""
-            _registry = ApatheticLogging_Internal_Registry
+            _registry = ApatheticLogging_Internal_RegistryData
             _constants = ApatheticLogging_Internal_Constants
             args_level = getattr(args, "log_level", None)
             if args_level is not None:
@@ -307,25 +307,27 @@ class ApatheticLogging_Internal_Logger:  # noqa: N801  # pyright: ignore[reportU
                     # (handles shadowed attributes correctly)
                     registered_env_vars = getattr(
                         namespace_class,
-                        "registered_priv_log_level_env_vars",
+                        "registered_internal_log_level_env_vars",
                         None,
                     )
                     registered_default = getattr(
                         namespace_class,
-                        "registered_priv_default_log_level",
+                        "registered_internal_default_log_level",
                         None,
                     )
                 else:
                     # Fallback to direct registry access
                     registry_cls = _registry
                     registered_env_vars = (
-                        registry_cls.registered_priv_log_level_env_vars
+                        registry_cls.registered_internal_log_level_env_vars
                     )
-                    registered_default = registry_cls.registered_priv_default_log_level
+                    registered_default = (
+                        registry_cls.registered_internal_default_log_level
+                    )
             else:
                 # Fallback to direct registry access
-                registered_env_vars = _registry.registered_priv_log_level_env_vars
-                registered_default = _registry.registered_priv_default_log_level
+                registered_env_vars = _registry.registered_internal_log_level_env_vars
+                registered_default = _registry.registered_internal_default_log_level
 
             env_vars_to_check = (
                 registered_env_vars or _constants.DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS

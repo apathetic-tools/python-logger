@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 import apathetic_logging as mod_alogs
-import apathetic_logging.registry as mod_registry
+import apathetic_logging.registry_data as mod_registry
 
 
 if TYPE_CHECKING:
@@ -28,17 +28,17 @@ else:
 def reset_registry_and_env() -> Generator[None, None, None]:
     """Reset registry state and environment variables before and after each test."""
     # Save original state
-    _registry = mod_registry.ApatheticLogging_Internal_Registry
-    original_name = _registry.registered_priv_logger_name
-    original_default = _registry.registered_priv_default_log_level
-    original_env_vars = _registry.registered_priv_log_level_env_vars
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    original_name = _registry.registered_internal_logger_name
+    original_default = _registry.registered_internal_default_log_level
+    original_env_vars = _registry.registered_internal_log_level_env_vars
     original_env = os.environ.get("TESTAPP_LOG_LEVEL")
     original_log_level = os.environ.get("LOG_LEVEL")
 
     # Reset state
-    _registry.registered_priv_logger_name = None
-    _registry.registered_priv_default_log_level = None
-    _registry.registered_priv_log_level_env_vars = None
+    _registry.registered_internal_logger_name = None
+    _registry.registered_internal_default_log_level = None
+    _registry.registered_internal_log_level_env_vars = None
     if "TESTAPP_LOG_LEVEL" in os.environ:
         del os.environ["TESTAPP_LOG_LEVEL"]
     if "LOG_LEVEL" in os.environ:
@@ -47,9 +47,9 @@ def reset_registry_and_env() -> Generator[None, None, None]:
     yield
 
     # Restore original state
-    _registry.registered_priv_logger_name = original_name
-    _registry.registered_priv_default_log_level = original_default
-    _registry.registered_priv_log_level_env_vars = original_env_vars
+    _registry.registered_internal_logger_name = original_name
+    _registry.registered_internal_default_log_level = original_default
+    _registry.registered_internal_log_level_env_vars = original_env_vars
     if original_env is not None:
         os.environ["TESTAPP_LOG_LEVEL"] = original_env
     if original_log_level is not None:

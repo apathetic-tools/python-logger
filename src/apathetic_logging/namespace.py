@@ -24,8 +24,8 @@ from .register_log_level_env_vars import (
 from .register_logger_name import (
     ApatheticLogging_Internal_RegisterLoggerName,
 )
-from .registry import (
-    ApatheticLogging_Internal_Registry,
+from .registry_data import (
+    ApatheticLogging_Internal_RegistryData,
 )
 from .safe_logging import (
     ApatheticLogging_Internal_SafeLogging,
@@ -46,7 +46,7 @@ class apathetic_logging(  # noqa: N801
     ApatheticLogging_Internal_RegisterDefaultLogLevel,
     ApatheticLogging_Internal_RegisterLogLevelEnvVars,
     ApatheticLogging_Internal_RegisterLoggerName,
-    ApatheticLogging_Internal_Registry,
+    ApatheticLogging_Internal_RegistryData,
     ApatheticLogging_Internal_SafeLogging,
     ApatheticLogging_Internal_TagFormatter,
 ):
