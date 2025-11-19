@@ -28,23 +28,12 @@ class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUn
     When mixed into apathetic_logging, it provides apathetic_logging.get_logger.
     """
 
-    # @staticmethod
-    # def get_logger(
-    #     logger_name: str | None = None,
-    # ) -> ApatheticLogging_Priv_Logger.Logger:
-
-    #     # Use get_logger_of_type() to handle name resolution and defensive checks
-    #     result = ApatheticLogging_Priv_GetLogger.get_logger_of_type(
-    #         logger_name, ApatheticLogging_Priv_Logger.Logger
-    #     )
-    #     return result
-
     @staticmethod
     def get_logger(
         logger_name: str | None = None,
     ) -> ApatheticLogging_Priv_Logger.Logger:
         registered_logger_name = ApatheticLogging_Priv_GetLogger._resolve_logger_name(
-            logger_name
+            logger_name, skip_frames=1
         )
         logger = logging.getLogger(registered_logger_name)
 
@@ -67,7 +56,7 @@ class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUn
     @staticmethod
     def get_logger_of_type(logger_name: str | None, _logger_class: type[_T]) -> _T:
         registered_logger_name = ApatheticLogging_Priv_GetLogger._resolve_logger_name(
-            logger_name
+            logger_name, skip_frames=2
         )
         logger = logging.getLogger(registered_logger_name)
 
@@ -80,7 +69,7 @@ class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUn
         return typed_logger
 
     @staticmethod
-    def _resolve_logger_name(logger_name: str | None) -> str:
+    def _resolve_logger_name(logger_name: str | None, *, skip_frames: int = 2) -> str:
         if logger_name is not None:
             return logger_name
 
@@ -93,22 +82,23 @@ class ApatheticLogging_Priv_GetLogger:  # noqa: N801  # pyright: ignore[reportUn
             frame = inspect.currentframe()
             if frame is not None:
                 try:
-                    # Get the calling frame (skip _resolve_logger_name and get_logger)
+                    # Skip the specified number of frames to get to the actual caller
                     caller_frame = frame.f_back
-                    if caller_frame is not None:
-                        # Skip get_logger frame to get to the actual caller
+                    for _ in range(skip_frames):
+                        if caller_frame is None:
+                            break
                         caller_frame = caller_frame.f_back
-                        if caller_frame is not None:
-                            caller_module = caller_frame.f_globals.get("__package__")
-                            if caller_module:
-                                _extract = (
-                                    ApatheticLogging_Priv_RegisterLoggerName._extract_top_level_package  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
-                                )
-                                inferred_name = _extract(caller_module)
-                                if inferred_name:
-                                    registry = ApatheticLogging_Priv_Registry
-                                    registry.registered_priv_logger_name = inferred_name
-                                    registered_logger_name = inferred_name
+                    if caller_frame is not None:
+                        caller_module = caller_frame.f_globals.get("__package__")
+                        if caller_module:
+                            _extract = (
+                                ApatheticLogging_Priv_RegisterLoggerName._extract_top_level_package  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+                            )
+                            inferred_name = _extract(caller_module)
+                            if inferred_name:
+                                registry = ApatheticLogging_Priv_Registry
+                                registry.registered_priv_logger_name = inferred_name
+                                registered_logger_name = inferred_name
                 finally:
                     del frame
 
