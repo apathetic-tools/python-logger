@@ -62,9 +62,12 @@ def _filter_runtime_mode_tests(
     items: list[pytest.Item],
 ) -> None:
     mode = _mode()
+    # Check if verbose mode is enabled (verbose > 0 means user wants verbose output)
+    verbose = getattr(config.option, "verbose", 0)
+    is_quiet = verbose <= 0
 
-    # file → number of tests
-    included_map: dict[str, int] = {}
+    # Only track included tests if not in quiet mode (for later reporting)
+    included_map: dict[str, int] | None = {} if not is_quiet else None
     root = str(config.rootpath)
     testpaths: list[str] = config.getini("testpaths") or []
 
@@ -80,7 +83,8 @@ def _filter_runtime_mode_tests(
             items.remove(item)
             continue
 
-        if runtime_marker and runtime_marker == mode:
+        # Only track if not in quiet mode
+        if runtime_marker and runtime_marker == mode and included_map is not None:
             file_path = str(item.fspath)
             # Make path relative to project root dir
             if file_path.startswith(root):
@@ -92,14 +96,31 @@ def _filter_runtime_mode_tests(
 
             included_map[file_path] = included_map.get(file_path, 0) + 1
 
-    # Store results for later reporting
-    config._included_map = included_map  # type: ignore[attr-defined]  # noqa: SLF001
-    config._runtime_mode = mode  # type: ignore[attr-defined]  # noqa: SLF001
+    # Store results for later reporting (only if not in quiet mode)
+    if included_map is not None:
+        config._included_map = included_map  # type: ignore[attr-defined]  # noqa: SLF001
+        config._runtime_mode = mode  # type: ignore[attr-defined]  # noqa: SLF001
 
 
 # ----------------------------------------------------------------------
 # Hooks
 # ----------------------------------------------------------------------
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    """Configure pytest options based on verbosity."""
+    verbose = getattr(config.option, "verbose", 0)
+    if verbose <= 0:
+        # In quiet mode, modify reportchars to exclude skipped tests ('s')
+        # The -ra flag in pytest.ini shows all, but hide skipped in quiet mode
+        reportchars = getattr(config.option, "reportchars", "")
+        if reportchars == "a":
+            # 'a' means "all except passed", change to exclude skipped and passed output
+            # Use explicit chars: f (failed), E (error), x (xfailed), X (xpassed)
+            config.option.reportchars = "fExX"
+        elif "s" in reportchars or "P" in reportchars:
+            # Remove 's' (skipped) and 'P' (passed with output) in quiet mode
+            config.option.reportchars = reportchars.replace("s", "").replace("P", "")
 
 
 def pytest_report_header(config: pytest.Config) -> str:  # noqa: ARG001 # pyright: ignore[reportUnknownParameterType]
@@ -125,6 +146,11 @@ def pytest_unconfigure(config: pytest.Config) -> None:
     mode = getattr(config, "_runtime_mode", "installed")
 
     if not included_map:
+        return
+
+    # Only print if pytest is not in quiet mode (verbose > 0 means verbose mode)
+    verbose = getattr(config.option, "verbose", 0)
+    if verbose <= 0:
         return
 
     total_tests = sum(included_map.values())
