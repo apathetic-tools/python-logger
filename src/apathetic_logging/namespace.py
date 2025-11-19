@@ -15,6 +15,12 @@ from .get_logger import (
 from .logger import (
     ApatheticLogging_Internal_Logger,
 )
+from .logging_snake import (
+    ApatheticLogging_Internal_LoggingSnakeCase,
+)
+from .logging_utils import (
+    ApatheticLogging_Internal_LoggingUtils,
+)
 from .registry import (
     ApatheticLogging_Internal_Registry,
 )
@@ -37,6 +43,8 @@ class apathetic_logging(  # noqa: N801
     ApatheticLogging_Internal_DualStreamHandler,
     ApatheticLogging_Internal_GetLogger,
     ApatheticLogging_Internal_Logger,
+    ApatheticLogging_Internal_LoggingSnakeCase,
+    ApatheticLogging_Internal_LoggingUtils,
     ApatheticLogging_Internal_Registry,
     ApatheticLogging_Internal_RegistryData,
     ApatheticLogging_Internal_SafeLogging,

@@ -17,6 +17,9 @@ from .constants import (
 from .dual_stream_handler import (
     ApatheticLogging_Internal_DualStreamHandler,
 )
+from .logger_snake import (
+    ApatheticLogging_Internal_LoggerSnakeCase,
+)
 from .registry_data import (
     ApatheticLogging_Internal_RegistryData,
 )
@@ -35,7 +38,10 @@ class ApatheticLogging_Internal_Logger:  # noqa: N801  # pyright: ignore[reportU
     When mixed into apathetic_logging, it provides apathetic_logging.Logger.
     """
 
-    class Logger(logging.Logger):
+    class Logger(
+        logging.Logger,
+        ApatheticLogging_Internal_LoggerSnakeCase,
+    ):
         """Logger for all Apathetic tools."""
 
         enable_color: bool = False
