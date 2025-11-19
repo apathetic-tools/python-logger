@@ -20,8 +20,8 @@ from .dual_stream_handler import (
 from .registry import (
     ApatheticLogging_Internal_Registry,
 )
-from .safe_trace import (
-    ApatheticLogging_Internal_SafeTrace,
+from .safe_logging import (
+    ApatheticLogging_Internal_SafeLogging,
 )
 from .tag_formatter import (
     ApatheticLogging_Internal_TagFormatter,
@@ -75,7 +75,7 @@ class ApatheticLogging_Internal_Logger:  # noqa: N801  # pyright: ignore[reportU
         def ensure_handlers(self) -> None:
             _dual_stream_handler = ApatheticLogging_Internal_DualStreamHandler
             _tag_formatter = ApatheticLogging_Internal_TagFormatter
-            _safe_trace = ApatheticLogging_Internal_SafeTrace
+            _safe_logging = ApatheticLogging_Internal_SafeLogging
             if self._last_stream_ids is None or not self.handlers:
                 rebuild = True
             else:
@@ -89,15 +89,15 @@ class ApatheticLogging_Internal_Logger:  # noqa: N801  # pyright: ignore[reportU
                 h.enable_color = self.enable_color
                 self.addHandler(h)
                 self._last_stream_ids = (sys.stdout, sys.stderr)
-                _safe_trace.safe_trace(
+                _safe_logging.safe_trace(
                     "ensure_handlers()", f"rebuilt_handlers={self.handlers}"
                 )
 
         def _log(  # type: ignore[override]
             self, level: int, msg: str, args: tuple[Any, ...], **kwargs: Any
         ) -> None:
-            _safe_trace = ApatheticLogging_Internal_SafeTrace
-            _safe_trace.safe_trace(
+            _safe_logging = ApatheticLogging_Internal_SafeLogging
+            _safe_logging.safe_trace(
                 "_log",
                 f"logger={self.name}",
                 f"id={id(self)}",

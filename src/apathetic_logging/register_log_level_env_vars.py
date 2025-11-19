@@ -6,8 +6,8 @@ from __future__ import annotations
 from .registry import (
     ApatheticLogging_Internal_Registry,
 )
-from .safe_trace import (
-    ApatheticLogging_Internal_SafeTrace,
+from .safe_logging import (
+    ApatheticLogging_Internal_SafeLogging,
 )
 
 
@@ -37,9 +37,9 @@ class ApatheticLogging_Internal_RegisterLogLevelEnvVars:  # noqa: N801  # pyrigh
             ... )
         """
         _registry = ApatheticLogging_Internal_Registry
-        _safe_trace = ApatheticLogging_Internal_SafeTrace
+        _safe_logging = ApatheticLogging_Internal_SafeLogging
         _registry.registered_priv_log_level_env_vars = env_vars
-        _safe_trace.safe_trace(
+        _safe_logging.safe_trace(
             "register_log_level_env_vars() called",
             f"env_vars={env_vars}",
         )

@@ -27,11 +27,8 @@ from .register_logger_name import (
 from .registry import (
     ApatheticLogging_Internal_Registry,
 )
-from .safe_log import (
-    ApatheticLogging_Internal_SafeLog,
-)
-from .safe_trace import (
-    ApatheticLogging_Internal_SafeTrace,
+from .safe_logging import (
+    ApatheticLogging_Internal_SafeLogging,
 )
 from .tag_formatter import (
     ApatheticLogging_Internal_TagFormatter,
@@ -50,9 +47,8 @@ class apathetic_logging(  # noqa: N801
     ApatheticLogging_Internal_RegisterLogLevelEnvVars,
     ApatheticLogging_Internal_RegisterLoggerName,
     ApatheticLogging_Internal_Registry,
-    ApatheticLogging_Internal_SafeLog,
+    ApatheticLogging_Internal_SafeLogging,
     ApatheticLogging_Internal_TagFormatter,
-    ApatheticLogging_Internal_SafeTrace,
 ):
     """Namespace for apathetic logging functionality.
 
@@ -71,9 +67,9 @@ class apathetic_logging(  # noqa: N801
     - ``register_log_level_env_vars()`` →
       ``ApatheticLogging_Internal_RegisterLogLevelEnvVars``
     - ``register_logger_name()`` → ``ApatheticLogging_Internal_RegisterLoggerName``
-    - ``safe_log()`` → ``ApatheticLogging_Internal_SafeLog``
-    - ``SAFE_TRACE()`` → ``ApatheticLogging_Internal_SafeTrace``
-    - ``make_test_trace()`` → ``ApatheticLogging_Internal_SafeTrace``
+    - ``safe_log()`` → ``ApatheticLogging_Internal_SafeLogging``
+    - ``safe_trace()`` → ``ApatheticLogging_Internal_SafeLogging``
+    - ``make_safe_trace()`` → ``ApatheticLogging_Internal_SafeLogging``
 
     **Constants:**
     - ``DEFAULT_APATHETIC_LOG_LEVEL`` → ``ApatheticLogging_Internal_Constants``

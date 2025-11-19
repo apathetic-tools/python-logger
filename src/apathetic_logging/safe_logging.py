@@ -1,5 +1,5 @@
-# src/apathetic_logging/safe_trace.py
-"""Safe trace functionality for Apathetic Logging."""
+# src/apathetic_logging/safe_logging.py
+"""Safe logging utilities for Apathetic Logging."""
 
 from __future__ import annotations
 
@@ -7,7 +7,8 @@ import builtins
 import importlib
 import sys
 from collections.abc import Callable
-from typing import Any
+from contextlib import suppress
+from typing import Any, TextIO, cast
 
 from .constants import (
     ApatheticLogging_Internal_Constants,
@@ -19,20 +20,33 @@ from .constants import (
 _real_time = importlib.import_module("time")
 
 
-class ApatheticLogging_Internal_SafeTrace:  # noqa: N801  # pyright: ignore[reportUnusedClass]
-    """Mixin class that provides the safe_trace and make_safe_trace static methods.
+class ApatheticLogging_Internal_SafeLogging:  # noqa: N801  # pyright: ignore[reportUnusedClass]
+    """Mixin class that provides safe logging utilities.
 
-    This class contains the safe_trace implementation as static methods.
-    When mixed into apathetic_logging, it provides apathetic_logging.safe_trace
-    and apathetic_logging.make_safe_trace.
+    This class contains both safe_log and safe_trace implementations as static
+    methods. When mixed into apathetic_logging, it provides:
+    - apathetic_logging.safe_log
+    - apathetic_logging.safe_trace
+    - apathetic_logging.make_safe_trace
     """
 
     @staticmethod
+    def safe_log(msg: str) -> None:
+        """Emergency logger that never fails."""
+        stream = cast("TextIO", sys.__stderr__)
+        try:
+            print(msg, file=stream)
+        except Exception:  # noqa: BLE001
+            # As final guardrail — never crash during crash reporting
+            with suppress(Exception):
+                stream.write(f"[INTERNAL] {msg}\n")
+
+    @staticmethod
     def make_safe_trace(icon: str = "🧪") -> Callable[..., Any]:
-        _safe_trace = ApatheticLogging_Internal_SafeTrace
+        _safe_logging = ApatheticLogging_Internal_SafeLogging
 
         def local_trace(label: str, *args: Any) -> Any:
-            return _safe_trace.safe_trace(label, *args, icon=icon)
+            return _safe_logging.safe_trace(label, *args, icon=icon)
 
         return local_trace
 

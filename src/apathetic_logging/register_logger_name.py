@@ -8,8 +8,8 @@ import sys
 from .registry import (
     ApatheticLogging_Internal_Registry,
 )
-from .safe_trace import (
-    ApatheticLogging_Internal_SafeTrace,
+from .safe_logging import (
+    ApatheticLogging_Internal_SafeLogging,
 )
 
 
@@ -64,7 +64,7 @@ class ApatheticLogging_Internal_RegisterLoggerName:  # noqa: N801  # pyright: ig
         """
         _register_logger_name = ApatheticLogging_Internal_RegisterLoggerName
         _registry = ApatheticLogging_Internal_Registry
-        _safe_trace = ApatheticLogging_Internal_SafeTrace
+        _safe_logging = ApatheticLogging_Internal_SafeLogging
         auto_inferred = False
         if logger_name is None:
             # Extract top-level package from the namespace module's __package__
@@ -83,7 +83,7 @@ class ApatheticLogging_Internal_RegisterLoggerName:  # noqa: N801  # pyright: ig
                 raise RuntimeError(_msg)
 
         _registry.registered_priv_logger_name = logger_name
-        _safe_trace.safe_trace(
+        _safe_logging.safe_trace(
             "register_logger_name() called",
             f"name={logger_name}",
             f"auto_inferred={auto_inferred}",
