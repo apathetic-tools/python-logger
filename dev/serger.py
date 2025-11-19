@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+"""
+Serger — Stitch your module into a single file.
+This single-file version is auto-generated from modular sources.
+Version: 0.1.0
+Commit: unknown (local build)
+Built: 2025-11-19 00:19:29 UTC
+"""
 # Serger — Stitch your module into a single file.
 # ============LICENSE============
 # License: MIT-aNOAI
@@ -6,9 +13,8 @@
 # ================================
 # Version: 0.1.0
 # Commit: unknown (local build)
-# Build Date: 2025-11-18 08:19:54 UTC
+# Build Date: 2025-11-19 00:19:29 UTC
 # Repo: https://github.com/apathetic-tools/serger
-
 
 from __future__ import annotations
 
@@ -58,18 +64,9 @@ from typing import (
 from typing_extensions import NotRequired
 
 
-"""
-Serger — Stitch your module into a single file.
-This single-file version is auto-generated from modular sources.
-Version: 0.1.0
-Commit: unknown (local build)
-Built: 2025-11-18 08:19:54 UTC
-"""
-
-
 __version__ = "0.1.0"
 __commit__ = "unknown (local build)"
-__build_date__ = "2025-11-18 08:19:54 UTC"
+__build_date__ = "2025-11-19 00:19:29 UTC"
 __STANDALONE__ = True
 __STITCH_SOURCE__ = "serger"
 __package__ = "serger"
@@ -1718,38 +1715,42 @@ def safe_isinstance(value: Any, expected_type: Any) -> bool:  # noqa: PLR0911
         return False
 
 
-# === serger.utils.utils_validation ===
-# src/serger/utils/utils_validation.py
+# === serger.meta ===
+# src/serger/meta.py
+
+"""Centralized program identity constants for Serger."""
 
 
-def validate_required_keys(
-    config: dict[str, Any] | Any,
-    required_keys: set[str],
-    param_name: str,
-) -> None:
-    """Validate that a config dict contains all required keys.
+_BASE = "serger"
 
-    Args:
-        config: The config dict to validate (TypedDict or dict)
-        required_keys: Set of required key names
-        param_name: Name of the parameter (for error messages)
+# CLI script name (the executable or `poetry run` entrypoint)
+PROGRAM_SCRIPT = _BASE
 
-    Raises:
-        TypeError: If any required keys are missing
-    """
-    if not required_keys:
-        return
+# config file name
+PROGRAM_CONFIG = _BASE
 
-    # TypedDict is a dict at runtime, but type checkers need help
-    config_dict = cast("dict[str, Any]", config)
-    missing = required_keys - config_dict.keys()
-    if missing:
-        missing_str = ", ".join(sorted(missing))
-        xmsg = (
-            f"Missing required keys in {param_name}: {missing_str}. "
-            f"Required keys: {', '.join(sorted(required_keys))}"
-        )
-        raise TypeError(xmsg)
+# Human-readable name for banners, help text, etc.
+PROGRAM_DISPLAY = _BASE.replace("-", " ").title()
+
+# Python package / import name
+PROGRAM_PACKAGE = _BASE.replace("-", "_")
+
+# Environment variable prefix (used for <APP>_BUILD_LOG_LEVEL, etc.)
+PROGRAM_ENV = _BASE.replace("-", "_").upper()
+
+# Short tagline or __DESCRIPTION for help screens and metadata
+DESCRIPTION = "Stitch your module into a single file."
+
+
+@dataclass(frozen=True)
+class Metadata:
+    """Lightweight result from get_metadata(), containing version and commit info."""
+
+    version: str
+    commit: str
+
+    def __str__(self) -> str:
+        return f"{self.version} ({self.commit})"
 
 
 # === serger.constants ===
@@ -1816,7 +1817,11 @@ DEFAULT_MODULE_MODE: str = "multi"  # Generate shims for all detected packages
 DEFAULT_SHIM: str = "all"  # Generate shims for all modules (default shim setting)
 DEFAULT_COMMENTS_MODE: str = "keep"  # Keep all comments (default comments mode)
 DEFAULT_DOCSTRING_MODE: str = "keep"  # Keep all docstrings (default docstring mode)
-DEFAULT_MODULE_BASES: list[str] = ["src"]  # Default directories to search for packages
+DEFAULT_MODULE_BASES: list[str] = [
+    "src",
+    "lib",
+    "packages",
+]  # Default directories to search for packages
 DEFAULT_MAIN_MODE: str = "auto"  # Automatically detect and generate __main__ block
 DEFAULT_MAIN_NAME: str | None = None  # Auto-detect main function (default)
 DEFAULT_DISABLE_BUILD_TIMESTAMP: bool = False  # Use real timestamps by default
@@ -1868,6 +1873,40 @@ DEFAULT_CATEGORIES: dict[str, dict[str, Any]] = {
         },
     },
 }
+
+
+# === serger.utils.utils_validation ===
+# src/serger/utils/utils_validation.py
+
+
+def validate_required_keys(
+    config: dict[str, Any] | Any,
+    required_keys: set[str],
+    param_name: str,
+) -> None:
+    """Validate that a config dict contains all required keys.
+
+    Args:
+        config: The config dict to validate (TypedDict or dict)
+        required_keys: Set of required key names
+        param_name: Name of the parameter (for error messages)
+
+    Raises:
+        TypeError: If any required keys are missing
+    """
+    if not required_keys:
+        return
+
+    # TypedDict is a dict at runtime, but type checkers need help
+    config_dict = cast("dict[str, Any]", config)
+    missing = required_keys - config_dict.keys()
+    if missing:
+        missing_str = ", ".join(sorted(missing))
+        xmsg = (
+            f"Missing required keys in {param_name}: {missing_str}. "
+            f"Required keys: {', '.join(sorted(required_keys))}"
+        )
+        raise TypeError(xmsg)
 
 
 # === serger.config.config_types ===
@@ -2061,7 +2100,7 @@ class RootConfig(TypedDict, total=False):
     docstring_mode: DocstringMode
     # Module bases: ordered list of directories where packages can be found
     # - str: Single directory (convenience, converted to list[str] on resolve)
-    # - list[str]: Ordered list of directories (default: ["src"])
+    # - list[str]: Ordered list of directories (default: ["src", "lib", "packages"])
     module_bases: str | list[str]
     # Main function configuration
     # - "none": Don't generate __main__ block
@@ -2090,8 +2129,9 @@ class RootConfigResolved(TypedDict):
     # Runtime behavior
     watch_interval: float
 
-    # Runtime flag (CLI only, not persisted in normal configs)
+    # Runtime flags (CLI only, not persisted in normal configs)
     dry_run: bool
+    validate_config: bool
 
     # Global provenance (optional, for audit/debug)
     __meta__: MetaBuildConfigResolved
@@ -2129,44 +2169,6 @@ class RootConfigResolved(TypedDict):
     main_name: str | None
     # Build timestamp control (always present, resolved with defaults)
     disable_build_timestamp: bool
-
-
-# === serger.meta ===
-# src/serger/meta.py
-
-"""Centralized program identity constants for Serger."""
-
-
-_BASE = "serger"
-
-# CLI script name (the executable or `poetry run` entrypoint)
-PROGRAM_SCRIPT = _BASE
-
-# config file name
-PROGRAM_CONFIG = _BASE
-
-# Human-readable name for banners, help text, etc.
-PROGRAM_DISPLAY = _BASE.replace("-", " ").title()
-
-# Python package / import name
-PROGRAM_PACKAGE = _BASE.replace("-", "_")
-
-# Environment variable prefix (used for <APP>_BUILD_LOG_LEVEL, etc.)
-PROGRAM_ENV = _BASE.replace("-", "_").upper()
-
-# Short tagline or __DESCRIPTION for help screens and metadata
-DESCRIPTION = "Stitch your module into a single file."
-
-
-@dataclass(frozen=True)
-class Metadata:
-    """Lightweight result from get_metadata(), containing version and commit info."""
-
-    version: str
-    commit: str
-
-    def __str__(self) -> str:
-        return f"{self.version} ({self.commit})"
 
 
 # === serger.apathetic_utils.files ===
@@ -2691,56 +2693,6 @@ def is_excluded_raw(  # noqa: PLR0911, PLR0912, PLR0915, C901
     return False
 
 
-# === serger.utils.utils_types ===
-# src/serger/utils/utils_types.py
-
-
-def _root_resolved(
-    path: Path | str,
-    root: Path | str,
-    pattern: str | None,
-    origin: OriginType,
-) -> dict[str, object]:
-    # Preserve raw string if available (to keep trailing slashes)
-    raw_path = path if isinstance(path, str) else str(path)
-    result: dict[str, object] = {
-        "path": raw_path,
-        "root": Path(root).resolve(),
-        "origin": origin,
-    }
-    if pattern is not None:
-        result["pattern"] = pattern
-    return result
-
-
-def make_pathresolved(
-    path: Path | str,
-    root: Path | str = ".",
-    origin: OriginType = "code",
-    *,
-    pattern: str | None = None,
-) -> PathResolved:
-    """Quick helper to build a PathResolved entry."""
-    # mutate class type
-    return cast("PathResolved", _root_resolved(path, root, pattern, origin))
-
-
-def make_includeresolved(
-    path: Path | str,
-    root: Path | str = ".",
-    origin: OriginType = "code",
-    *,
-    pattern: str | None = None,
-    dest: Path | str | None = None,
-) -> IncludeResolved:
-    """Create an IncludeResolved entry with optional dest override."""
-    entry = _root_resolved(path, root, pattern, origin)
-    if dest is not None:
-        entry["dest"] = Path(dest)
-    # mutate class type
-    return cast("IncludeResolved", entry)
-
-
 # === serger.logs ===
 # src/serger/logs.py
 
@@ -2820,6 +2772,166 @@ def get_app_logger() -> AppLogger:
         f"handlers={[type(h).__name__ for h in _APP_LOGGER.handlers]}",
     )
     return _APP_LOGGER
+
+
+# === serger.utils.utils_paths ===
+# src/serger/utils/utils_paths.py
+
+
+def shorten_path_for_display(
+    path: Path | str | PathResolved | IncludeResolved,
+    *,
+    cwd: Path | None = None,
+    config_dir: Path | None = None,
+) -> str:
+    """Shorten an absolute path for display purposes.
+
+    Tries to make the path relative to cwd first, then config_dir, and picks
+    the shortest result. If neither works, returns the absolute path as a string.
+
+    If path is a PathResolved or IncludeResolved, resolves exclusively against
+    its built-in `root` field (ignoring cwd and config_dir).
+
+    Args:
+        path: Path to shorten (can be Path, str, PathResolved, or IncludeResolved)
+        cwd: Current working directory (optional, ignored for PathResolved/
+            IncludeResolved)
+        config_dir: Config directory (optional, ignored for PathResolved/
+            IncludeResolved)
+
+    Returns:
+        Shortened path string (relative when possible, absolute otherwise)
+    """
+    # Handle PathResolved or IncludeResolved types
+    if isinstance(path, dict) and "root" in path:
+        # PathResolved or IncludeResolved - resolve against its root exclusively
+        root = Path(path["root"]).resolve()
+        path_val = path["path"]
+        # Resolve path relative to root
+        path_obj = (root / path_val).resolve()
+        # Try to make relative to root
+        try:
+            rel_to_root = str(path_obj.relative_to(root))
+        except ValueError:
+            # Not relative to root, return absolute
+            return str(path_obj)
+        else:
+            if rel_to_root:
+                return rel_to_root
+            return "."
+
+    # Handle regular Path or str
+    path_obj = Path(path).resolve()
+
+    candidates: list[str] = []
+
+    # Try relative to cwd
+    if cwd:
+        cwd_resolved = Path(cwd).resolve()
+        try:
+            rel_to_cwd = str(path_obj.relative_to(cwd_resolved))
+            candidates.append(rel_to_cwd)
+        except ValueError:
+            pass
+
+    # Try relative to config_dir
+    if config_dir:
+        config_dir_resolved = Path(config_dir).resolve()
+        try:
+            rel_to_config = str(path_obj.relative_to(config_dir_resolved))
+            candidates.append(rel_to_config)
+        except ValueError:
+            pass
+
+    # If we have candidates, pick the shortest one
+    if candidates:
+        return min(candidates, key=len)
+
+    # Fall back to absolute path
+    return str(path_obj)
+
+
+def shorten_paths_for_display(
+    paths: (
+        list[Path]
+        | list[str]
+        | list[PathResolved]
+        | list[IncludeResolved]
+        | list[Path | str | PathResolved | IncludeResolved]
+    ),
+    *,
+    cwd: Path | None = None,
+    config_dir: Path | None = None,
+) -> list[str]:
+    """Shorten a list of paths for display purposes.
+
+    Applies shorten_path_for_display to each path in the list. Can handle
+    mixed types (Path, str, PathResolved, IncludeResolved).
+
+    Args:
+        paths: List of paths to shorten (can be Path, str, PathResolved, or
+            IncludeResolved, or a mix)
+        cwd: Current working directory (optional, ignored for PathResolved/
+            IncludeResolved)
+        config_dir: Config directory (optional, ignored for PathResolved/
+            IncludeResolved)
+
+    Returns:
+        List of shortened path strings
+    """
+    return [
+        shorten_path_for_display(path, cwd=cwd, config_dir=config_dir) for path in paths
+    ]
+
+
+# === serger.utils.utils_types ===
+# src/serger/utils/utils_types.py
+
+
+def _root_resolved(
+    path: Path | str,
+    root: Path | str,
+    pattern: str | None,
+    origin: OriginType,
+) -> dict[str, object]:
+    # Preserve raw string if available (to keep trailing slashes)
+    raw_path = path if isinstance(path, str) else str(path)
+    result: dict[str, object] = {
+        "path": raw_path,
+        "root": Path(root).resolve(),
+        "origin": origin,
+    }
+    if pattern is not None:
+        result["pattern"] = pattern
+    return result
+
+
+def make_pathresolved(
+    path: Path | str,
+    root: Path | str = ".",
+    origin: OriginType = "code",
+    *,
+    pattern: str | None = None,
+) -> PathResolved:
+    """Quick helper to build a PathResolved entry."""
+    # mutate class type
+    return cast("PathResolved", _root_resolved(path, root, pattern, origin))
+
+
+def make_includeresolved(
+    path: Path | str,
+    root: Path | str = ".",
+    origin: OriginType = "code",
+    *,
+    pattern: str | None = None,
+    dest: Path | str | None = None,
+) -> IncludeResolved:
+    """Create an IncludeResolved entry with optional dest override."""
+    entry = _root_resolved(path, root, pattern, origin)
+    if dest is not None:
+        entry["dest"] = Path(dest)
+    # mutate class type
+    return cast("IncludeResolved", entry)
 
 
 # === serger.config.config_validate ===
@@ -6304,6 +6416,92 @@ def _normalize_path_with_root(
     return root, rel
 
 
+def _extract_module_bases_from_includes(  # noqa: PLR0912
+    includes: list[IncludeResolved],
+    config_dir: Path,
+) -> list[str]:
+    """Extract parent directories from includes to use as module_bases.
+
+    For each include, extracts the first directory component that contains
+    packages (e.g., "src/" from "src/mypkg/main.py" or "src/mypkg/**/*.py").
+    Returns absolute paths. Skips filesystem root and config_dir itself.
+    Returns a deduplicated list preserving order.
+
+    Args:
+        includes: List of resolved includes
+        config_dir: Config directory for resolving paths
+
+    Returns:
+        List of module base directories as absolute paths
+    """
+    logger = get_app_logger()
+    config_dir_resolved = config_dir.resolve()
+    bases: list[str] = []
+    seen_bases: set[str] = set()
+
+    for inc in includes:
+        # Get the root directory for this include
+        include_root = Path(inc["root"]).resolve()
+        include_path = inc["path"]
+
+        # Extract the first directory component from the path
+        if isinstance(include_path, Path):
+            # Resolved Path object: get first component
+            path_parts = include_path.parts
+            if path_parts:
+                # Get first directory component
+                first_dir = path_parts[0]
+                parent_dir = (include_root / first_dir).resolve()
+            else:
+                parent_dir = include_root
+        else:
+            # String pattern: extract first directory component
+            path_str = str(include_path)
+            # Remove glob patterns and trailing slashes
+            if path_str.endswith("/**"):
+                # Recursive pattern: remove "/**"
+                path_str = path_str.removesuffix("/**")
+            elif path_str.endswith("/"):
+                # Directory: remove trailing slash
+                path_str = path_str.rstrip("/")
+
+            # Extract first directory component
+            # For "src/mypkg/main.py" → "src"
+            # For "src/mypkg/**/*.py" → "src"
+            # For "lib/otherpkg/" → "lib"
+            if "/" in path_str:
+                # Get first component (before first /)
+                first_component = path_str.split("/", 1)[0]
+                # Remove any glob chars from first component
+                if has_glob_chars(first_component):
+                    # If first component has glob, use include_root
+                    parent_dir = include_root
+                else:
+                    parent_dir = (include_root / first_component).resolve()
+            else:
+                # Single filename or pattern: use root
+                parent_dir = include_root
+
+        # Skip if parent is filesystem root or config_dir itself
+        if parent_dir in {parent_dir.anchor, config_dir_resolved}:
+            continue
+
+        # Store as absolute path
+        base_str = str(parent_dir)
+
+        # Deduplicate while preserving order
+        if base_str not in seen_bases:
+            seen_bases.add(base_str)
+            bases.append(base_str)
+            logger.trace(
+                "[MODULE_BASES] Extracted base from include: %s → %s",
+                inc["path"],
+                base_str,
+            )
+
+    return bases
+
+
 # --------------------------------------------------------------------------- #
 # main per-build resolver
 # --------------------------------------------------------------------------- #
@@ -6311,7 +6509,7 @@ def _normalize_path_with_root(
 
 def _get_first_level_modules_from_base(
     base_str: str,
-    config_dir: Path,
+    _config_dir: Path,
 ) -> list[str]:
     """Get first-level module/package names from a single module_base directory.
 
@@ -6325,8 +6523,8 @@ def _get_first_level_modules_from_base(
     - .py files at first level are modules
 
     Args:
-        base_str: Module base directory path (relative or absolute)
-        config_dir: Config directory for resolving relative paths
+        base_str: Module base directory path (absolute)
+        _config_dir: Config directory (unused, kept for compatibility)
 
     Returns:
         Sorted list of first-level module/package names found in the base
@@ -6334,8 +6532,8 @@ def _get_first_level_modules_from_base(
     logger = get_app_logger()
     modules: list[str] = []
 
-    # Resolve base path relative to config_dir
-    base_path = (config_dir / base_str).resolve()
+    # base_str is already an absolute path
+    base_path = Path(base_str).resolve()
 
     if not base_path.exists() or not base_path.is_dir():
         logger.trace(
@@ -6394,8 +6592,8 @@ def _get_first_level_modules_from_bases(
     modules from each base sorted but not deduplicated across bases.
 
     Args:
-        module_bases: List of module base directory paths (relative or absolute)
-        config_dir: Config directory for resolving relative paths
+        module_bases: List of module base directory paths (absolute)
+        config_dir: Config directory (unused, kept for compatibility)
 
     Returns:
         List of first-level module/package names found in module_bases,
@@ -6511,7 +6709,8 @@ def _infer_packages_from_includes(  # noqa: C901, PLR0912, PLR0915
         for path_str in path_strings:
             # Check if path is within any module_base
             for base_str in module_bases:
-                base_path = (config_dir / base_str).resolve()
+                # base_str is already an absolute path
+                base_path = Path(base_str).resolve()
                 # Try to resolve path relative to config_dir
                 try:
                     path_obj = (config_dir / path_str).resolve()
@@ -6593,7 +6792,8 @@ def _infer_packages_from_includes(  # noqa: C901, PLR0912, PLR0915
                 path_obj = (config_dir / path_str).resolve()
                 # Try to find first-level directory relative to module_bases
                 for base_str in module_bases:
-                    base_path = (config_dir / base_str).resolve()
+                    # base_str is already an absolute path
+                    base_path = Path(base_str).resolve()
                     try:
                         rel_path = path_obj.relative_to(base_path)
                         parts = list(rel_path.parts)
@@ -6911,6 +7111,19 @@ def resolve_build_config(  # noqa: C901, PLR0912, PLR0915
         f"[resolve_build_config] Resolved {len(resolved_cfg['include'])} include(s)"
     )
 
+    # --- Extract module_bases from includes (before resolving module_bases) ---
+    # Separate CLI and config includes for priority ordering
+    cli_includes: list[IncludeResolved] = [
+        inc for inc in resolved_cfg["include"] if inc["origin"] == "cli"
+    ]
+    config_includes: list[IncludeResolved] = [
+        inc for inc in resolved_cfg["include"] if inc["origin"] == "config"
+    ]
+
+    # Extract bases from includes (CLI first, then config)
+    cli_bases = _extract_module_bases_from_includes(cli_includes, config_dir)
+    config_bases = _extract_module_bases_from_includes(config_includes, config_dir)
+
     # --- Excludes ---------------------------
     resolved_cfg["exclude"] = _resolve_excludes(
         resolved_cfg,
@@ -7012,14 +7225,72 @@ def resolve_build_config(  # noqa: C901, PLR0912, PLR0915
     # ------------------------------
     # Module bases
     # ------------------------------
-    # Convert str to list[str] if needed
+    # Convert str to list[str] if needed, then merge with bases from includes
     if "module_bases" in resolved_cfg:
         module_bases = resolved_cfg["module_bases"]
-        resolved_cfg["module_bases"] = (
+        config_module_bases = (
             [module_bases] if isinstance(module_bases, str) else module_bases
         )
     else:
-        resolved_cfg["module_bases"] = DEFAULT_MODULE_BASES
+        config_module_bases = DEFAULT_MODULE_BASES
+
+    # Merge with priority: CLI includes > config includes > config module_bases >
+    # defaults
+    # Deduplicate while preserving priority order
+    merged_bases: list[str] = []
+    seen_bases: set[str] = set()
+
+    # Add CLI bases first (highest priority)
+    # (already absolute from _extract_module_bases_from_includes)
+    for base in cli_bases:
+        if base not in seen_bases:
+            seen_bases.add(base)
+            merged_bases.append(base)
+
+    # Add config bases (second priority)
+    # (already absolute from _extract_module_bases_from_includes)
+    for base in config_bases:
+        if base not in seen_bases:
+            seen_bases.add(base)
+            merged_bases.append(base)
+
+    # Add config module_bases (third priority) - resolve relative paths to absolute
+    for base in config_module_bases:
+        # Resolve relative paths to absolute
+        base_path = (config_dir / base).resolve()
+        base_abs = str(base_path)
+        if base_abs not in seen_bases:
+            seen_bases.add(base_abs)
+            merged_bases.append(base_abs)
+
+    # Add defaults last (lowest priority, but should already be in config_module_bases)
+    # Resolve relative paths to absolute
+    for base in DEFAULT_MODULE_BASES:
+        base_path = (config_dir / base).resolve()
+        base_abs = str(base_path)
+        if base_abs not in seen_bases:
+            seen_bases.add(base_abs)
+            merged_bases.append(base_abs)
+
+    resolved_cfg["module_bases"] = merged_bases
+    if cli_bases or config_bases:
+        # Use display helpers for logging
+        display_bases = shorten_paths_for_display(
+            merged_bases, cwd=cwd, config_dir=config_dir
+        )
+        display_cli = shorten_paths_for_display(
+            cli_bases, cwd=cwd, config_dir=config_dir
+        )
+        display_config = shorten_paths_for_display(
+            config_bases, cwd=cwd, config_dir=config_dir
+        )
+        logger.debug(
+            "[MODULE_BASES] Extracted bases from includes: CLI=%s, config=%s, "
+            "merged=%s",
+            display_cli,
+            display_config,
+            display_bases,
+        )
 
     # ------------------------------
     # Main mode
@@ -7277,7 +7548,8 @@ def resolve_build_config(  # noqa: C901, PLR0912, PLR0915
             # Can be either a directory (package) or a .py file (module)
             package_path: str | None = None
             for base_str in module_bases_list:
-                base_path = (config_dir / base_str).resolve()
+                # base_str is already an absolute path
+                base_path = Path(base_str).resolve()
                 package_dir = base_path / package
                 package_file = base_path / f"{package}.py"
 
@@ -7394,6 +7666,10 @@ def resolve_config(
 
     # Add watch_interval to resolved config
     resolved["watch_interval"] = watch_interval
+
+    # Set runtime flags with defaults (will be overridden in _execute_build if set)
+    resolved["dry_run"] = False
+    resolved["validate_config"] = False
 
     return resolved
 
@@ -10338,7 +10614,7 @@ def _find_package_root_for_file(
     file_path: Path,
     *,
     module_bases: list[str] | None = None,
-    config_dir: Path | None = None,
+    _config_dir: Path | None = None,
 ) -> Path | None:
     """Find the package root for a file.
 
@@ -10348,8 +10624,8 @@ def _find_package_root_for_file(
 
     Args:
         file_path: Path to the Python file
-        module_bases: Optional list of module base directories
-        config_dir: Optional config directory for resolving relative module_bases
+        module_bases: Optional list of module base directories (absolute paths)
+        _config_dir: Optional config directory (unused, kept for compatibility)
 
     Returns:
         Path to the package root directory, or None if not found
@@ -10405,10 +10681,10 @@ def _find_package_root_for_file(
         current_dir = parent
 
     # If no __init__.py found, check if file is under any module_bases directory
-    if module_bases and config_dir and last_package_dir is None:
-        config_dir_resolved = config_dir.resolve()
+    if module_bases and last_package_dir is None:
         for base_str in module_bases:
-            base_path = (config_dir_resolved / base_str).resolve()
+            # base_str is already an absolute path
+            base_path = Path(base_str).resolve()
             try:
                 # Check if file is under this base
                 rel_path = file_path_resolved.relative_to(base_path)
@@ -10439,8 +10715,8 @@ def detect_packages_from_files(
     package_name: str,
     *,
     module_bases: list[str] | None = None,
-    config_dir: Path | None = None,
-) -> set[str]:
+    _config_dir: Path | None = None,
+) -> tuple[set[str], list[str]]:
     """Detect packages from file paths.
 
     If files are under module_bases directories, treats everything after the
@@ -10451,33 +10727,55 @@ def detect_packages_from_files(
     Args:
         file_paths: List of file paths to check
         package_name: Configured package name (used as fallback)
-        module_bases: Optional list of module base directories
-        config_dir: Optional config directory for resolving relative module_bases
+        module_bases: Optional list of module base directories (absolute paths)
+        _config_dir: Optional config directory (unused, kept for compatibility)
 
     Returns:
-        Set of detected package names (always includes package_name)
+        Tuple of (set of detected package names, list of parent directories).
+        Package names always includes package_name. Parent directories are
+        returned as absolute paths, deduplicated.
     """
     logger = get_app_logger()
     detected: set[str] = set()
+    parent_dirs: list[Path] = []
+    seen_parents: set[Path] = set()
 
     # Detect packages from files
     for file_path in file_paths:
-        pkg_root = _find_package_root_for_file(
-            file_path, module_bases=module_bases, config_dir=config_dir
-        )
+        pkg_root = _find_package_root_for_file(file_path, module_bases=module_bases)
         if pkg_root:
             # Extract package name from directory name
             pkg_name = pkg_root.name
             detected.add(pkg_name)
+
+            # Extract parent directory (module base)
+            parent_dir = pkg_root.parent.resolve()
+            # Check if parent is filesystem root (parent of root equals root)
+            is_root = parent_dir.parent == parent_dir
+            if not is_root and parent_dir not in seen_parents:
+                seen_parents.add(parent_dir)
+                parent_dirs.append(parent_dir)
+
             logger.trace(
-                "[PKG_DETECT] Detected package %s from %s (root: %s)",
+                "[PKG_DETECT] Detected package %s from %s (root: %s, parent: %s)",
                 pkg_name,
                 file_path,
                 pkg_root,
+                parent_dir,
             )
 
     # Always include configured package (for fallback and multi-package scenarios)
     detected.add(package_name)
+
+    # Return parent directories as absolute paths
+    normalized_parents: list[str] = []
+    seen_normalized: set[str] = set()
+
+    for parent_dir in parent_dirs:
+        base_str = str(parent_dir)
+        if base_str not in seen_normalized:
+            seen_normalized.add(base_str)
+            normalized_parents.append(base_str)
 
     if len(detected) == 1 and package_name in detected:
         logger.debug(
@@ -10491,7 +10789,7 @@ def detect_packages_from_files(
             sorted(detected),
         )
 
-    return detected
+    return detected, normalized_parents
 
 
 def force_mtime_advance(path: Path, seconds: float = 1.0, max_tries: int = 50) -> None:
@@ -10611,7 +10909,8 @@ def _collect_modules(  # noqa: PLR0912, PLR0915
 
     for file_path in file_paths:
         if not file_path.exists():
-            logger.warning("Skipping missing file: %s", file_path)
+            file_display = shorten_path_for_display(file_path)
+            logger.warning("Skipping missing file: %s", file_display)
             continue
 
         # Derive module name from file path
@@ -10698,7 +10997,8 @@ def _collect_modules(  # noqa: PLR0912, PLR0915
         header = f"# === {module_name} ==="
         parts.append(f"\n{header}\n{module_body.strip()}\n\n")
 
-        logger.trace("Processed module: %s (from %s)", module_name, file_path)
+        file_display = shorten_path_for_display(file_path)
+        logger.trace("Processed module: %s (from %s)", module_name, file_display)
 
     return module_sources, all_imports, parts, derived_module_names
 
@@ -11487,10 +11787,29 @@ def _build_final_script(  # noqa: C901, PLR0912, PLR0913, PLR0915
         if module_mode != "flat" or all_packages:
             all_packages.add(package_name)
 
+        # Add detected packages that have modules in the final output
+        # This is important when files from outside the config directory are included
+        # and packages are detected via module_bases but not directly referenced
+        # in module names (e.g., when __init__.py is excluded)
+        # Only add packages that actually have modules (not deleted by actions)
+        all_module_names = set(shim_names) | set(module_names_for_structure)
+        for detected_pkg in detected_packages:
+            # Check if any module belongs to this package
+            # Module must start with package name (exact match or package.module)
+            # to ensure we only add packages that are actually used as packages,
+            # not just components of other package names
+            has_modules = any(
+                mod == detected_pkg or mod.startswith(f"{detected_pkg}.")
+                for mod in all_module_names
+            )
+            if has_modules:
+                all_packages.add(detected_pkg)
+
         logger.trace(
-            "Collected packages: %s (package_name=%s)",
+            "Collected packages: %s (package_name=%s, detected_packages=%s)",
             sorted(all_packages),
             package_name,
+            sorted(detected_packages),
         )
 
         # Sort packages by depth (shallowest first) to create parents before children
@@ -11525,8 +11844,8 @@ def _build_final_script(  # noqa: C901, PLR0912, PLR0913, PLR0915
         shim_blocks.append("    return _mod")
         shim_blocks.append("")
 
+        shim_blocks.append("def _setup_pkg_modules(  # noqa: C901, PLR0912")
         shim_blocks.append(
-            "def _setup_pkg_modules("
             "pkg_name: str, module_names: list[str], "
             "name_mapping: dict[str, str] | None = None"
             ") -> None:"
@@ -11559,7 +11878,7 @@ def _build_final_script(  # noqa: C901, PLR0912, PLR0913, PLR0915
         )
         shim_blocks.append("            # mypkg.public.utils)")
         shim_blocks.append("            _name_parts = _name.split('.')")
-        shim_blocks.append("            if len(_name_parts) > 2:")
+        shim_blocks.append("            if len(_name_parts) > 2:  # noqa: PLR2004")
         shim_blocks.append("                # Has at least one intermediate package")
         shim_blocks.append("                _parent_pkg = '.'.join(_name_parts[:-1])")
         shim_blocks.append(
@@ -11967,16 +12286,6 @@ def _build_final_script(  # noqa: C901, PLR0912, PLR0913, PLR0915
 
     script_text = (
         "#!/usr/bin/env python3\n"
-        f"# {header_line}\n"
-        f"{license_section}"
-        f"# Version: {version}\n"
-        f"# Commit: {commit}\n"
-        f"# Build Date: {build_date}\n"
-        f"{authors_line}"
-        f"{repo_line}"
-        "\n# noqa: E402\n"
-        "\n"
-        f"{future_block}\n"
         '"""\n'
         + (
             config.get("file_docstring", "")
@@ -11989,7 +12298,17 @@ def _build_final_script(  # noqa: C901, PLR0912, PLR0913, PLR0915
                 f"Built: {build_date}\n" + (f"Authors: {authors}\n" if authors else "")
             )
         )
-        + '"""\n\n'
+        + '"""\n'
+        f"# {header_line}\n"
+        f"{license_section}"
+        f"# Version: {version}\n"
+        f"# Commit: {commit}\n"
+        f"# Build Date: {build_date}\n"
+        f"{authors_line}"
+        f"{repo_line}"
+        "\n# noqa: E402\n"
+        "\n"
+        f"{future_block}\n"
         f"{import_block}\n"
         "\n"
         # constants come *after* imports to avoid breaking __future__ rules
@@ -12201,17 +12520,10 @@ def stitch_modules(  # noqa: PLR0915, PLR0912, PLR0913, C901
             and all(isinstance(x, str) for x in module_bases_raw)  # pyright: ignore[reportUnknownVariableType]
             else None
         )
-        config_dir = None
-        meta = config.get("__meta__")
-        if meta and isinstance(meta, dict):
-            config_dir_raw = meta.get("config_root")  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
-            if isinstance(config_dir_raw, Path):
-                config_dir = config_dir_raw
-        detected_packages = detect_packages_from_files(
+        detected_packages, _discovered_parent_dirs = detect_packages_from_files(
             order_paths,
             package_name,
             module_bases=module_bases,
-            config_dir=config_dir,
         )
 
     # --- Validation Phase ---
@@ -12571,7 +12883,8 @@ def stitch_modules(  # noqa: PLR0915, PLR0912, PLR0913, C901
         raise RuntimeError(xmsg) from e
 
     # --- Output (compilation succeeded) ---
-    logger.debug("Writing output file: %s", out_path)
+    out_display = shorten_path_for_display(out_path)
+    logger.debug("Writing output file: %s", out_display)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(final_script, encoding="utf-8")
     out_path.chmod(0o755)
@@ -12711,7 +13024,12 @@ def collect_included_files(
             exclude_root = Path(exc["root"]).resolve()
             exclude_patterns = [str(exc["path"])]
             if is_excluded_raw(file_path, exclude_patterns, exclude_root):
-                logger.trace(f"[COLLECT] Excluded {file_path} by pattern {exc['path']}")
+                exc_display = shorten_path_for_display(exc)
+                logger.trace(
+                    "[COLLECT] Excluded %s by pattern %s",
+                    file_path,
+                    exc_display,
+                )
                 is_excluded = True
                 break
         if not is_excluded:
@@ -13066,6 +13384,7 @@ def run_build(  # noqa: C901, PLR0915, PLR0912
     )
     logger = get_app_logger()
     dry_run = build_cfg.get("dry_run", DEFAULT_DRY_RUN)
+    validate_config = build_cfg.get("validate_config", False)
 
     # Extract stitching fields from config
     package = build_cfg.get("package")
@@ -13120,11 +13439,26 @@ def run_build(  # noqa: C901, PLR0915, PLR0912
     if is_directory and included_files and package:
         out_path = out_path / f"{package}.py"
 
-    if dry_run:
-        if included_files and package:
-            logger.info("🧪 (dry-run) Would stitch %s to: %s", package, out_path)
+    # --- Validate-config exit point ---
+    # Exit after file collection but before expensive stitching work
+    if validate_config:
+        # Build summary (accounting for output already shown)
+        summary_parts: list[str] = []
+        if included_files:
+            summary_parts.append(f"{len(included_files)} file(s) collected")
+            if package:
+                summary_parts.append(f"package: {package}")
         else:
-            logger.info("🧪 (dry-run) Would write to: %s", out_path)
+            summary_parts.append("no files (not a stitch build)")
+        if out_path:
+            meta = build_cfg["__meta__"]
+            out_display = shorten_path_for_display(
+                out_path,
+                cwd=meta.get("cli_root"),
+                config_dir=meta.get("config_root"),
+            )
+            summary_parts.append(f"output: {out_display}")
+        logger.info("✓ Configuration is valid (%s)", " • ".join(summary_parts))
         return
 
     if not included_files:
@@ -13258,9 +13592,24 @@ def run_build(  # noqa: C901, PLR0915, PLR0912
     # Detect packages once from final files (after all exclusions)
     logger.debug("Detecting packages from included files (after exclusions)...")
     module_bases = build_cfg.get("module_bases", [])
-    detected_packages = detect_packages_from_files(
-        final_files, package, module_bases=module_bases, config_dir=config_root
+    detected_packages, discovered_parent_dirs = detect_packages_from_files(
+        final_files, package, module_bases=module_bases
     )
+
+    # Add discovered package parent directories to module_bases (lowest priority)
+    if discovered_parent_dirs:
+        # Deduplicate while preserving order (add at end)
+        seen_bases = set(module_bases)
+        for parent_dir in discovered_parent_dirs:
+            if parent_dir not in seen_bases:
+                seen_bases.add(parent_dir)
+                module_bases.append(parent_dir)
+                logger.debug(
+                    "[MODULE_BASES] Added discovered package parent directory: %s",
+                    parent_dir,
+                )
+        # Update build_cfg with extended module_bases
+        build_cfg["module_bases"] = module_bases
 
     # Resolve order paths (order is list[str] of paths, or None for auto-discovery)
     topo_paths: list[Path] | None = None
@@ -13335,10 +13684,37 @@ def run_build(  # noqa: C901, PLR0915, PLR0912
         disable_timestamp=disable_timestamp,
     )
 
-    # Create parent directory if needed
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    # Create parent directory if needed (skip in dry-run)
+    if not dry_run:
+        out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    logger.info("🧵 Stitching %s → %s", package, out_path)
+    # Dry-run exit: simulate full pre-stitch pipeline, exit before stitching
+    if dry_run:
+        # Build comprehensive summary
+        dry_run_summary_parts: list[str] = []
+        dry_run_summary_parts.append(f"Package: {package}")
+        dry_run_summary_parts.append(f"Files: {len(final_files)} module(s)")
+        dry_run_summary_parts.append(f"Output: {out_path}")
+
+        # Add detected packages (if verbose/debug)
+        if detected_packages:
+            packages_str = ", ".join(sorted(detected_packages))
+            logger.debug("Detected packages: %s", packages_str)
+
+        # Add order resolution method
+        order_method = "explicit" if order is not None else "auto-discovered"
+        logger.debug("Order: %s (%d modules)", order_method, len(order_paths))
+
+        logger.info("🧪 (dry-run) Would stitch: %s", " • ".join(dry_run_summary_parts))
+        return
+
+    meta = build_cfg["__meta__"]
+    out_display = shorten_path_for_display(
+        out_path,
+        cwd=meta.get("cli_root"),
+        config_dir=meta.get("config_root"),
+    )
+    logger.info("🧵 Stitching %s → %s", package, out_display)
 
     try:
         stitch_modules(
@@ -13354,7 +13730,7 @@ def run_build(  # noqa: C901, PLR0915, PLR0912
             post_processing=post_processing,
             is_serger_build=is_serger_build_result,
         )
-        logger.info("✅ Stitch completed → %s\n", out_path)
+        logger.info("✅ Stitch completed → %s\n", out_display)
     except RuntimeError as e:
         xmsg = f"Stitch build failed: {e}"
         raise RuntimeError(xmsg) from e
@@ -14159,11 +14535,6 @@ def _setup_parser() -> argparse.ArgumentParser:
             "Examples: 'dist/serger.py' (file) or 'bin/' (directory)."
         ),
     )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Simulate build actions without copying or deleting files.",
-    )
     parser.add_argument("-c", "--config", help="Path to build config file.")
 
     parser.add_argument(
@@ -14258,6 +14629,23 @@ def _setup_parser() -> argparse.ArgumentParser:
         "--selftest",
         action="store_true",
         help="Run a built-in sanity test to verify tool correctness.",
+    )
+
+    # --- Build execution mode ---
+    build_mode = parser.add_mutually_exclusive_group()
+    build_mode.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Simulate build actions without copying or deleting files.",
+    )
+    build_mode.add_argument(
+        "--validate-config",
+        action="store_true",
+        help=(
+            "Validate configuration file and resolved settings without "
+            "executing a build. Validates config syntax, file collection, "
+            "and path resolution (includes CLI arguments and environment variables)."
+        ),
     )
     parser.add_argument(
         "--disable-build-timestamp",
@@ -14608,6 +14996,7 @@ def _execute_build(
     )
 
     resolved["dry_run"] = getattr(args, "dry_run", DEFAULT_DRY_RUN)
+    resolved["validate_config"] = getattr(args, "validate_config", False)
 
     if watch_enabled:
         watch_interval = resolved["watch_interval"]
@@ -14625,7 +15014,7 @@ def _execute_build(
 # --------------------------------------------------------------------------- #
 
 
-def main(argv: list[str] | None = None) -> int:  # noqa: PLR0911
+def main(argv: list[str] | None = None) -> int:  # noqa: PLR0911, PLR0912
     logger = get_app_logger()  # init (use env + defaults)
 
     try:
@@ -14650,6 +15039,10 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0911
         # --- Validate package ---
         if not _validate_package(config.root_cfg, config.resolved, args):
             return 1
+
+        # --- Validate-config notice ---
+        if getattr(args, "validate_config", None):
+            logger.info("🔍 Validating configuration...")
 
         # --- Dry-run notice ---
         if getattr(args, "dry_run", None):
@@ -14723,13 +15116,12 @@ def _setup_pkg_modules(  # noqa: C901, PLR0912
     # Set up package attributes for nested packages BEFORE registering
     # modules (so packages are available when modules are registered)
     _seen_packages: set[str] = set()
-    _min_parts_for_intermediate_pkg = 3  # e.g., mypkg.public.utils has 3 parts
     for _name in module_names:
         if _name != pkg_name and _name.startswith(pkg_name + "."):
             # Extract parent package (e.g., mypkg.public from
             # mypkg.public.utils)
             _name_parts = _name.split(".")
-            if len(_name_parts) >= _min_parts_for_intermediate_pkg:
+            if len(_name_parts) > 2:  # noqa: PLR2004
                 # Has at least one intermediate package
                 _parent_pkg = ".".join(_name_parts[:-1])
                 if (
@@ -14787,11 +15179,11 @@ def _setup_pkg_modules(  # noqa: C901, PLR0912
 
 
 _create_pkg_module("serger")
-_create_pkg_module("serger.config")
-_create_pkg_module("serger.utils")
-_create_pkg_module("serger.apathetic_utils")
-_create_pkg_module("serger.apathetic_logs")
 _create_pkg_module("serger.apathetic_schema")
+_create_pkg_module("serger.apathetic_utils")
+_create_pkg_module("serger.utils")
+_create_pkg_module("serger.apathetic_logs")
+_create_pkg_module("serger.config")
 
 _setup_pkg_modules(
     "serger",
@@ -14810,26 +15202,7 @@ _setup_pkg_modules(
     ],
     None,
 )
-_setup_pkg_modules(
-    "serger.config",
-    [
-        "serger.config.config_loader",
-        "serger.config.config_resolve",
-        "serger.config.config_types",
-        "serger.config.config_validate",
-    ],
-    None,
-)
-_setup_pkg_modules(
-    "serger.utils",
-    [
-        "serger.utils.utils_matching",
-        "serger.utils.utils_modules",
-        "serger.utils.utils_types",
-        "serger.utils.utils_validation",
-    ],
-    None,
-)
+_setup_pkg_modules("serger.apathetic_schema", ["serger.apathetic_schema.schema"], None)
 _setup_pkg_modules(
     "serger.apathetic_utils",
     [
@@ -14842,8 +15215,28 @@ _setup_pkg_modules(
     ],
     None,
 )
+_setup_pkg_modules(
+    "serger.utils",
+    [
+        "serger.utils.utils_matching",
+        "serger.utils.utils_modules",
+        "serger.utils.utils_paths",
+        "serger.utils.utils_types",
+        "serger.utils.utils_validation",
+    ],
+    None,
+)
 _setup_pkg_modules("serger.apathetic_logs", ["serger.apathetic_logs.logs"], None)
-_setup_pkg_modules("serger.apathetic_schema", ["serger.apathetic_schema.schema"], None)
+_setup_pkg_modules(
+    "serger.config",
+    [
+        "serger.config.config_loader",
+        "serger.config.config_resolve",
+        "serger.config.config_types",
+        "serger.config.config_validate",
+    ],
+    None,
+)
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

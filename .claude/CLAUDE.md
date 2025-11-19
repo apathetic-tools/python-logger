@@ -363,6 +363,10 @@ Apathetic Python Logger is a minimal wrapper for the Python standard library log
 - `tests/` - Test suite
 - `dev/` - Development scripts
 
+### Development Scripts (`dev/`)
+- **NEVER edit scripts in `dev/`**: These are development tools and should not be modified by AI assistants
+- **If you believe there is a problem with a script in `dev/`**: Report the problem to the developer and stop - do not attempt to fix it yourself
+
 ### Test Directory Structure
 - **`__init__.py` files in tests**: Only `tests/` and `tests/utils/` should have `__init__.py` files
 - **Do NOT add `__init__.py`** to test subdirectories (e.g., `tests/0_tooling/`, `tests/3_independant/`, `tests/5_core/`, `tests/9_integration/`, `tests/10_app_integration/`)
