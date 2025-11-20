@@ -1,7 +1,35 @@
 # 🧩 Contributing Guide
 
-Thanks for your interest in contributing to **Apathetic Python Logger** — a minimal wrapper for the Python standard library logger.  
-This guide explains how to set up your environment, run checks, and safely contribute code.
+Thanks for your interest in contributing to **Apathetic Python Logger** — a minimal wrapper for the Python standard library logger.
+
+📚 **[Full Contributing Guide →](https://apathetic-tools.github.io/python-logging/contributing)**
+
+For detailed information on setting up your environment, running checks, and contributing code, please visit our documentation website.
+
+This file provides a quick reference for common development tasks.
+
+---
+
+## Quick Reference
+
+### Development Commands
+
+| Command | Description |
+|----------|-------------|
+| `poetry run poe check:fix` | Auto-fix issues, re-format, type-check, and re-test. |
+| `poetry run poe check` | Run linting (`ruff`), type checks (`mypy`), and tests (`pytest`). |
+| `poetry run poe fix` | Run all auto-fixers (`ruff`). |
+| `poetry run poe build:script` | Bundle the project into a single portable script in `dist/`. |
+
+### Setup
+
+```bash
+# Install dependencies
+poetry install --with dev
+
+# Run checks before committing
+poetry run poe check:fix
+```
 
 ---
 
@@ -41,24 +69,6 @@ poetry install --with dev
 This creates an isolated virtual environment with Ruff, Mypy, pytest, and Poe tasks.
 
 ---
-
-## ⚙️ Development Commands
-
-All key workflows are defined in **`[tool.poe.tasks]`** inside `pyproject.toml`.
-
-| Command | Description |
-|----------|-------------|
-| `poetry run poe check:fix` | Auto-fix issues, re-format, type-check, and re-test. |
-| `poetry run poe check` | Run linting (`ruff`), type checks (`mypy`), and tests (`pytest`). |
-| `poetry run poe fix` | Run all auto-fixers (`ruff`). |
-| `poetry run poe build:script` | Bundle the project into a single portable script in `dist/`. |
-
-Example workflow:
-
-```bash
-# Auto-fix & re-check
-poetry run poe check:fix
-```
 
 ---
 

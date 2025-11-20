@@ -2,16 +2,19 @@
 title: Apathetic Python Logger
 description: Minimal wrapper for the Python standard library logger
 url: https://apathetic-tools.github.io
-baseurl: /python-logs
+baseurl: /python-logging
 
 # GitHub Pages settings
 plugins:
-  - jekyll-feed
   - jekyll-seo-tag
   - jekyll-sitemap
 
 # Theme (using minimal theme for clean look)
 theme: minima
+
+# Sass/SCSS settings
+sass:
+  style: compressed
 
 # Exclude files from processing
 exclude:

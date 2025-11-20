@@ -1,0 +1,115 @@
+// Custom dark mode styles for Apathetic Python Logger documentation
+// Auto-detects user preference and defaults to dark mode
+
+// Default to dark mode
+:root {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --link-color: #4a9eff;
+  --code-bg: #2d2d2d;
+  --code-text: #f8f8f2;
+  --border-color: #404040;
+  --header-bg: #252525;
+}
+
+// Light mode (only if user explicitly prefers it)
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --link-color: #0066cc;
+    --code-bg: #f5f5f5;
+    --code-text: #333333;
+    --border-color: #e0e0e0;
+    --header-bg: #f8f8f8;
+  }
+}
+
+// Apply dark mode styles
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.site-header {
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.site-title,
+.site-title:visited {
+  color: var(--text-color);
+}
+
+.site-nav .page-link {
+  color: var(--text-color);
+}
+
+a {
+  color: var(--link-color);
+}
+
+a:visited {
+  color: var(--link-color);
+  opacity: 0.8;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+// Code blocks
+.highlight {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+}
+
+code {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+}
+
+pre {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  border: 1px solid var(--border-color);
+}
+
+// Blockquotes
+blockquote {
+  border-left: 4px solid var(--border-color);
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+// Tables
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+
+th,
+td {
+  border: 1px solid var(--border-color);
+}
+
+th {
+  background-color: var(--header-bg);
+}
+
+// Footer
+.site-footer {
+  border-top: 1px solid var(--border-color);
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+.site-footer a {
+  color: var(--link-color);
+}
+
+// Horizontal rules
+hr {
+  border-color: var(--border-color);
+}
+
