@@ -6,11 +6,8 @@ description: Minimal wrapper for the Python standard library logger
 url: https://apathetic-tools.github.io
 baseurl: /python-logging
 
-
-
 # supported plugins: https://pages.github.com/versions.json
 plugins:
-
 # GHP locked value
   - jekyll-coffeescript
   - jekyll-default-layout
@@ -21,7 +18,6 @@ plugins:
   - jekyll-readme-index
   - jekyll-titles-from-headings
   - jekyll-relative-links
-
 # extra
   - jekyll-seo-tag
   - jekyll-sitemap
@@ -69,12 +65,14 @@ exclude:
 # Site metadata
 author: 
   name: Apathetic Tools
-github:
-  username: "apathetic-tools"
+  url: https://apathetic-tools.github.io/
+
+license:
+  text: MIT-a-NOAI
+  url: https://github.com/apathetic-tools/python-logs/blob/main/LICENSE
+
 
 # Build settings
-
-
 lsi: false  # GHP locked value
 safe: true  # GHP locked value
 source: ["docs"]  # GHP locked value

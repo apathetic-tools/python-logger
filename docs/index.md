@@ -7,9 +7,9 @@ permalink: /
 # Apathetic Python Logger 📝
 
 **Minimal wrapper for the Python standard library logger.**  
-*Because consistent, colorized logging shouldn't require large dependencies.*
+*Because consistent logging shouldn't require large dependencies.*
 
-Apathetic Python Logger provides a lightweight, dependency-free logging solution designed for CLI tools. It extends Python's standard library `logging` module with colorized output, dual-stream handling (stdout/stderr), and seamless integration with Apathetic Tools projects.
+*Apathetic Python Logger* provides a lightweight, dependency-free logging solution designed for CLI tools. It extends Python's standard library `logging` module with colorized output, dual-stream handling (stdout/stderr), extra logging levels, and seamless integration with Apathetic Tools projects.
 
 ## Features
 
@@ -17,6 +17,7 @@ Apathetic Python Logger provides a lightweight, dependency-free logging solution
 - 🔄 **Dual-stream handling** — Smart routing to stdout/stderr
 - 🪶 **Zero dependencies** — Uses only Python's standard library
 - 🏷️ **Tag-based formatting** — Clean, readable log tags with emoji support
+- 📊 **Extra logging levels** — TEST, TRACE, DETAIL, MINIMAL, and SILENT levels for fine-grained control
 - 🔧 **CLI-friendly** — Designed for command-line applications
 - 🧩 **Apathetic Tools integration** — Works seamlessly with serger and other Apathetic Tools
 
@@ -75,16 +76,10 @@ You're free to use, copy, and modify the library under the standard MIT terms.
 The additional rider simply requests that this project not be used to train or fine-tune AI/ML systems until the author deems fair compensation frameworks exist.  
 Normal use, packaging, and redistribution for human developers are unaffected.
 
-## Links
+## Resources
 
 - 📘 [Roadmap](https://github.com/apathetic-tools/python-logs/blob/main/ROADMAP.md)
 - 📝 [Release Notes](https://github.com/apathetic-tools/python-logs/releases)
 - 🐛 [Issue Tracker](https://github.com/apathetic-tools/python-logs/issues)
 - 💬 [Discord](https://discord.gg/PW6GahZ7)
-
----
-
-<p align="center">
-  <sub>😐 <a href="https://apathetic-tools.github.io/">Apathetic Tools</a> © <a href="https://github.com/apathetic-tools/python-logs/blob/main/LICENSE">MIT-a-NOAI</a></sub>
-</p>
 

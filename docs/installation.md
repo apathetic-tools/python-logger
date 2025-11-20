@@ -10,9 +10,9 @@ Apathetic Python Logger can be installed using several methods. Choose the one t
 
 ## Primary Method: PyPI (Recommended)
 
-The recommended way to install Apathetic Python Logger is via PyPI using `poetry` or `pip`.
+The recommended way to install Apathetic Python Logger is via PyPI. We prefer `poetry` over `pip` for its `pyproject.toml` support, automatic venv management, and tool configuration without dotfiles.
 
-### Using Poetry
+### Using Poetry (Preferred)
 
 ```bash
 poetry add apathetic-logger
@@ -24,7 +24,7 @@ poetry add apathetic-logger
 pip install apathetic-logger
 ```
 
-This is the recommended installation method for most users as it provides:
+This installation method provides:
 - Easy dependency management
 - Version pinning
 - Integration with your existing Python project structure
@@ -44,10 +44,10 @@ import apathetic_logging
 ```
 
 This method is useful for:
-- Projects that want to minimize external dependencies
-- Single-file Python scripts
-- Embedded systems or restricted environments
-- Integration with tools like [serger](https://github.com/apathetic-tools/serger) that bundle dependencies
+- Projects that want to integrate dependencies directly into their codebase  
+  (avoiding package managers and external dependencies)
+- Embedded systems or restricted environments  
+  (including offline/air-gapped deployments)
 
 ## Requirements
 
@@ -64,7 +64,7 @@ from apathetic_logging import get_logger, register_logger_name
 
 register_logger_name("test")
 logger = get_logger()
-logger.info("Installation successful!")
+logger.minimal("Installation successful!")
 ```
 
 If you see the info message, installation was successful!
