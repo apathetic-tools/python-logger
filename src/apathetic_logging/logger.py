@@ -255,7 +255,24 @@ class ApatheticLogging_Internal_Logger:  # noqa: N801  # pyright: ignore[reportU
         def extend_logging_module(cls) -> bool:
             """The return value tells you if we ran or not.
             If it is False and you're calling it via super(),
-            you can likely skip your code too."""
+            you can likely skip your code too.
+
+            Note for tests:
+                When testing isinstance checks on logger instances, use
+                ``logging.getLoggerClass()`` instead of direct class references
+                (e.g., ``mod_alogs.Logger``). This works reliably in both installed
+                and singlefile runtime modes because it uses the actual class object
+                that was set via ``logging.setLoggerClass()``, rather than a class
+                reference from the import shim which may have different object identity
+                in singlefile mode.
+
+            Example:
+                    # ✅ Good: Works in both installed and singlefile modes
+                    assert isinstance(logger, logging.getLoggerClass())
+
+                    # ❌ May fail in singlefile mode due to class identity differences
+                    assert isinstance(logger, mod_alogs.Logger)
+            """
             _constants = ApatheticLogging_Internal_Constants
             # Check if this specific class has already extended the module
             # (not inherited from base class)

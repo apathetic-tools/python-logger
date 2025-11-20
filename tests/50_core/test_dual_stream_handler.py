@@ -203,8 +203,16 @@ def test_dual_stream_handler_test_level_bypasses_capture(
     handler = mod_alogs.apathetic_logging.DualStreamHandler()
     # Get logger through logging.getLogger to ensure handler sees the same instance
     logger = logging.getLogger(logger_name)
-    # Ensure it's our Logger class
-    if not isinstance(logger, mod_alogs.Logger):
+    # Ensure it's our Logger class.
+    # Use logging.getLoggerClass() which works in both modes. This is necessary
+    # because in singlefile mode, direct class references (e.g., mod_alogs.Logger)
+    # may have different object identity than the actual class used to create logger
+    # instances, even though they're functionally the same. Using
+    # logging.getLoggerClass() uses the actual class object that was set via
+    # logging.setLoggerClass() in extend_logging_module(), which works reliably
+    # in both installed and singlefile runtime modes.
+    # See extend_logging_module() docstring for more details.
+    if not isinstance(logger, logging.getLoggerClass()):
         # Create a new logger if it's not our type
         logger = mod_alogs.Logger(logger_name)
     logger.setLevel("test")  # Set to TEST level
@@ -215,10 +223,10 @@ def test_dual_stream_handler_test_level_bypasses_capture(
     monkeypatch.setattr(sys, "__stderr__", bypass_buf)
 
     # --- execute ---
-    logger.test("test level message")
-    logger.trace("trace level message")
+    logger.test("test level message")  # type: ignore[attr-defined]
+    logger.trace("trace level message")  # type: ignore[attr-defined]
     logger.debug("debug level message")
-    logger.detail("detail level message")
+    logger.detail("detail level message")  # type: ignore[attr-defined]
     logger.warning("warning level message")  # Should still go to normal stderr
 
     # --- verify ---

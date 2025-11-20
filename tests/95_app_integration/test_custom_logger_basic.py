@@ -44,6 +44,18 @@ def test_custom_logger_correct_usage_pattern() -> None:
     # --- verify ---
     assert logger is not None
     assert logger.name == app_name
+    # Check isinstance using logging.getLoggerClass() which works in both modes.
+    # This is necessary because in singlefile mode, direct class references
+    # (e.g., mod_alogs.Logger) may have different object identity than the actual
+    # class used to create logger instances, even though they're functionally
+    # the same. Using logging.getLoggerClass() uses the actual class object
+    # that was set via logging.setLoggerClass() in extend_logging_module(),
+    # which works reliably in both installed and singlefile runtime modes.
+    # See extend_logging_module() docstring for more details.
+    # In this test, AppLoggerForTest.extend_logging_module() was called,
+    # so the logger class is AppLoggerForTest, not mod_alogs.Logger
+    assert isinstance(logger, logging.getLoggerClass())
+    # Also verify it's an instance of mod_alogs.Logger (AppLoggerForTest extends it)
     assert isinstance(logger, mod_alogs.Logger)
     # Should be able to use custom levels
     logger.setLevel("TRACE")
@@ -70,9 +82,22 @@ def test_custom_logger_with_typed_getter() -> None:
     # --- verify ---
     assert logger is not None
     assert logger.name == app_name
-    # Check that logger has expected apathetic_logging.Logger methods/behavior
-    # (instead of isinstance check which may fail in singlefile mode due to class
-    # reference differences)
+    # Check isinstance using logging.getLoggerClass() which works in both modes.
+    # This is necessary because in singlefile mode, direct class references
+    # (e.g., mod_alogs.Logger) may have different object identity than the actual
+    # class used to create logger instances, even though they're functionally
+    # the same. Using logging.getLoggerClass() uses the actual class object
+    # that was set via logging.setLoggerClass() in extend_logging_module(),
+    # which works reliably in both installed and singlefile runtime modes.
+    # See extend_logging_module() docstring for more details.
+    # In this test, AppLoggerForTest.extend_logging_module() was called,
+    # so the logger class is AppLoggerForTest, not mod_alogs.Logger
+    assert isinstance(logger, logging.getLoggerClass())
+    # Note: We don't check "isinstance(logger, mod_alogs.Logger)" here because
+    # in singlefile mode, class identity may differ even though AppLoggerForTest
+    # extends mod_alogs.Logger. The isinstance check above and hasattr checks below
+    # are sufficient to verify the logger has the expected behavior.
+    # Also check that logger has expected apathetic_logging.Logger methods/behavior
     assert hasattr(logger, "trace")
     assert hasattr(logger, "colorize")
     assert hasattr(logger, "determine_log_level")

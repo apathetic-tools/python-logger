@@ -64,9 +64,19 @@ def test_get_logger_works_after_extend_logging_module() -> None:
 
     # --- verify ---
     assert logger is not None
-    # Check that logger has expected apathetic_logging.Logger methods/behavior
-    # (instead of isinstance check which may fail in singlefile mode due to class
-    # reference differences)
+    # Check isinstance using logging.getLoggerClass() which works in both modes.
+    # This is necessary because in singlefile mode, direct class references
+    # (e.g., mod_alogs.Logger) may have different object identity than the actual
+    # class used to create logger instances, even though they're functionally
+    # the same. Using logging.getLoggerClass() uses the actual class object
+    # that was set via logging.setLoggerClass() in extend_logging_module(),
+    # which works reliably in both installed and singlefile runtime modes.
+    # See extend_logging_module() docstring for more details.
+    assert isinstance(logger, logging.getLoggerClass())
+    # Note: We don't check "logging.getLoggerClass() is mod_alogs.Logger" here
+    # because in singlefile mode, class identity may differ even though they're
+    # functionally the same. The isinstance check above is sufficient.
+    # Also check that logger has expected apathetic_logging.Logger methods/behavior
     assert hasattr(logger, "trace")
     assert hasattr(logger, "colorize")
     assert hasattr(logger, "determine_log_level")
