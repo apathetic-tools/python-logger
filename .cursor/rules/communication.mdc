@@ -17,11 +17,13 @@ alwaysApply: true
 
 ### Handling Developer Questions
 
-- **When the developer asks a question**: If the developer asks a question (even if the rest of the prompt implies doing work), you **must**:
+- **When the developer asks a question**: If the developer asks ANY question (including analytical questions like "do we still need X?", "would it be safe to Y?", "can we simplify Z?"), you **must**:
   1. Provide a complete answer with recommendations
   2. Ask what to do and **stop** - do not implement changes
   3. Wait for their response before proceeding with any implementation
 
+- **What counts as a question**: Any query ending with "?", or phrases like "do we need", "should we", "can we", "would it be safe", "is it possible", etc. Even if the question seems to imply action, treat it as a question first.
+
 - **Exploratory work allowed**: You may perform exploratory findings (reading code, searching the codebase, analyzing patterns) to answer the question, but **do not modify core project code** to implement changes.
 
-- **After answering**: Once you've provided the answer and recommendations, ask if you should proceed with implementation. Only proceed after explicit confirmation.
+- **After answering**: Once you've provided the answer and recommendations, explicitly ask "Should I proceed with implementing this?" or "Would you like me to make these changes?" and wait for confirmation. Only proceed after explicit confirmation.
