@@ -39,6 +39,25 @@ class ApatheticLogging_Internal_DualStreamHandler:  # noqa: N801  # pyright: ign
             super().__init__(*args, **kwargs)  # pyright: ignore[reportUnknownMemberType]
 
         def emit(self, record: logging.LogRecord, *args: Any, **kwargs: Any) -> None:
+            """Routes based on log level and handles colorization.
+
+            Features:
+            - Routes messages to stdout or stderr based on log level:
+              - DETAIL, INFO, and MINIMAL → stdout (normal program output)
+              - TRACE, DEBUG, WARNING, ERROR, and CRITICAL → stderr
+                (diagnostic/error output)
+            - In TEST mode, TEST/TRACE/DEBUG messages bypass pytest capture
+              by writing to sys.__stderr__ instead of sys.stderr
+            - Sets enable_color attribute on record for TagFormatter integration
+
+            Args:
+                record: The LogRecord to emit
+                *args: Additional positional arguments (for future-proofing)
+                **kwargs: Additional keyword arguments (for future-proofing)
+
+            logging.Handler.emit() implementation:
+            https://docs.python.org/3.10/library/logging.html#logging.Handler.emit
+            """
             # Import here to avoid circular dependency
             from .constants import (  # noqa: PLC0415
                 ApatheticLogging_Internal_Constants,
@@ -73,14 +92,8 @@ class ApatheticLogging_Internal_DualStreamHandler:  # noqa: N801  # pyright: ign
                     self.stream = sys.__stderr__
                 else:
                     self.stream = sys.stderr
-            elif level == _constants.DETAIL_LEVEL:
-                # DETAIL → stdout (normal program output, like INFO)
-                self.stream = sys.stdout
-            elif level == _constants.MINIMAL_LEVEL:
-                # MINIMAL → stdout (normal program output)
-                self.stream = sys.stdout
             else:
-                # INFO → stdout (normal program output)
+                # DETAIL, INFO, MINIMAL → stdout (normal program output)
                 self.stream = sys.stdout
 
             # used by TagFormatter

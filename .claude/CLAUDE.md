@@ -333,12 +333,12 @@ Please help me resolve the remaining issues to get `poetry run poe check:fix` pa
   - **type**: The type of change (feat, fix, docs, style, refactor, test, chore)
   - **scope**: The feature or module being worked on (optional but recommended)
   - **subject**: A concise description of what was done
-    - **Important**: The subject line should account for all staged files in the commit
+    - **Important**: The subject line must summarize the overall work across all staged files, not just the last change
     - If the subject line cannot summarize all changes in a short sentence, prioritize the most impactful change to the project
     - All changes should still be detailed in the commit message body
 - Include the feature being worked on in the scope, and if appropriate, a concise description of what was done
 - **Commit message body**: After the first line, include a traditional bulleted list summarizing the key changes made in the commit
-  - **Important**: The body should list all significant changes, ensuring all staged files are represented
+  - **Important**: The body must cover all significant changes across all staged files, not just the most recent change
   - If many files were changed, group related changes together in the bulleted list
 
 **Examples:**

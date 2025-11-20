@@ -103,22 +103,43 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
     def _log(  # type: ignore[override]
         self, level: int, msg: str, args: tuple[Any, ...], **kwargs: Any
     ) -> None:
-        _safe_logging = ApatheticLogging_Internal_SafeLogging
-        _safe_logging.safeTrace(
-            "_log",
-            f"logger={self.name}",
-            f"id={id(self)}",
-            f"level={self.levelName}",
-            f"msg={msg!r}",
-        )
+        """Log a message with the specified level.
+
+        Changed:
+        - Automatically ensures handlers are attached via ensureHandlers()
+
+        Args:
+            level: The numeric logging level
+            msg: The message format string
+            args: Arguments for the message format string
+            **kwargs: Additional keyword arguments passed to the base implementation
+
+        Wrapper for logging.Logger._log.
+
+        https://docs.python.org/3.10/library/logging.html#logging.Logger._log
+        """
         self.ensureHandlers()
         super()._log(level, msg, args, **kwargs)
 
     def setLevel(self, level: int | str) -> None:
-        """Case insensitive version that resolves string level names.
+        """Set the logging level of this logger.
 
-        Validates that custom levels (TEST, TRACE, MINIMAL, DETAIL, SILENT) are
-        not set to 0, which would cause NOTSET inheritance from root logger.
+        Changed:
+        - Accepts both int and str level values (case-insensitive for strings)
+        - Automatically resolves string level names to numeric values
+        - Supports custom level names (TEST, TRACE, MINIMAL, DETAIL, SILENT)
+        - Validates that custom levels are not set to 0, which would cause
+          NOTSET inheritance from root logger
+
+        Args:
+            level: The logging level, either as an integer or a string name
+                (case-insensitive). Standard levels (DEBUG, INFO, WARNING, ERROR,
+                CRITICAL) and custom levels (TEST, TRACE, MINIMAL, DETAIL, SILENT)
+                are supported.
+
+        Wrapper for logging.Logger.setLevel.
+
+        https://docs.python.org/3.10/library/logging.html#logging.Logger.setLevel
         """
         _constants = ApatheticLogging_Internal_Constants
         # Resolve string to integer if needed
@@ -195,14 +216,14 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
 
     @staticmethod
     def addLevelName(level: int, level_name: str) -> None:
-        """Safely add a custom logging level name with validation.
+        """Associate a level name with a numeric level.
 
-        This is a wrapper around logging.addLevelName() that validates the level
-        value to prevent NOTSET inheritance issues. Custom levels with values <= 0
-        will inherit from the root logger, causing unexpected behavior.
-
-        Also sets logging.<LEVEL_NAME> attribute for convenience, matching the
-        pattern of built-in levels (logging.DEBUG, logging.INFO, etc.).
+        Changed:
+        - Validates that level value is positive (> 0) to prevent NOTSET
+          inheritance issues
+        - Sets logging.<LEVEL_NAME> attribute for convenience, matching the
+          pattern of built-in levels (logging.DEBUG, logging.INFO, etc.)
+        - Validates existing attributes to ensure consistency
 
         Args:
             level: The numeric level value (must be > 0 for custom levels)
@@ -213,10 +234,9 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
             ValueError: If logging.<LEVEL_NAME> already exists with an invalid value
                 (not a positive integer, or different from the provided level)
 
-        Example:
-            >>> Logger.addLevelName(5, "TRACE")
-            >>> # Now logging.TRACE = 5 (convenience attribute)
-            >>> # logging.addLevelName(5, "TRACE")  # Equivalent, but unsafe
+        Wrapper for logging.addLevelName.
+
+        https://docs.python.org/3.10/library/logging.html#logging.addLevelName
         """
         # Validate level is positive
         ApatheticLogging_Internal_LoggerCore.validate_level_positive(level, level_name)
