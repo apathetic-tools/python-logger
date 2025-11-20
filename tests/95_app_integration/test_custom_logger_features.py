@@ -2,11 +2,11 @@
 """Tests for tricky features with custom logger child classes."""
 
 import logging
-import os
 from typing import TYPE_CHECKING, cast
 
 # Import from conftest in same directory
 import conftest
+import pytest
 
 import apathetic_logging as mod_alogs
 
@@ -213,10 +213,12 @@ def test_custom_methods_inherit_base_features() -> None:
     assert hasattr(logger, "log_performance")
 
 
-def test_child_class_determine_log_level_with_registered_settings() -> None:
-    """Test that child class determine_log_level() works with registered settings."""
+def test_child_class_determine_log_level_env_var_override(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that env vars override child class default in determine_log_level()."""
     # --- setup ---
-    app_name = "testapp_registered"
+    app_name = "testapp_registered_env"
     AppLoggerForTest.extend_logging_module()
     mod_alogs.register_logger_name(app_name)
     mod_alogs.register_default_log_level("warning")
@@ -225,18 +227,42 @@ def test_child_class_determine_log_level_with_registered_settings() -> None:
     # Create logger directly to ensure we get the child class instance
     logger = AppLoggerForTest(app_name)
 
-    # Test that registered env vars are checked
+    # Set up child class default (INFO) that env var should override
+    # Child class has hardcoded default of "INFO"
     # Note: Child class checks env vars directly, not through registry
-    os.environ["TESTAPP_LOG_LEVEL"] = "error"
+
+    # --- execute ---
+    monkeypatch.setenv("TESTAPP_LOG_LEVEL", "error")
     level = logger.determine_log_level()
+
+    # --- verify ---
+    # Env var should override child class default
     assert level == "ERROR"
 
-    # Test fallback to child class default (not registered default)
-    if "TESTAPP_LOG_LEVEL" in os.environ:
-        del os.environ["TESTAPP_LOG_LEVEL"]
-    if "LOG_LEVEL" in os.environ:
-        del os.environ["LOG_LEVEL"]
+
+def test_child_class_determine_log_level_default_precedence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that child class default takes precedence over registered default."""
+    # --- setup ---
+    app_name = "testapp_registered_default"
+    AppLoggerForTest.extend_logging_module()
+    mod_alogs.register_logger_name(app_name)
+    # Register a default that child class should override
+    mod_alogs.register_default_log_level("warning")
+    mod_alogs.register_log_level_env_vars(["TESTAPP_LOG_LEVEL", "LOG_LEVEL"])
+
+    # Create logger directly to ensure we get the child class instance
+    logger = AppLoggerForTest(app_name)
+
+    # Ensure no env vars are set
+    monkeypatch.delenv("TESTAPP_LOG_LEVEL", raising=False)
+    monkeypatch.delenv("LOG_LEVEL", raising=False)
+
+    # --- execute ---
     level = logger.determine_log_level()
+
+    # --- verify ---
     # Child class override returns "INFO" as hardcoded default
     # This shows that child class override takes precedence over registered defaults
     assert level == "INFO"  # Child override takes precedence

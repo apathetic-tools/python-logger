@@ -3,11 +3,11 @@
 
 import argparse
 import logging
-import os
 from typing import cast
 
 # Import from conftest in same directory
 import conftest
+import pytest
 
 import apathetic_logging as mod_alogs
 
@@ -78,33 +78,93 @@ def test_custom_logger_with_typed_getter() -> None:
     assert hasattr(logger, "determine_log_level")
 
 
-def test_custom_logger_determine_log_level_override() -> None:
-    """Test that custom determine_log_level() override works correctly."""
+def test_custom_logger_determine_log_level_with_cli_args(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that CLI args override environment variables and root log level."""
     # --- setup ---
-    app_name = "testapp_determine"
+    app_name = "testapp_determine_cli"
     AppLoggerForTest.extend_logging_module()
     mod_alogs.register_logger_name(app_name)
-    # Create logger directly to ensure we get the child class instance
     logger = AppLoggerForTest(app_name)
 
-    # Test with command-line args
+    # Set up conflicting values that CLI args should override
+    monkeypatch.setenv("TESTAPP_LOG_LEVEL", "info")
+    root_log_level = "info"
+
+    # --- execute ---
     args = argparse.Namespace(log_level="debug")
-    level = logger.determine_log_level(args=args)
+    level = logger.determine_log_level(args=args, root_log_level=root_log_level)
+
+    # --- verify ---
+    # CLI args should override both env var and root log level
     assert level == "DEBUG"
 
-    # Test with environment variable
-    os.environ["TESTAPP_LOG_LEVEL"] = "warning"
-    level = logger.determine_log_level()
-    assert level == "WARNING"
-    if "TESTAPP_LOG_LEVEL" in os.environ:
-        del os.environ["TESTAPP_LOG_LEVEL"]
 
-    # Test with root log level
+def test_custom_logger_determine_log_level_with_env_var(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that environment variables override root log level."""
+    # --- setup ---
+    app_name = "testapp_determine_env"
+    AppLoggerForTest.extend_logging_module()
+    mod_alogs.register_logger_name(app_name)
+    logger = AppLoggerForTest(app_name)
+
+    # Set up conflicting root log level that env var should override
+    root_log_level = "info"
+
+    # --- execute ---
+    monkeypatch.setenv("TESTAPP_LOG_LEVEL", "warning")
+    level = logger.determine_log_level(root_log_level=root_log_level)
+
+    # --- verify ---
+    # Env var should override root log level
+    assert level == "WARNING"
+
+
+def test_custom_logger_determine_log_level_with_root_log_level(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that root log level is used when no CLI args or env vars are set."""
+    # --- setup ---
+    app_name = "testapp_determine_root"
+    AppLoggerForTest.extend_logging_module()
+    mod_alogs.register_logger_name(app_name)
+    logger = AppLoggerForTest(app_name)
+
+    # Ensure no env vars are set
+    monkeypatch.delenv("TESTAPP_LOG_LEVEL", raising=False)
+    monkeypatch.delenv("LOG_LEVEL", raising=False)
+
+    # --- execute ---
     level = logger.determine_log_level(root_log_level="error")
+
+    # --- verify ---
+    # Root log level should be used when nothing else is set
     assert level == "ERROR"
 
-    # Test default fallback
+
+def test_custom_logger_determine_log_level_default_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that determine_log_level() falls back to default when nothing is set."""
+    # --- setup ---
+    app_name = "testapp_determine_default"
+    AppLoggerForTest.extend_logging_module()
+    mod_alogs.register_logger_name(app_name)
+    logger = AppLoggerForTest(app_name)
+
+    # Ensure no env vars or other settings are set
+    monkeypatch.delenv("TESTAPP_LOG_LEVEL", raising=False)
+    monkeypatch.delenv("LOG_LEVEL", raising=False)
+
+    # --- execute ---
+    # No CLI args, no env vars, no root log level - should use default
     level = logger.determine_log_level()
+
+    # --- verify ---
+    # Should fall back to default (INFO)
     assert level == "INFO"
 
 

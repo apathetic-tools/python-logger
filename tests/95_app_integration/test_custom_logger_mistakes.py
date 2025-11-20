@@ -2,11 +2,11 @@
 """Tests for common mistakes when using custom logger pattern."""
 
 import logging
-import os
 from typing import cast
 
 # Import from conftest in same directory
 import conftest
+import pytest
 
 import apathetic_logging as mod_alogs
 
@@ -74,7 +74,9 @@ def test_registering_after_get_logger() -> None:
     assert level in ("DEBUG", "INFO")  # May depend on registration timing
 
 
-def test_registering_after_get_logger_affects_new_instances() -> None:
+def test_registering_after_get_logger_affects_new_instances(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test that registering after getLogger() affects new logger instances."""
     # --- setup ---
     app_name = "testapp_late_register_new"
@@ -87,7 +89,7 @@ def test_registering_after_get_logger_affects_new_instances() -> None:
     # Register configuration
     mod_alogs.register_logger_name(app_name)
     mod_alogs.register_default_log_level("warning")
-    os.environ["TESTAPP_LOG_LEVEL"] = "error"
+    monkeypatch.setenv("TESTAPP_LOG_LEVEL", "error")
     mod_alogs.register_log_level_env_vars(["TESTAPP_LOG_LEVEL"])
 
     # Create new logger after registration
@@ -98,7 +100,3 @@ def test_registering_after_get_logger_affects_new_instances() -> None:
     level2 = logger2.determine_log_level()
     # Should check env var first
     assert level2 == "ERROR"
-
-    # Cleanup
-    if "TESTAPP_LOG_LEVEL" in os.environ:
-        del os.environ["TESTAPP_LOG_LEVEL"]

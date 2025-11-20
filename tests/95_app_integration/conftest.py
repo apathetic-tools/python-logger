@@ -4,10 +4,7 @@
 import argparse
 import logging
 import os
-from collections.abc import Generator
 from typing import TYPE_CHECKING
-
-import pytest
 
 import apathetic_logging as mod_alogs
 
@@ -21,32 +18,6 @@ else:
 # ----------------------------------------------------------------------
 # Fixtures
 # ----------------------------------------------------------------------
-
-
-@pytest.fixture(autouse=True)
-def reset_env() -> Generator[None, None, None]:
-    """Reset environment variables before and after each test.
-
-    Registry state and logger class are handled by the global fixture.
-    This fixture only handles environment variables specific to app integration tests.
-    """
-    # Save original environment variables
-    original_env = os.environ.get("TESTAPP_LOG_LEVEL")
-    original_log_level = os.environ.get("LOG_LEVEL")
-
-    # Reset environment variables
-    if "TESTAPP_LOG_LEVEL" in os.environ:
-        del os.environ["TESTAPP_LOG_LEVEL"]
-    if "LOG_LEVEL" in os.environ:
-        del os.environ["LOG_LEVEL"]
-
-    yield
-
-    # Restore original environment variables
-    if original_env is not None:
-        os.environ["TESTAPP_LOG_LEVEL"] = original_env
-    if original_log_level is not None:
-        os.environ["LOG_LEVEL"] = original_log_level
 
 
 # ----------------------------------------------------------------------
