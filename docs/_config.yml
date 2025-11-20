@@ -1,25 +1,61 @@
 # Jekyll configuration for GitHub Pages
+# general config reference: https://jekyllrb.com/docs/configuration/
+
 title: Apathetic Python Logger
 description: Minimal wrapper for the Python standard library logger
 url: https://apathetic-tools.github.io
 baseurl: /python-logging
 
-# GitHub Pages settings
+
+
+# supported plugins: https://pages.github.com/versions.json
 plugins:
+
+# GHP locked value
+  - jekyll-coffeescript
+  - jekyll-default-layout
+  - jekyll-gist
+  - jekyll-github-metadata
+  - jekyll-optional-front-matter
+  - jekyll-paginate
+  - jekyll-readme-index
+  - jekyll-titles-from-headings
+  - jekyll-relative-links
+
+# extra
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-remote-theme
 
 # Theme (using remote theme to get latest minima with dark mode support)
 remote_theme: jekyll/minima
+theme: minima
 
 # Minima theme settings
 minima:
   skin: auto  # Auto-detects system preference, defaults to dark
 
-# Sass/SCSS settings
-sass:
-  style: compressed
+  # Navigation
+  nav_pages:
+    - index.md
+    - installation.md
+    - quickstart.md
+    - api.md
+    - examples.md
+    - contributing.md
+
+  hide_site_feed_link: true
+  social_links:
+    - title: Discord
+      icon: discord
+      url: "https://discord.gg/PW6GahZ7"
+    - title: GitHub Repository
+      icon: github
+      url: "https://github.com/apathetic-tools/python-logging"    
+    - title: PyPI
+      icon: pypi
+      url: "https://pypi.org/project/apathetic-logging/"
+
 
 # Exclude files from processing
 exclude:
@@ -31,27 +67,26 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
 
-# Navigation
-header_pages:
-  - index.md
-  - installation.md
-  - quickstart.md
-  - api.md
-  - examples.md
-  - contributing.md
-
 # Site metadata
-author: Apathetic Tools
-email: ""
-twitter:
-  username: ""
+author: 
+  name: Apathetic Tools
 github:
   username: "apathetic-tools"
 
 # Build settings
+
+
+lsi: false  # GHP locked value
+safe: true  # GHP locked value
+source: ["docs"]  # GHP locked value
+incremental: false  # GHP locked value
+highlighter: rouge  # GHP locked value
+gist:  # GHP locked value
+  noscript: false  # GHP locked value
 markdown: kramdown
-highlighter: rouge
-kramdown:
+kramdown:  # GHP locked value
   input: GFM
-  syntax_highlighter: rouge
+  math_engine: mathjax  # GHP locked value
+  syntax_highlighter: rouge  # GHP locked value
+
 
