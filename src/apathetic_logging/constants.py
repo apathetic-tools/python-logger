@@ -65,8 +65,6 @@ class ApatheticLogging_Internal_Constants:  # noqa: N801  # pyright: ignore[repo
         "TEST": (ANSIColors.GRAY, "[TEST]"),
         "TRACE": (ANSIColors.GRAY, "[TRACE]"),
         "DEBUG": (ANSIColors.CYAN, "[DEBUG]"),
-        "DETAIL": (ANSIColors.CYAN, "[DETAIL]"),
-        "MINIMAL": (ANSIColors.GREEN, "[MINIMAL]"),
         "WARNING": ("", "⚠️ "),
         "ERROR": ("", "❌ "),
         "CRITICAL": ("", "💥 "),
