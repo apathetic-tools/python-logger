@@ -53,10 +53,10 @@ class ApatheticLogging_Internal_LoggingUtils:  # noqa: N801  # pyright: ignore[r
         """Extract top-level package name from package string.
 
         Args:
-            package: Package string (e.g., "myapp.submodule") or None.
+            package: Package string (e.g., "myapp.submodule") or None
 
         Returns:
-            Top-level package name (e.g., "myapp") or None if package is None.
+            Top-level package name (e.g., "myapp") or None if package is None
         """
         if package is None:
             return None
@@ -69,11 +69,11 @@ class ApatheticLogging_Internal_LoggingUtils:  # noqa: N801  # pyright: ignore[r
         """Infer logger name from caller's frame.
 
         Args:
-            skip_frames: Number of frames to skip to get to actual caller.
-            frame: Frame to start from, or None.
+            skip_frames: Number of frames to skip to get to actual caller
+            frame: Frame to start from, or None
 
         Returns:
-            Inferred logger name or None if cannot be inferred.
+            Inferred logger name or None if cannot be inferred
         """
         if frame is None:
             return None

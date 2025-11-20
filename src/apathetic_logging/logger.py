@@ -43,14 +43,15 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
     """
 
     enable_color: bool = False
+    """Enable ANSI color output for log messages."""
 
     _logging_module_extended: bool = False
 
     # if stdout or stderr are redirected, we need to repoint
     _last_stream_ids: tuple[TextIO, TextIO] | None = None
 
-    # Default stacklevel for errorIfNotDebug/criticalIfNotDebug methods
     DEFAULT_STACKLEVEL = 2
+    """Default stacklevel for errorIfNotDebug/criticalIfNotDebug methods."""
 
     def __init__(
         self,
@@ -58,7 +59,18 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
         level: int = logging.NOTSET,
         *,
         enable_color: bool | None = None,
+        propagate: bool = False,
     ) -> None:
+        """Initialize the logger.
+
+        Resolves log level, color support, and log propagation.
+
+        Args:
+            name: Logger name
+            level: Initial logging level (defaults to NOTSET, then auto-resolved)
+            enable_color: Force color output on/off, or None for auto-detect
+            propagate: False avoids duplicate root logs
+        """
         # it is too late to call extend_logging_module
 
         # now let's init our logger
@@ -75,11 +87,17 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
             else type(self).determine_color_enabled()
         )
 
-        self.propagate = False  # avoid duplicate root logs
+        self.propagate = propagate
 
         # handler attachment will happen in _log() with ensureHandlers()
 
     def ensureHandlers(self) -> None:
+        """Ensure handlers are attached to this logger.
+
+        DualStreamHandler is what will ensure logs go to the write channel.
+
+        Rebuilds handlers if they're missing or if stdout/stderr have changed.
+        """
         _dual_stream_handler = ApatheticLogging_Internal_DualStreamHandler
         _tag_formatter = ApatheticLogging_Internal_TagFormatter
         _safe_logging = ApatheticLogging_Internal_SafeLogging
@@ -415,12 +433,25 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
     def colorize(
         self, text: str, color: str, *, enable_color: bool | None = None
     ) -> str:
+        """Apply ANSI color codes to text.
+
+        Defaults to using the instance's enable_color setting.
+
+        Args:
+            text: Text to colorize
+            color: ANSI color code
+            enable_color: Override color setting, or None to use instance default
+
+        Returns:
+            Colorized text if enabled, otherwise original text
+        """
         _constants = ApatheticLogging_Internal_Constants
         if enable_color is None:
             enable_color = self.enable_color
         return f"{color}{text}{_constants.ANSIColors.RESET}" if enable_color else text
 
     def trace(self, msg: str, *args: Any, **kwargs: Any) -> None:
+        """Log a trace-level message (more verbose than DEBUG)."""
         _constants = ApatheticLogging_Internal_Constants
         if self.isEnabledFor(_constants.TRACE_LEVEL):
             self._log(_constants.TRACE_LEVEL, msg, args, **kwargs)
@@ -454,10 +485,29 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
             self._log(_constants.TEST_LEVEL, msg, args, **kwargs)
 
     def resolveLevelName(self, level_name: str) -> int | None:
-        """logging.getLevelNamesMapping() is only introduced in 3.11"""
+        """Resolve a level name to its numeric value. Case-insensitive.
+
+        Args:
+            level_name: Level name (e.g., "DEBUG", "INFO")
+
+        Returns:
+            Numeric level value, or None if not found
+        """
         return getattr(logging, level_name.upper(), None)
 
     def logDynamic(self, level: str | int, msg: str, *args: Any, **kwargs: Any) -> None:
+        """Log a message with a dynamically provided log level
+           (unlike .info(), .error(), etc.).
+
+        Useful when you have a log level (string or numeric) and don't want to resolve
+        either the string to int, or the int to a log method.
+
+        Args:
+            level: Log level as string name or integer
+            msg: Message format string
+            *args: Arguments for message formatting
+            **kwargs: Additional keyword arguments
+        """
         # Resolve level
         if isinstance(level, str):
             level_no = self.resolveLevelName(level)

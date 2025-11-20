@@ -33,8 +33,15 @@ class ApatheticLogging_Internal_DualStreamHandler:  # noqa: N801  # pyright: ign
         """
 
         enable_color: bool = False
+        """Enable ANSI color output for log messages."""
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
+            """Initialize the dual stream handler. super().__init__() to StreamHandler.
+
+            Args:
+                *args: Additional positional arguments (for future-proofing)
+                **kwargs: Additional keyword arguments (for future-proofing)
+            """
             # default to stdout, overridden per record in emit()
             super().__init__(*args, **kwargs)  # pyright: ignore[reportUnknownMemberType]
 

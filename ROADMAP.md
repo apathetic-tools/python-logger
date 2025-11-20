@@ -18,7 +18,6 @@ Exploring bundling options for generating the single-file release:
 - should we make lint tests that check for new functions we don't cover?
 
 ## 🧑‍💻 Development
-- make sure all functions have docstrings
 
 
 ## 🚀 Deployment

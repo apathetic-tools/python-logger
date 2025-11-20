@@ -16,27 +16,33 @@ class ApatheticLogging_Internal_Constants:  # noqa: N801  # pyright: ignore[repo
     """
 
     DEFAULT_APATHETIC_LOG_LEVEL: str = "detail"
-    DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS: ClassVar[list[str]] = ["LOG_LEVEL"]
+    """Default log level when no other source is found."""
 
-    # Flag for quick runtime enable/disable
+    DEFAULT_APATHETIC_LOG_LEVEL_ENV_VARS: ClassVar[list[str]] = ["LOG_LEVEL"]
+    """Default environment variable names to check for log level."""
+
     SAFE_TRACE_ENABLED: bool = os.getenv("SAFE_TRACE", "").lower() in {
         "1",
         "true",
         "yes",
     }
+    """Enable safe trace diagnostics (controlled by SAFE_TRACE env var)."""
 
-    # Logger levels
-    # most verbose, bypasses capture (2, not 0 to avoid NOTSET)
+    # levels must be careful not to equal 0 to avoid NOTSET
     TEST_LEVEL: int = logging.DEBUG - 8
+    """Most verbose level, bypasses capture."""
+
     TRACE_LEVEL: int = logging.DEBUG - 5
-    # DEBUG      - builtin # verbose
+    """More verbose than DEBUG."""
+
     DETAIL_LEVEL: int = logging.INFO - 5
-    # INFO       - builtin
+    """More detailed than INFO."""
+
     MINIMAL_LEVEL: int = logging.INFO + 5
-    # WARNING    - builtin
-    # ERROR      - builtin
-    # CRITICAL   - builtin # quiet mode
-    SILENT_LEVEL: int = logging.CRITICAL + 1  # one above the highest builtin level
+    """Less detailed than INFO."""
+
+    SILENT_LEVEL: int = logging.CRITICAL + 1
+    """Disables all logging (one above the highest builtin level)."""
 
     LEVEL_ORDER: ClassVar[list[str]] = [
         "test",  # most verbose, bypasses capture for debugging tests
@@ -50,16 +56,32 @@ class ApatheticLogging_Internal_Constants:  # noqa: N801  # pyright: ignore[repo
         "critical",
         "silent",  # disables all logging
     ]
+    """Ordered list of log level names from most to least verbose."""
 
     class ANSIColors:
-        """ANSI color code constants."""
+        """A selection of ANSI color code constants.
+
+        For a comprehensive reference on ANSI escape codes and color support,
+        see: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+        """
 
         RESET: str = "\033[0m"
+        """Reset ANSI color codes."""
+
         CYAN: str = "\033[36m"
+        """Cyan ANSI color code."""
+
         YELLOW: str = "\033[93m"  # or \033[33m
+        """Yellow ANSI color code."""
+
         RED: str = "\033[91m"  # or \033[31m # or background \033[41m
+        """Red ANSI color code."""
+
         GREEN: str = "\033[92m"  # or \033[32m
+        """Green ANSI color code."""
+
         GRAY: str = "\033[90m"
+        """Gray ANSI color code."""
 
     TAG_STYLES: ClassVar[dict[str, tuple[str, str]]] = {
         "TEST": (ANSIColors.GRAY, "[TEST]"),
@@ -69,3 +91,4 @@ class ApatheticLogging_Internal_Constants:  # noqa: N801  # pyright: ignore[repo
         "ERROR": ("", "❌ "),
         "CRITICAL": ("", "💥 "),
     }
+    """Mapping of level names to (color_code, tag_text) tuples."""

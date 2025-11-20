@@ -23,6 +23,13 @@ class ApatheticLogging_Internal_TagFormatter:  # noqa: N801  # pyright: ignore[r
     """
 
     class TagFormatter(logging.Formatter):
+        """Formatter that adds level tags to log messages.
+
+        Adds colored or plain text tags (e.g., [DEBUG], [ERROR]) based on
+        log level. Color support is controlled by the enable_color attribute
+        on the LogRecord.
+        """
+
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             """Initialize the TagFormatter.
 
@@ -36,6 +43,16 @@ class ApatheticLogging_Internal_TagFormatter:  # noqa: N801  # pyright: ignore[r
             *args: Any,
             **kwargs: Any,
         ) -> str:
+            """Format a log record with level tag prefix.
+
+            Args:
+                record: LogRecord to format
+                *args: Additional positional arguments (for future-proofing)
+                **kwargs: Additional keyword arguments (for future-proofing)
+
+            Returns:
+                Formatted message with optional level tag prefix
+            """
             _constants = ApatheticLogging_Internal_Constants
             tag_color, tag_text = _constants.TAG_STYLES.get(record.levelname, ("", ""))
             msg = super().format(record, *args, **kwargs)

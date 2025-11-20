@@ -43,6 +43,14 @@ class ApatheticLogging_Internal_SafeLogging:  # noqa: N801  # pyright: ignore[re
 
     @staticmethod
     def makeSafeTrace(icon: str = "🧪") -> Callable[..., Any]:
+        """Create a trace function with a custom icon. Assign it to a variable.
+
+        Args:
+            icon: Emoji prefix/suffix for easier visual scanning
+
+        Returns:
+            A callable trace function
+        """
         _safe_logging = ApatheticLogging_Internal_SafeLogging
 
         def local_trace(label: str, *args: Any) -> Any:
@@ -53,6 +61,10 @@ class ApatheticLogging_Internal_SafeLogging:  # noqa: N801  # pyright: ignore[re
     @staticmethod
     def safeTrace(label: str, *args: Any, icon: str = "🧪") -> None:
         """Emit a synchronized, flush-safe diagnostic line.
+
+        Mainly for troubleshooting and tests, avoids the
+        logging framework and capture systems, can work even
+        pre-logging framework initialization.
 
         Args:
             label: Short identifier or context string.
