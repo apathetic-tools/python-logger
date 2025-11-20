@@ -2,35 +2,12 @@
 """Tests for get_logger function."""
 
 import sys
-from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
 
 import apathetic_logging as mod_alogs
 import apathetic_logging.registry_data as mod_registry
-
-
-@pytest.fixture(autouse=True)
-def reset_registry() -> Generator[None, None, None]:
-    """Reset registry state before and after each test."""
-    # Save original values
-    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-    original_env_vars = _registry.registered_internal_log_level_env_vars
-    original_default = _registry.registered_internal_default_log_level
-    original_name = _registry.registered_internal_logger_name
-
-    # Reset to None
-    _registry.registered_internal_log_level_env_vars = None
-    _registry.registered_internal_default_log_level = None
-    _registry.registered_internal_logger_name = None
-
-    yield
-
-    # Restore original values
-    _registry.registered_internal_log_level_env_vars = original_env_vars
-    _registry.registered_internal_default_log_level = original_default
-    _registry.registered_internal_logger_name = original_name
 
 
 def test_get_logger_with_registered_name() -> None:

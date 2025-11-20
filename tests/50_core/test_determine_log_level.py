@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import pytest
 
 import apathetic_logging as mod_alogs
-import apathetic_logging.registry_data as mod_registry
 
 
 if TYPE_CHECKING:
@@ -18,21 +17,16 @@ else:
 
 
 @pytest.fixture(autouse=True)
-def reset_registry(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, None]:
-    """Reset registry state and environment before and after each test."""
-    # Save original values (copy list if present to avoid mutating shared state)
-    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-    _ns = mod_alogs.apathetic_logging
-    original_env_vars = _registry.registered_internal_log_level_env_vars
-    original_default = _registry.registered_internal_default_log_level
-    # Copy list if present to avoid mutating shared reference
-    original_env_vars_copy = (
-        list(original_env_vars) if original_env_vars is not None else None
-    )
+def reset_namespace_and_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> Generator[None, None, None]:
+    """Reset namespace shadow attributes and environment.
 
-    # Reset to None on registry class
-    _registry.registered_internal_log_level_env_vars = None
-    _registry.registered_internal_default_log_level = None
+    Registry state is handled by the global fixture, but this handles:
+    - Shadow attributes on namespace class (set directly on namespace)
+    - Environment variables
+    """
+    _ns = mod_alogs.apathetic_logging
 
     # Also reset any shadow attributes on namespace class (in case a previous
     # test set them directly on the namespace class)
@@ -46,11 +40,7 @@ def reset_registry(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, Non
     monkeypatch.delenv("LOG_LEVEL", raising=False)
     monkeypatch.delenv("MYAPP_LOG_LEVEL", raising=False)
 
-    yield
-
-    # Restore original values
-    _registry.registered_internal_log_level_env_vars = original_env_vars_copy
-    _registry.registered_internal_default_log_level = original_default
+    return  # type: ignore[return-value]
 
 
 def test_determine_log_level_from_args(

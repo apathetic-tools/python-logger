@@ -34,32 +34,50 @@ runtime_swap()
 
 # Import after runtime_swap to ensure we get the right module
 import apathetic_logging as mod_alogs  # noqa: E402
+import apathetic_logging.registry_data as mod_registry  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
-def reset_logger_class() -> Generator[None, None, None]:
-    """Reset logger class before and after each test to prevent test pollution.
+def reset_logger_class_and_registry() -> Generator[None, None, None]:
+    """Reset logger class and registry state before and after each test.
 
-    This ensures that tests that set a custom logger class don't affect
-    subsequent tests.
+    This ensures that tests that set a custom logger class or modify registry
+    state don't affect subsequent tests. This is the lowest common denominator
+    needed by almost all tests.
     """
+    # Save original state
     original_logger_class = logging.getLoggerClass()
+    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+    original_name = _registry.registered_internal_logger_name
+    original_default = _registry.registered_internal_default_log_level
+    original_env_vars = _registry.registered_internal_log_level_env_vars
+
     # Clear any existing loggers from the registry
     _logging_utils = mod_alogs.apathetic_logging
     logger_names = list(logging.Logger.manager.loggerDict.keys())
     for logger_name in logger_names:
         _logging_utils.remove_logger(logger_name)
-    # Reset to default before test
+
+    # Reset to defaults before test
     logging.setLoggerClass(mod_alogs.Logger)
     mod_alogs.Logger.extend_logging_module()
+    _registry.registered_internal_logger_name = None
+    _registry.registered_internal_default_log_level = None
+    _registry.registered_internal_log_level_env_vars = None
+
     yield
+
     # Clear loggers again after test
     logger_names = list(logging.Logger.manager.loggerDict.keys())
     for logger_name in logger_names:
         _logging_utils.remove_logger(logger_name)
-    # Reset to original after test
+
+    # Restore original state after test
     logging.setLoggerClass(original_logger_class)
     mod_alogs.Logger.extend_logging_module()
+    _registry.registered_internal_logger_name = original_name
+    _registry.registered_internal_default_log_level = original_default
+    _registry.registered_internal_log_level_env_vars = original_env_vars
 
 
 # ----------------------------------------------------------------------

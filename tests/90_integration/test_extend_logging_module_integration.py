@@ -2,35 +2,8 @@
 """Integration tests for extend_logging_module() and get_logger()."""
 
 import logging
-from collections.abc import Generator
-
-import pytest
 
 import apathetic_logging as mod_alogs
-import apathetic_logging.registry_data as mod_registry
-
-
-@pytest.fixture(autouse=True)
-def reset_registry() -> Generator[None, None, None]:
-    """Reset registry state and logger class before and after each test."""
-    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-    _logging_utils = mod_alogs.apathetic_logging
-    original_name = _registry.registered_internal_logger_name
-    original_logger_class = logging.getLoggerClass()
-    _registry.registered_internal_logger_name = None
-    # Clear any existing loggers from the registry
-    logger_names = list(logging.Logger.manager.loggerDict.keys())
-    for logger_name in logger_names:
-        _logging_utils.remove_logger(logger_name)
-    # Reset logger class to default before test (may have been changed by other tests)
-    logging.setLoggerClass(mod_alogs.Logger)
-    mod_alogs.Logger.extend_logging_module()
-    yield
-    _registry.registered_internal_logger_name = original_name
-    # Reset logger class to original after test
-    logging.setLoggerClass(original_logger_class)
-    # Re-extend with the default Logger class to ensure it's set correctly
-    mod_alogs.Logger.extend_logging_module()
 
 
 def test_extend_logging_module_called_twice_is_safe() -> None:
