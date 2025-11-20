@@ -9,7 +9,7 @@
         <ul class="contact-list">
             <li class="p-author h-card">
               {% if site.author %}
-                {% site.author.url %}
+                {% if site.author.url %}
                   <a href="{{ site.author.url }}">{{ site.author.name | default: site.author | escape }}</a>
                 {% else %}
                   {{ site.author.name | default: site.author | escape }}
