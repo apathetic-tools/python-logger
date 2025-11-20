@@ -8,9 +8,14 @@ baseurl: /python-logging
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
+  - jekyll-remote-theme
 
-# Theme (using minimal theme for clean look)
-theme: minima
+# Theme (using remote theme to get latest minima with dark mode support)
+remote_theme: jekyll/minima
+
+# Minima theme settings
+minima:
+  skin: auto  # Auto-detects system preference, defaults to dark
 
 # Sass/SCSS settings
 sass:
