@@ -29,7 +29,6 @@ plugins:
 
 # Theme (using remote theme to get latest minima with dark mode support)
 remote_theme: jekyll/minima
-theme: minima
 
 # Minima theme settings
 minima:
