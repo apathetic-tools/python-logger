@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from contextlib import suppress
 from unittest.mock import patch
 
@@ -73,6 +74,17 @@ def test_module_std_camel_function(
     assert camel_func is not None, (
         f"Function {func_name} not found on apathetic_logging"
     )
+
+    # Check if the underlying function exists before trying to patch it
+    # Some functions don't exist in Python 3.10
+    # (e.g., getLevelNamesMapping, getHandlerNames, getHandlerByName)
+    module_name, func_name_in_module = mock_target.rsplit(".", 1)
+    if module_name == "logging" and not hasattr(logging, func_name_in_module):
+        py_version = f"{sys.version_info[0]}.{sys.version_info[1]}"
+        pytest.skip(
+            f"{func_name} requires {func_name_in_module} which doesn't exist "
+            f"in logging module on Python {py_version}"
+        )
 
     # Mock the underlying stdlib function
     with patch(mock_target) as mock_func:
