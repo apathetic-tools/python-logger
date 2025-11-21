@@ -11,9 +11,14 @@ from unittest.mock import patch
 import pytest
 
 import apathetic_logging as mod_alogs
+import apathetic_logging.constants as mod_constants
 import apathetic_logging.logging_std_snake as mod_std_snake
 from tests.utils.level_validation import validate_test_level
 
+
+MIN_PYTHON_VERSION = (
+    mod_constants.ApatheticLogging_Internal_Constants.MIN_PYTHON_VERSION
+)
 
 # Safe test level value (26 is between MINIMAL=25 and WARNING=30)
 TEST_LEVEL_VALUE = 26
@@ -21,7 +26,7 @@ validate_test_level(TEST_LEVEL_VALUE)
 
 # List of all stdlib module-level snake_case functions and their test parameters
 # Format: (function_name, args, kwargs, mock_target, min_python_version)
-# min_python_version is (major, minor) tuple or None if available in 3.10+
+# min_python_version is (major, minor) tuple or None if available in MIN_PYTHON_VERSION+
 MODULE_STD_SNAKE_TESTS: list[
     tuple[str, tuple[object, ...], dict[str, object], str, tuple[int, int] | None]
 ] = [
@@ -76,7 +81,7 @@ def test_module_std_snake_function(
     This is a "happy path" test that verifies each snake_case wrapper function
     exists and calls the underlying stdlib function correctly.
 
-    For functions with min_version > 3.10, also tests that they raise
+    For functions with min_version > MIN_PYTHON_VERSION, also tests that they raise
     NotImplementedError on older versions by mocking sys.version_info.
     """
     # Get the snake_case function

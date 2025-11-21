@@ -95,3 +95,6 @@ class ApatheticLogging_Internal_Constants:  # noqa: N801  # pyright: ignore[repo
         "CRITICAL": ("", "💥 "),
     }
     """Mapping of level names to (color_code, tag_text) tuples."""
+
+    MIN_PYTHON_VERSION: tuple[int, int] = (3, 10)
+    """Minimum supported Python version (major, minor)."""
