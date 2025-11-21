@@ -10,6 +10,9 @@ import pytest
 
 import apathetic_logging as mod_alogs
 
+# Import the get_logger module to ensure it's available for patching
+import apathetic_logging.get_logger as mod_get_logger  # noqa: F401  # pyright: ignore[reportUnusedImport]
+
 
 # List of all library module-level snake_case functions and their test parameters
 # Format: (function_name, args, kwargs, mock_target_module, mock_target_function)
@@ -112,9 +115,10 @@ def test_module_lib_snake_function(
         if mock_target_module == "apathetic_logging.get_logger":
             # get_logger is a function on the apathetic_logging namespace class
             # The actual implementation is in ApatheticLogging_Internal_GetLogger class
-            # which is in the get_logger module. Patch the class method directly.
+            # which is in the get_logger module. Use the full module path for patching.
+            # The module name when imported is 'apathetic_logging.get_logger'
             patch_target = (
-                f"apathetic_logging.get_logger."
+                "apathetic_logging.get_logger."
                 f"ApatheticLogging_Internal_GetLogger.{mock_target_function}"
             )
         elif mock_target_module == "apathetic_logging.logging_utils":
