@@ -25,7 +25,7 @@ def test_use_level_context_manager_with_child_class() -> None:
     """Test use_level() context manager works with child logger class."""
     # --- setup ---
     app_name = "testapp_use_level"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
     logger.setLevel("INFO")
@@ -45,7 +45,7 @@ def test_use_level_minimum_with_child_class() -> None:
     """Test use_level() with minimum=True works with child logger class."""
     # --- setup ---
     app_name = "testapp_use_level_min"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
     logger.setLevel("TRACE")  # More verbose
@@ -71,7 +71,7 @@ def test_log_dynamic_with_child_class() -> None:
     """Test log_dynamic() method works with child logger class."""
     # --- setup ---
     app_name = "testapp_log_dynamic"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
     logger.setLevel("DEBUG")
@@ -91,7 +91,7 @@ def test_error_if_not_debug_with_child_class() -> None:
     """Test error_if_not_debug() works with child logger class."""
     # --- setup ---
     app_name = "testapp_error_if_not_debug"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
 
@@ -122,7 +122,7 @@ def test_critical_if_not_debug_with_child_class() -> None:
     """Test critical_if_not_debug() works with child logger class."""
     # --- setup ---
     app_name = "testapp_critical_if_not_debug"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
 
@@ -151,7 +151,7 @@ def test_trace_method_with_child_class() -> None:
     """Test trace() method works with child logger class."""
     # --- setup ---
     app_name = "testapp_trace"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
 
@@ -172,7 +172,7 @@ def test_colorize_with_child_class() -> None:
     """Test colorize() method works with child logger class."""
     # --- setup ---
     app_name = "testapp_colorize"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
 
@@ -190,7 +190,7 @@ def test_custom_methods_inherit_base_features() -> None:
     """Test that custom methods can use inherited base logger features."""
     # --- setup ---
     app_name = "testapp_inherit"
-    AppLoggerWithCustomMethodForTest.extend_logging_module()
+    AppLoggerWithCustomMethodForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     # Create logger directly to ensure we get the right type
     logger = AppLoggerWithCustomMethodForTest(app_name)
@@ -219,7 +219,7 @@ def test_child_class_determine_log_level_env_var_override(
     """Test that env vars override child class default in determine_log_level()."""
     # --- setup ---
     app_name = "testapp_registered_env"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     mod_alogs.registerDefaultLogLevel("warning")
     mod_alogs.registerLogLevelEnvVars(["TESTAPP_LOG_LEVEL", "LOG_LEVEL"])
@@ -246,7 +246,7 @@ def test_child_class_determine_log_level_default_precedence(
     """Test that child class default takes precedence over registered default."""
     # --- setup ---
     app_name = "testapp_registered_default"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     # Register a default that child class should override
     mod_alogs.registerDefaultLogLevel("warning")
@@ -281,8 +281,8 @@ def test_multiple_child_classes_independent() -> None:
             return "WARNING"
 
     # Both should be able to extend (second call returns False)
-    result1 = LoggerA.extend_logging_module()
-    result2 = LoggerB.extend_logging_module()
+    result1 = LoggerA.extendLoggingModule()
+    result2 = LoggerB.extendLoggingModule()
     # First may return False if already extended, second definitely False
     assert isinstance(result1, bool)
     assert result2 is False

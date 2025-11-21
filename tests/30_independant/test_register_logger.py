@@ -115,7 +115,7 @@ def test_register_logger_auto_infer_fails_without_package() -> None:
 
 
 def test_register_logger_extends_logging_module() -> None:
-    """register_logger() should call extend_logging_module() on Logger class."""
+    """register_logger() should call extendLoggingModule() on Logger class."""
     # --- setup ---
     # Verify TRACE exists (from import-time extension)
     # register_logger should ensure it's extended even if called again
@@ -137,7 +137,7 @@ def test_register_logger_extends_logging_module() -> None:
 
 
 def test_register_logger_with_custom_class() -> None:
-    """register_logger() should call extend_logging_module() on custom class."""
+    """register_logger() should call extendLoggingModule() on custom class."""
 
     # --- setup ---
     # Create a custom logger class
@@ -145,13 +145,13 @@ def test_register_logger_with_custom_class() -> None:
         _logging_module_extended = False
 
         @classmethod
-        def extend_logging_module(cls) -> bool:
+        def extendLoggingModule(cls) -> bool:
             """Custom extend that sets a flag."""
             if cls._logging_module_extended:
                 return False
             cls._logging_module_extended = True
             # Call parent to actually extend
-            return super().extend_logging_module()
+            return super().extendLoggingModule()
 
     # --- execute ---
     mod_alogs.registerLogger("test_custom", CustomLogger)

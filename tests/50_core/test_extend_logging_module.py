@@ -1,5 +1,5 @@
 # tests/50_core/test_extend_logging_module.py
-"""Tests for Logger.extend_logging_module() class method."""
+"""Tests for Logger.extendLoggingModule() class method."""
 
 import logging
 
@@ -7,14 +7,14 @@ import apathetic_logging as mod_alogs
 
 
 def test_extend_logging_module_adds_trace_level() -> None:
-    """extend_logging_module() should add TRACE level to logging module."""
+    """extendLoggingModule() should add TRACE level to logging module."""
     # --- setup ---
     # Reset the extension state by creating a new logger class
     # (in real usage, this is called once at module import)
 
     # --- execute ---
-    # Call extend_logging_module (may have already been called)
-    result = mod_alogs.Logger.extend_logging_module()
+    # Call extendLoggingModule (may have already been called)
+    result = mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Should have TRACE level defined
@@ -25,9 +25,9 @@ def test_extend_logging_module_adds_trace_level() -> None:
 
 
 def test_extend_logging_module_adds_detail_level() -> None:
-    """extend_logging_module() should add DETAIL level to logging module."""
+    """extendLoggingModule() should add DETAIL level to logging module."""
     # --- execute ---
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Should have DETAIL level defined
@@ -36,9 +36,9 @@ def test_extend_logging_module_adds_detail_level() -> None:
 
 
 def test_extend_logging_module_adds_minimal_level() -> None:
-    """extend_logging_module() should add MINIMAL level to logging module."""
+    """extendLoggingModule() should add MINIMAL level to logging module."""
     # --- execute ---
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Should have MINIMAL level defined
@@ -47,9 +47,9 @@ def test_extend_logging_module_adds_minimal_level() -> None:
 
 
 def test_extend_logging_module_adds_silent_level() -> None:
-    """extend_logging_module() should add SILENT level to logging module."""
+    """extendLoggingModule() should add SILENT level to logging module."""
     # --- execute ---
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Should have SILENT level defined
@@ -58,9 +58,9 @@ def test_extend_logging_module_adds_silent_level() -> None:
 
 
 def test_extend_logging_module_adds_level_names() -> None:
-    """extend_logging_module() should add level names to logging module."""
+    """extendLoggingModule() should add level names to logging module."""
     # --- execute ---
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Should be able to get level names
@@ -75,9 +75,9 @@ def test_extend_logging_module_adds_level_names() -> None:
 
 
 def test_extend_logging_module_sets_logger_class() -> None:
-    """extend_logging_module() should set the logger class."""
+    """extendLoggingModule() should set the logger class."""
     # --- execute ---
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # The logger class should be set (though we can't easily test this

@@ -89,7 +89,7 @@ class ApatheticLogging_Internal_LoggingUtils:  # noqa: N801  # pyright: ignore[r
         # Use logging.getLevelName() which handles all registered levels:
         # - Standard library levels (DEBUG, INFO, etc.)
         # - Custom apathetic levels (TEST, TRACE, etc.)
-        #   registered via extend_logging_module()
+        #   registered via extendLoggingModule()
         # - User-registered levels via logging.addLevelName()
         level_name = logging.getLevelName(level)
         # getLevelName returns "Level {level}" format for unknown levels
@@ -143,7 +143,7 @@ class ApatheticLogging_Internal_LoggingUtils:  # noqa: N801  # pyright: ignore[r
         # Use getattr() to find level constants registered via logging.addLevelName():
         # - Standard library levels (DEBUG, INFO, etc.) - registered by default
         # - Custom apathetic levels (TEST, TRACE, etc.)
-        #   registered via extend_logging_module()
+        #   registered via extendLoggingModule()
         # - User-registered levels via our addLevelName() method
         #   (but not stdlib's logging.addLevelName() which doesn't set attribute)
         # - User-registered levels via setattr(logging, level_str, value)

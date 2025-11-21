@@ -195,7 +195,7 @@ class ApatheticLogging_Internal_LibSnakeCase:  # noqa: N801  # pyright: ignore[r
             logger_name: The name of the logger to retrieve (e.g., "myapp").
                 If None, extracts the top-level package from __package__.
             logger_class: Optional logger class to use. If provided and the class
-                has an ``extend_logging_module()`` method, it will be called.
+                has an ``extendLoggingModule()`` method, it will be called.
 
         Wrapper for ApatheticLogging_Internal_Registry.registerLogger
         with snake_case naming.

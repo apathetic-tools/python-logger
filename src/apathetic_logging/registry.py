@@ -92,18 +92,18 @@ class ApatheticLogging_Internal_Registry:  # noqa: N801  # pyright: ignore[repor
         If logger_name is not provided, the top-level package is automatically
         extracted from the calling module's __package__ attribute.
 
-        If logger_class is provided and has an ``extend_logging_module()``
+        If logger_class is provided and has an ``extendLoggingModule()``
         method, it will be called to extend the logging module with custom
         levels and set the logger class. If logger_class is provided but does
-        not have ``extend_logging_module()``, ``logging.setLoggerClass()``
+        not have ``extendLoggingModule()``, ``logging.setLoggerClass()``
         will be called directly to set the logger class. If logger_class is not
         provided, nothing is done with the logger class (the default ``Logger``
         is already extended at import time).
 
         **Important**: If you're using a custom logger class that has
-        ``extend_logging_module()``, do not call ``logging.setLoggerClass()``
+        ``extendLoggingModule()``, do not call ``logging.setLoggerClass()``
         directly. Instead, pass the class to ``registerLogger()`` and let
-        ``extend_logging_module()`` handle setting the logger class. This
+        ``extendLoggingModule()`` handle setting the logger class. This
         ensures consistent behavior and avoids class identity issues in
         singlefile mode.
 
@@ -111,7 +111,7 @@ class ApatheticLogging_Internal_Registry:  # noqa: N801  # pyright: ignore[repor
             logger_name: The name of the logger to retrieve (e.g., "myapp").
                 If None, extracts the top-level package from __package__.
             logger_class: Optional logger class to use. If provided and the class
-                has an ``extend_logging_module()`` method, it will be called.
+                has an ``extendLoggingModule()`` method, it will be called.
                 If the class doesn't have that method, ``logging.setLoggerClass()``
                 will be called directly. If None, nothing is done (default Logger
                 is already set up at import time).
@@ -125,15 +125,15 @@ class ApatheticLogging_Internal_Registry:  # noqa: N801  # pyright: ignore[repor
             >>> registerLogger()
             ...     # Uses top-level package from __package__
 
-            >>> # Register with custom logger class (has extend_logging_module)
+            >>> # Register with custom logger class (has extendLoggingModule)
             >>> from apathetic_logging import Logger
             >>> class AppLogger(Logger):
             ...     pass
-            >>> # Don't call AppLogger.extend_logging_module() or
+            >>> # Don't call AppLogger.extendLoggingModule() or
             >>> # logging.setLoggerClass() directly - registerLogger() handles it
             >>> registerLogger("myapp", AppLogger)
 
-            >>> # Register with any logger class (no extend_logging_module)
+            >>> # Register with any logger class (no extendLoggingModule)
             >>> import logging
             >>> class SimpleLogger(logging.Logger):
             ...     pass
@@ -160,8 +160,11 @@ class ApatheticLogging_Internal_Registry:  # noqa: N801  # pyright: ignore[repor
         )
 
         if logger_class is not None:
-            # extend_logging_module will call setLoggerClass for those that support it
-            if hasattr(logger_class, "extend_logging_module"):
+            # extendLoggingModule will call setLoggerClass for those that support it
+            # Check for camelCase first, then snake_case for compatibility
+            if hasattr(logger_class, "extendLoggingModule"):
+                logger_class.extendLoggingModule()  # type: ignore[attr-defined]
+            elif hasattr(logger_class, "extend_logging_module"):
                 logger_class.extend_logging_module()  # type: ignore[attr-defined]
             else:
                 logging.setLoggerClass(logger_class)

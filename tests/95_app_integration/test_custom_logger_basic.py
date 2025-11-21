@@ -26,7 +26,7 @@ def test_custom_logger_correct_usage_pattern() -> None:
     # Step 1: Extend the logging module (must happen first)
     # Note: This sets the logger class globally, so logging.getLogger()
     # will create instances of AppLoggerForTest
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
 
     # Step 2: Register environment variables
     mod_alogs.registerLogLevelEnvVars([log_level_env_var, "LOG_LEVEL"])
@@ -38,7 +38,7 @@ def test_custom_logger_correct_usage_pattern() -> None:
     mod_alogs.registerLogger(app_name)
 
     # Step 5: Get logger instance
-    # Since extend_logging_module() was called, this will be AppLoggerForTest
+    # Since extendLoggingModule() was called, this will be AppLoggerForTest
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
 
     # --- verify ---
@@ -49,10 +49,10 @@ def test_custom_logger_correct_usage_pattern() -> None:
     # (e.g., mod_alogs.Logger) may have different object identity than the actual
     # class used to create logger instances, even though they're functionally
     # the same. Using logging.getLoggerClass() uses the actual class object
-    # that was set via logging.setLoggerClass() in extend_logging_module(),
+    # that was set via logging.setLoggerClass() in extendLoggingModule(),
     # which works reliably in both installed and singlefile runtime modes.
-    # See extend_logging_module() docstring for more details.
-    # In this test, AppLoggerForTest.extend_logging_module() was called,
+    # See extendLoggingModule() docstring for more details.
+    # In this test, AppLoggerForTest.extendLoggingModule() was called,
     # so the logger class is AppLoggerForTest, not mod_alogs.Logger
     assert isinstance(logger, logging.getLoggerClass())
     # Also verify it's an instance of mod_alogs.Logger (AppLoggerForTest extends it)
@@ -68,7 +68,7 @@ def test_custom_logger_with_typed_getter() -> None:
     """Test custom logger with typed getter function."""
     # --- setup ---
     app_name = "testapp_typed"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
 
     def get_app_logger() -> AppLoggerForTest:
@@ -87,10 +87,10 @@ def test_custom_logger_with_typed_getter() -> None:
     # (e.g., mod_alogs.Logger) may have different object identity than the actual
     # class used to create logger instances, even though they're functionally
     # the same. Using logging.getLoggerClass() uses the actual class object
-    # that was set via logging.setLoggerClass() in extend_logging_module(),
+    # that was set via logging.setLoggerClass() in extendLoggingModule(),
     # which works reliably in both installed and singlefile runtime modes.
-    # See extend_logging_module() docstring for more details.
-    # In this test, AppLoggerForTest.extend_logging_module() was called,
+    # See extendLoggingModule() docstring for more details.
+    # In this test, AppLoggerForTest.extendLoggingModule() was called,
     # so the logger class is AppLoggerForTest, not mod_alogs.Logger
     assert isinstance(logger, logging.getLoggerClass())
     # Note: We don't check "isinstance(logger, mod_alogs.Logger)" here because
@@ -109,7 +109,7 @@ def test_custom_logger_determine_log_level_with_cli_args(
     """Test that CLI args override environment variables and root log level."""
     # --- setup ---
     app_name = "testapp_determine_cli"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = AppLoggerForTest(app_name)
 
@@ -132,7 +132,7 @@ def test_custom_logger_determine_log_level_with_env_var(
     """Test that environment variables override root log level."""
     # --- setup ---
     app_name = "testapp_determine_env"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = AppLoggerForTest(app_name)
 
@@ -155,7 +155,7 @@ def test_custom_logger_determine_log_level_with_root_log_level(
     """Test that root log level is used when no CLI args or env vars are set."""
     # --- setup ---
     app_name = "testapp_determine_root"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = AppLoggerForTest(app_name)
 
@@ -177,7 +177,7 @@ def test_custom_logger_determine_log_level_default_fallback(
     """Test that determine_log_level() falls back to default when nothing is set."""
     # --- setup ---
     app_name = "testapp_determine_default"
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     logger = AppLoggerForTest(app_name)
 
@@ -199,7 +199,7 @@ def test_custom_logger_with_custom_methods() -> None:
     # --- setup ---
     app_name = "testapp_custom_methods"
     # Need to set logger class to our custom class
-    AppLoggerWithCustomMethodForTest.extend_logging_module()
+    AppLoggerWithCustomMethodForTest.extendLoggingModule()
     mod_alogs.registerLogger(app_name)
     # Create logger directly to ensure we get the right type
     logger = AppLoggerWithCustomMethodForTest(app_name)

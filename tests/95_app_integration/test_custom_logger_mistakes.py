@@ -14,25 +14,25 @@ import apathetic_logging as mod_alogs
 AppLoggerForTest = conftest.AppLoggerForTest
 
 
-def test_forgetting_extend_logging_module_before_get_logger() -> None:
-    """Test what happens when extend_logging_module() is forgotten.
+def test_forgetting_extendLoggingModule_before_get_logger() -> None:
+    """Test what happens when extendLoggingModule() is forgotten.
 
-    This simulates a user creating a logger before calling extend_logging_module().
+    This simulates a user creating a logger before calling extendLoggingModule().
     """
     # --- setup ---
     app_name = "testapp_no_extend"
 
-    # User forgets to call extend_logging_module() first
+    # User forgets to call extendLoggingModule() first
     # But it's already called at import time in __init__.py
     # So we need to test the case where they create a logger directly
     # without going through the normal pattern
 
     # --- execute ---
-    # Create logger directly (extend_logging_module was called at import)
+    # Create logger directly (extendLoggingModule was called at import)
     logger = AppLoggerForTest(app_name)
 
     # --- verify ---
-    # Should still work because extend_logging_module was called at import
+    # Should still work because extendLoggingModule was called at import
     assert logger is not None
     assert logger.name == app_name
     # Should have TRACE and SILENT available
@@ -50,7 +50,7 @@ def test_registering_after_get_logger() -> None:
     app_name = "testapp_late_register"
 
     # User creates logger first
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     logger = cast("AppLoggerForTest", logging.getLogger(app_name))
 
     # Then registers things after (wrong order)
@@ -82,7 +82,7 @@ def test_registering_after_get_logger_affects_new_instances(
     app_name = "testapp_late_register_new"
 
     # Create logger before registration
-    AppLoggerForTest.extend_logging_module()
+    AppLoggerForTest.extendLoggingModule()
     # Create logger1 to test that it exists before registration
     _logger1 = cast("AppLoggerForTest", logging.getLogger(f"{app_name}_1"))
 

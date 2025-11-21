@@ -16,35 +16,35 @@ else:
 
 
 # ---------------------------------------------------------------------------
-# Tests for validate_level_positive()
+# Tests for validateLevelPositive()
 # ---------------------------------------------------------------------------
 
 
 def testvalidate_level_positive_valid_level() -> None:
-    """validate_level_positive() should pass for valid levels (> 0)."""
+    """validateLevelPositive() should pass for valid levels (> 0)."""
     # Should not raise for valid levels
-    mod_alogs.Logger.validate_level_positive(1, level_name="TEST")
-    mod_alogs.Logger.validate_level_positive(5, level_name="TRACE")
-    mod_alogs.Logger.validate_level_positive(10, level_name="DEBUG")
-    mod_alogs.Logger.validate_level_positive(100, level_name="CUSTOM")
+    mod_alogs.Logger.validateLevelPositive(1, level_name="TEST")
+    mod_alogs.Logger.validateLevelPositive(5, level_name="TRACE")
+    mod_alogs.Logger.validateLevelPositive(10, level_name="DEBUG")
+    mod_alogs.Logger.validateLevelPositive(100, level_name="CUSTOM")
 
 
 def testvalidate_level_positive_zero_raises() -> None:
-    """validate_level_positive() should raise ValueError for level 0."""
+    """validateLevelPositive() should raise ValueError for level 0."""
     with pytest.raises(ValueError, match=r"<= 0.*NOTSET inheritance"):
-        mod_alogs.Logger.validate_level_positive(0, level_name="TEST")
+        mod_alogs.Logger.validateLevelPositive(0, level_name="TEST")
 
 
 def testvalidate_level_positive_negative_raises() -> None:
-    """validate_level_positive() should raise ValueError for negative levels."""
+    """validateLevelPositive() should raise ValueError for negative levels."""
     with pytest.raises(ValueError, match=r"<= 0.*NOTSET inheritance"):
-        mod_alogs.Logger.validate_level_positive(-5, level_name="NEGATIVE")
+        mod_alogs.Logger.validateLevelPositive(-5, level_name="NEGATIVE")
 
 
 def testvalidate_level_positive_auto_detects_name() -> None:
-    """validate_level_positive() should auto-detect level name if None."""
+    """validateLevelPositive() should auto-detect level name if None."""
     with pytest.raises(ValueError, match=r"NOTSET.*<= 0"):
-        mod_alogs.Logger.validate_level_positive(0, level_name=None)
+        mod_alogs.Logger.validateLevelPositive(0, level_name=None)
 
 
 # ---------------------------------------------------------------------------
@@ -197,12 +197,12 @@ def test_add_level_name_rejects_different_existing_value() -> None:
 
 
 def test_add_level_name_works_with_extend_logging_module() -> None:
-    """addLevelName() should work correctly when used by extend_logging_module()."""
+    """addLevelName() should work correctly when used by extendLoggingModule()."""
     # Reset extension flag
     mod_alogs.Logger._logging_module_extended = False  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
 
-    # Call extend_logging_module (uses addLevelName internally)
-    result = mod_alogs.Logger.extend_logging_module()
+    # Call extendLoggingModule (uses addLevelName internally)
+    result = mod_alogs.Logger.extendLoggingModule()
 
     assert result is True
 

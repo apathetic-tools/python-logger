@@ -203,3 +203,46 @@ class ApatheticLogging_Internal_LibLoggerSnakeCase:  # noqa: N801  # pyright: ig
         """
         with self.useLevel(level, minimum=minimum, **kwargs):  # type: ignore[attr-defined]
             yield
+
+    # --- Class Methods (snake_case) ---
+
+    @classmethod
+    def extend_logging_module(cls) -> bool:
+        """Extend the logging module with custom levels.
+
+        The return value tells you if we ran or not.
+        If it is False and you're calling it via super(),
+        you can likely skip your code too.
+
+        Wrapper for Logger.extendLoggingModule with snake_case naming.
+        """
+        return cls.extendLoggingModule()  # type: ignore[attr-defined,no-any-return]
+
+    @classmethod
+    def determine_color_enabled(cls) -> bool:
+        """Return True if colored output should be enabled.
+
+        Wrapper for Logger.determineColorEnabled with snake_case naming.
+        """
+        return cls.determineColorEnabled()  # type: ignore[attr-defined,no-any-return]
+
+    @staticmethod
+    def validate_level_positive(level: int, *, level_name: str | None = None) -> None:
+        """Validate that a level value is positive (> 0).
+
+        Custom levels with values <= 0 will inherit from the root logger,
+        causing NOTSET inheritance issues.
+
+        Args:
+            level: The numeric level value to validate
+            level_name: Optional name for the level (for error messages).
+                If None, will attempt to get from getLevelName()
+
+        Raises:
+            ValueError: If level <= 0
+
+        Wrapper for Logger.validateLevelPositive with snake_case naming.
+        """
+        ApatheticLogging_Internal_LoggerCore.validateLevelPositive(
+            level, level_name=level_name
+        )

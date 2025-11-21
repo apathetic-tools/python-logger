@@ -60,7 +60,7 @@ def reset_logger_class_and_registry() -> Generator[None, None, None]:
 
     # Reset to defaults before test
     logging.setLoggerClass(mod_alogs.Logger)
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
     # Explicitly restore standard level names to ensure they're registered
     # even if a previous test added conflicting custom level names
     _constants = mod_alogs.apathetic_logging
@@ -82,7 +82,7 @@ def reset_logger_class_and_registry() -> Generator[None, None, None]:
 
     # Restore original state after test
     logging.setLoggerClass(original_logger_class)
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
     # Explicitly restore standard level names to ensure they're registered
     # even if the test added conflicting custom level names
     mod_alogs.Logger.addLevelName(_constants.TEST_LEVEL, "TEST")

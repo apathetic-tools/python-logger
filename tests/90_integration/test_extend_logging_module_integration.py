@@ -1,20 +1,20 @@
-# tests/90_integration/test_extend_logging_module_integration.py
-"""Integration tests for extend_logging_module() and get_logger()."""
+# tests/90_integration/test_extendLoggingModule_integration.py
+"""Integration tests for extendLoggingModule() and get_logger()."""
 
 import logging
 
 import apathetic_logging as mod_alogs
 
 
-def test_extend_logging_module_called_twice_is_safe() -> None:
-    """Calling extend_logging_module() twice should be safe and idempotent."""
+def test_extendLoggingModule_called_twice_is_safe() -> None:
+    """Calling extendLoggingModule() twice should be safe and idempotent."""
     # --- setup ---
     # First call (may have already been called at import)
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- execute ---
     # Second call
-    result2 = mod_alogs.Logger.extend_logging_module()
+    result2 = mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Second call should return False (already extended)
@@ -30,13 +30,13 @@ def test_extend_logging_module_called_twice_is_safe() -> None:
     assert logging.SILENT == mod_alogs.apathetic_logging.SILENT_LEVEL  # type: ignore[attr-defined]  # pyright: ignore[reportAttributeAccessIssue,reportUnknownMemberType]
 
 
-def test_extend_logging_module_before_get_logger_works() -> None:
-    """extend_logging_module() should work when called before get_logger()."""
+def test_extendLoggingModule_before_get_logger_works() -> None:
+    """extendLoggingModule() should work when called before get_logger()."""
     # --- setup ---
     mod_alogs.registerLogger("test_integration")
 
     # --- execute ---
-    # extend_logging_module() is already called at import, but we can verify
+    # extendLoggingModule() is already called at import, but we can verify
     # that get_logger() works correctly
     logger = mod_alogs.getLogger()
 
@@ -54,8 +54,8 @@ def test_extend_logging_module_before_get_logger_works() -> None:
     assert logger.levelName == "SILENT"
 
 
-def test_get_logger_works_after_extend_logging_module() -> None:
-    """get_logger() should work correctly after extend_logging_module() is called."""
+def test_get_logger_works_after_extendLoggingModule() -> None:
+    """get_logger() should work correctly after extendLoggingModule() is called."""
     # --- setup ---
     mod_alogs.registerLogger("test_get_logger_after_extend")
 
@@ -69,9 +69,9 @@ def test_get_logger_works_after_extend_logging_module() -> None:
     # (e.g., mod_alogs.Logger) may have different object identity than the actual
     # class used to create logger instances, even though they're functionally
     # the same. Using logging.getLoggerClass() uses the actual class object
-    # that was set via logging.setLoggerClass() in extend_logging_module(),
+    # that was set via logging.setLoggerClass() in extendLoggingModule(),
     # which works reliably in both installed and singlefile runtime modes.
-    # See extend_logging_module() docstring for more details.
+    # See extendLoggingModule() docstring for more details.
     assert isinstance(logger, logging.getLoggerClass())
     # Note: We don't check "logging.getLoggerClass() is mod_alogs.Logger" here
     # because in singlefile mode, class identity may differ even though they're
@@ -92,7 +92,7 @@ def test_get_logger_works_after_extend_logging_module() -> None:
 
 
 def test_logger_can_use_trace_level_after_extend() -> None:
-    """Logger should be able to use TRACE level after extend_logging_module()."""
+    """Logger should be able to use TRACE level after extendLoggingModule()."""
     # --- setup ---
     logger = mod_alogs.Logger("test_trace_logger")
     logger.setLevel("TRACE")
@@ -104,7 +104,7 @@ def test_logger_can_use_trace_level_after_extend() -> None:
 
 
 def test_logger_can_use_detail_level_after_extend() -> None:
-    """Logger should be able to use DETAIL level after extend_logging_module()."""
+    """Logger should be able to use DETAIL level after extendLoggingModule()."""
     # --- setup ---
     logger = mod_alogs.Logger("test_detail_logger")
     logger.setLevel("DETAIL")
@@ -117,7 +117,7 @@ def test_logger_can_use_detail_level_after_extend() -> None:
 
 
 def test_logger_can_use_minimal_level_after_extend() -> None:
-    """Logger should be able to use MINIMAL level after extend_logging_module()."""
+    """Logger should be able to use MINIMAL level after extendLoggingModule()."""
     # --- setup ---
     logger = mod_alogs.Logger("test_minimal_logger")
     logger.setLevel("MINIMAL")
@@ -130,7 +130,7 @@ def test_logger_can_use_minimal_level_after_extend() -> None:
 
 
 def test_logger_can_use_silent_level_after_extend() -> None:
-    """Logger should be able to use SILENT level after extend_logging_module()."""
+    """Logger should be able to use SILENT level after extendLoggingModule()."""
     # --- setup ---
     logger = mod_alogs.Logger("test_silent_logger")
 
@@ -142,8 +142,8 @@ def test_logger_can_use_silent_level_after_extend() -> None:
     assert logger.levelName == "SILENT"
 
 
-def test_extend_logging_module_sets_logger_class() -> None:
-    """extend_logging_module() should set the logger class for logging.getLogger()."""
+def test_extendLoggingModule_sets_logger_class() -> None:
+    """extendLoggingModule() should set the logger class for logging.getLogger()."""
     # --- setup ---
     mod_alogs.registerLogger("test_logger_class")
 
@@ -161,12 +161,12 @@ def test_extend_logging_module_sets_logger_class() -> None:
     assert hasattr(logger, "determineLogLevel")
 
 
-def test_multiple_calls_to_extend_logging_module() -> None:
-    """Multiple calls to extend_logging_module() should not cause issues."""
+def test_multiple_calls_to_extendLoggingModule() -> None:
+    """Multiple calls to extendLoggingModule() should not cause issues."""
     # --- execute ---
     results: list[bool] = []
     for _ in range(5):
-        result = mod_alogs.Logger.extend_logging_module()
+        result = mod_alogs.Logger.extendLoggingModule()
         results.append(result)
 
     # --- verify ---
@@ -180,8 +180,8 @@ def test_multiple_calls_to_extend_logging_module() -> None:
     assert hasattr(logging, "SILENT")
 
 
-def test_extend_logging_module_preserves_existing_loggers() -> None:
-    """extend_logging_module() should not break existing loggers."""
+def test_extendLoggingModule_preserves_existing_loggers() -> None:
+    """extendLoggingModule() should not break existing loggers."""
     # --- setup ---
     # Create a logger before calling extend (though it's already called at import)
     existing_logger = mod_alogs.Logger("existing_logger")
@@ -189,7 +189,7 @@ def test_extend_logging_module_preserves_existing_loggers() -> None:
 
     # --- execute ---
     # Call extend again (should be safe)
-    mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # Existing logger should still work
@@ -207,7 +207,7 @@ def test_full_integration_flow() -> None:
     # This simulates the typical usage pattern
 
     # --- execute ---
-    # 1. extend_logging_module() is called at import (already done)
+    # 1. extendLoggingModule() is called at import (already done)
     # 2. Register logger name
     mod_alogs.registerLogger("integration_test")
 
@@ -232,14 +232,14 @@ def test_full_integration_flow() -> None:
     assert hasattr(logger, "determineLogLevel")
 
 
-def test_get_logger_requires_extend_logging_module() -> None:
-    """get_logger() should work even if extend_logging_module() was called at import.
+def test_get_logger_requires_extendLoggingModule() -> None:
+    """get_logger() should work even if extendLoggingModule() was called at import.
 
-    Note: In practice, extend_logging_module() is always called at import time
+    Note: In practice, extendLoggingModule() is always called at import time
     in __init__.py. This test verifies that the integration works correctly.
     """
     # --- setup ---
-    # extend_logging_module() is already called at import time
+    # extendLoggingModule() is already called at import time
     # Verify that get_logger() works correctly
     mod_alogs.registerLogger("test_requires_extend")
 
@@ -258,8 +258,8 @@ def test_get_logger_requires_extend_logging_module() -> None:
     assert hasattr(logger, "trace")
 
 
-def test_extend_logging_module_idempotent_behavior() -> None:
-    """extend_logging_module() should be idempotent - safe to call multiple times."""
+def test_extendLoggingModule_idempotent_behavior() -> None:
+    """extendLoggingModule() should be idempotent - safe to call multiple times."""
     # --- setup ---
     # Get initial state
     initial_trace = getattr(logging, "TRACE", None)
@@ -267,9 +267,9 @@ def test_extend_logging_module_idempotent_behavior() -> None:
 
     # --- execute ---
     # Call multiple times
-    mod_alogs.Logger.extend_logging_module()
-    result2 = mod_alogs.Logger.extend_logging_module()
-    result3 = mod_alogs.Logger.extend_logging_module()
+    mod_alogs.Logger.extendLoggingModule()
+    result2 = mod_alogs.Logger.extendLoggingModule()
+    result3 = mod_alogs.Logger.extendLoggingModule()
 
     # --- verify ---
     # All calls after the first should return False
@@ -290,13 +290,13 @@ def test_extend_logging_module_idempotent_behavior() -> None:
 
 def test_get_logger_returns_apathetic_logger_after_extend() -> None:
     """get_logger() should return apathetic_logging.Logger
-     after extend_logging_module().
+     after extendLoggingModule().
 
-    This verifies that extend_logging_module() sets the logger class correctly,
+    This verifies that extendLoggingModule() sets the logger class correctly,
     so that logging.getLogger() returns the right type.
     """
     # --- setup ---
-    # extend_logging_module() is called at import time, which sets
+    # extendLoggingModule() is called at import time, which sets
     # logging.setLoggerClass(apathetic_logging.Logger)
     mod_alogs.registerLogger("test_logger_type")
 

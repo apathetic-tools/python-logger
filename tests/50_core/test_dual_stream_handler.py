@@ -209,9 +209,9 @@ def test_dual_stream_handler_test_level_bypasses_capture(
     # may have different object identity than the actual class used to create logger
     # instances, even though they're functionally the same. Using
     # logging.getLoggerClass() uses the actual class object that was set via
-    # logging.setLoggerClass() in extend_logging_module(), which works reliably
+    # logging.setLoggerClass() in extendLoggingModule(), which works reliably
     # in both installed and singlefile runtime modes.
-    # See extend_logging_module() docstring for more details.
+    # See extendLoggingModule() docstring for more details.
     if not isinstance(logger, logging.getLoggerClass()):
         # Create a new logger if it's not our type
         logger = mod_alogs.Logger(logger_name)

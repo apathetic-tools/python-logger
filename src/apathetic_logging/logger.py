@@ -71,7 +71,7 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
             enable_color: Force color output on/off, or None for auto-detect
             propagate: False avoids duplicate root logs
         """
-        # it is too late to call extend_logging_module
+        # it is too late to call extendLoggingModule
 
         # now let's init our logger
         super().__init__(name, level)
@@ -84,7 +84,7 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
         self.enable_color = (
             enable_color
             if enable_color is not None
-            else type(self).determine_color_enabled()
+            else type(self).determineColorEnabled()
         )
 
         self.propagate = propagate
@@ -186,15 +186,15 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
 
         # Validate any level <= 0 (prevents NOTSET inheritance)
         # Built-in levels (DEBUG=10, INFO=20, etc.) are all > 0, so they pass
-        # validate_level_positive() will raise if level <= 0
+        # validateLevelPositive() will raise if level <= 0
         # At this point, level is guaranteed to be int (resolved above)
         level_name = _logging_utils.getLevelName(level)
-        self.validate_level_positive(level, level_name=level_name)
+        self.validateLevelPositive(level, level_name=level_name)
 
         super().setLevel(level)
 
     @classmethod
-    def determine_color_enabled(cls) -> bool:
+    def determineColorEnabled(cls) -> bool:
         """Return True if colored output should be enabled."""
         # Respect explicit overrides
         if "NO_COLOR" in os.environ:
@@ -206,7 +206,7 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
         return sys.stdout.isatty()
 
     @staticmethod
-    def validate_level_positive(level: int, *, level_name: str | None = None) -> None:
+    def validateLevelPositive(level: int, *, level_name: str | None = None) -> None:
         """Validate that a level value is positive (> 0).
 
         Custom levels with values <= 0 will inherit from the root logger,
@@ -221,8 +221,8 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
             ValueError: If level <= 0
 
         Example:
-            >>> Logger.validate_level_positive(5, level_name="TRACE")
-            >>> Logger.validate_level_positive(0, level_name="TEST")
+            >>> Logger.validateLevelPositive(5, level_name="TRACE")
+            >>> Logger.validateLevelPositive(0, level_name="TEST")
             ValueError: Level 'TEST' has value 0...
         """
         if level <= 0:
@@ -264,7 +264,7 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
         https://docs.python.org/3.10/library/logging.html#logging.addLevelName
         """
         # Validate level is positive
-        ApatheticLogging_Internal_LoggerCore.validate_level_positive(
+        ApatheticLogging_Internal_LoggerCore.validateLevelPositive(
             level, level_name=level_name
         )
 
@@ -280,7 +280,7 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
                 )
                 raise ValueError(msg)
             # Validate existing value is positive
-            ApatheticLogging_Internal_LoggerCore.validate_level_positive(
+            ApatheticLogging_Internal_LoggerCore.validateLevelPositive(
                 existing_value, level_name=level_name
             )
             if existing_value != level:
@@ -298,7 +298,7 @@ class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyr
         setattr(logging, level_name, level)
 
     @classmethod
-    def extend_logging_module(cls) -> bool:
+    def extendLoggingModule(cls) -> bool:
         """The return value tells you if we ran or not.
         If it is False and you're calling it via super(),
         you can likely skip your code too.

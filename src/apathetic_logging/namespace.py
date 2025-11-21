@@ -104,7 +104,7 @@ class apathetic_logging(  # noqa: N801
 # This must be called before any loggers are created
 # This runs when namespace.py is executed (both installed and stitched modes)
 # The method is idempotent, so safe to call multiple times if needed
-apathetic_logging.Logger.extend_logging_module()
+apathetic_logging.Logger.extendLoggingModule()
 
 # Note: All exports are handled in __init__.py
 # - For library builds (installed/singlefile): __init__.py is included, exports happen
