@@ -27,3 +27,15 @@ alwaysApply: true
 - **Exploratory work allowed**: You may perform exploratory findings (reading code, searching the codebase, analyzing patterns) to answer the question, but **do not modify core project code** to implement changes.
 
 - **After answering**: Once you've provided the answer and recommendations, explicitly ask "Should I proceed with implementing this?" or "Would you like me to make these changes?" and wait for confirmation. Only proceed after explicit confirmation.
+
+### Troubleshooting When Stuck
+
+- **When stuck troubleshooting**: If you're stuck and need help, ask the user for insight. When doing so, also ask if you should:
+  - Stash the current changes
+  - Rollback to the last passing commit
+  - Add one isolated feature/change at a time, passing tests each time before re-committing
+- **If the user says yes**: 
+  - Create an implementation plan in `.plans/` following the format in `.ai/templates/plan_debug_rollback.tmpl.md`
+  - Consult `.ai/workflows/plan_debug_rollback.md` for detailed instructions on the isolated changes workflow
+  - Keep the plan updated as you progress
+- **Continue asking for insight**: This is a good practice - keep doing it when you're stuck

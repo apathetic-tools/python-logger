@@ -20,8 +20,23 @@ alwaysApply: true
   1. Run `poetry run poe sync:ai:guidance` to sync changes to `.cursor/` and `.claude/`
   2. Include the generated files (`.cursor/rules/*.mdc`, `.cursor/commands/*.md`, `.claude/CLAUDE.md`) as part of the same changeset/commit
 - **Before committing**: Run `poetry run poe check:fix` (this also regenerates `dist/package.py` as needed)
-- **Debugging failing tests**: Set `LOG_LEVEL=test` to output TRACE and DEBUG logs in failing tests, bypassing pytest's log capture. This is useful for debugging test failures:
-  ```bash
-  LOG_LEVEL=test poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
-  ```
-  The `test` log level is the most verbose and bypasses pytest's log capture, allowing you to see all TRACE and DEBUG logs even when tests fail.
+- **Debugging failing tests**: Use these troubleshooting techniques:
+  - **Set `LOG_LEVEL=test`** to output TRACE and DEBUG logs in failing tests, bypassing pytest's log capture:
+    ```bash
+    LOG_LEVEL=test poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
+    ```
+    The `test` log level is the most verbose and bypasses pytest's log capture, allowing you to see all TRACE and DEBUG logs even when tests fail.
+  - **Add copious `logger.trace()` statements** throughout the code to trace execution flow and variable values during debugging
+  - **Use `apathetic_logging.safe_trace()`** when logging is not available or captured even with `LOG_LEVEL=test`. `safe_trace()` writes directly to `sys.__stderr__` and bypasses all logging frameworks and capture systems, making it useful for:
+    - Pre-logging framework initialization debugging
+    - When pytest's capture is interfering
+    - When the logging system itself might be broken
+  - **Use `apathetic_logging.make_safe_trace(icon)`** to create custom trace functions with specific icons for easier visual scanning (e.g., `trace = make_safe_trace("🔍")` then use `trace("label", value)`)
+  - **Enable `safe_trace()` output** by setting the `SAFE_TRACE` environment variable:
+    ```bash
+    SAFE_TRACE=1 poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
+    ```
+    Or combine with `LOG_LEVEL=test`:
+    ```bash
+    LOG_LEVEL=test SAFE_TRACE=1 poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
+    ```

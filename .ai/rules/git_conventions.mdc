@@ -42,3 +42,12 @@ Other examples:
 - `fix(config): resolve validation error for empty build configs`
 - `refactor(utils): simplify path normalization logic`
 - `test(integration): add tests for log level handling`
+
+### Checkpoint Commits and Squashing
+
+- **Checkpoint commits** use the format `checkpoint(scope): brief description` and are intermediate saves during debugging
+- **When making a regular commit after checkpoint commits**: Before committing, check if there are checkpoint commits since the last regular commit
+- **Ask the user**: "I see [N] checkpoint commit(s) since the last regular commit. Would you like me to squash them with this commit?"
+- If yes, use interactive rebase or `git reset --soft` to squash them before committing
+- If no, proceed with a regular commit
+- This helps keep git history clean by consolidating debugging checkpoints into meaningful commits

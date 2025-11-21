@@ -72,7 +72,7 @@ Why this change is needed.
 ## Phase N+1: Process Improvement Recommendations
 
 - [ ] Review plan execution process
-- [ ] Recommend improvements to `.plans/_format.md` (don't implement, just recommend)
+- [ ] Recommend improvements to `.ai/workflows/plan_feature.md` (don't implement, just recommend)
 - [ ] Recommend changes to `.ai/rules/` and `.ai/commands/` that would reduce problems (don't implement, just recommend)
 - [ ] Document what worked well and what didn't
 - [ ] Update quick reference checklist

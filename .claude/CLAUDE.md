@@ -325,6 +325,18 @@ Please help me resolve the remaining issues to get `poetry run poe check:fix` pa
 
 - **After answering**: Once you've provided the answer and recommendations, explicitly ask "Should I proceed with implementing this?" or "Would you like me to make these changes?" and wait for confirmation. Only proceed after explicit confirmation.
 
+### Troubleshooting When Stuck
+
+- **When stuck troubleshooting**: If you're stuck and need help, ask the user for insight. When doing so, also ask if you should:
+  - Stash the current changes
+  - Rollback to the last passing commit
+  - Add one isolated feature/change at a time, passing tests each time before re-committing
+- **If the user says yes**: 
+  - Create an implementation plan in `.plans/` following the format in `.ai/templates/plan_debug_rollback.tmpl.md`
+  - Consult `.ai/workflows/plan_debug_rollback.md` for detailed instructions on the isolated changes workflow
+  - Keep the plan updated as you progress
+- **Continue asking for insight**: This is a good practice - keep doing it when you're stuck
+
 # Git Conventions
 
 ### Git Commit Conventions
@@ -364,6 +376,15 @@ Other examples:
 - `fix(config): resolve validation error for empty build configs`
 - `refactor(utils): simplify path normalization logic`
 - `test(integration): add tests for log level handling`
+
+### Checkpoint Commits and Squashing
+
+- **Checkpoint commits** use the format `checkpoint(scope): brief description` and are intermediate saves during debugging
+- **When making a regular commit after checkpoint commits**: Before committing, check if there are checkpoint commits since the last regular commit
+- **Ask the user**: "I see [N] checkpoint commit(s) since the last regular commit. Would you like me to squash them with this commit?"
+- If yes, use interactive rebase or `git reset --soft` to squash them before committing
+- If no, proceed with a regular commit
+- This helps keep git history clean by consolidating debugging checkpoints into meaningful commits
 
 # Project Overview
 
@@ -482,11 +503,26 @@ Apathetic Python Logger is a minimal wrapper for the Python standard library log
   1. Run `poetry run poe sync:ai:guidance` to sync changes to `.cursor/` and `.claude/`
   2. Include the generated files (`.cursor/rules/*.mdc`, `.cursor/commands/*.md`, `.claude/CLAUDE.md`) as part of the same changeset/commit
 - **Before committing**: Run `poetry run poe check:fix` (this also regenerates `dist/package.py` as needed)
-- **Debugging failing tests**: Set `LOG_LEVEL=test` to output TRACE and DEBUG logs in failing tests, bypassing pytest's log capture. This is useful for debugging test failures:
-  ```bash
-  LOG_LEVEL=test poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
-  ```
-  The `test` log level is the most verbose and bypasses pytest's log capture, allowing you to see all TRACE and DEBUG logs even when tests fail.
+- **Debugging failing tests**: Use these troubleshooting techniques:
+  - **Set `LOG_LEVEL=test`** to output TRACE and DEBUG logs in failing tests, bypassing pytest's log capture:
+    ```bash
+    LOG_LEVEL=test poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
+    ```
+    The `test` log level is the most verbose and bypasses pytest's log capture, allowing you to see all TRACE and DEBUG logs even when tests fail.
+  - **Add copious `logger.trace()` statements** throughout the code to trace execution flow and variable values during debugging
+  - **Use `apathetic_logging.safe_trace()`** when logging is not available or captured even with `LOG_LEVEL=test`. `safe_trace()` writes directly to `sys.__stderr__` and bypasses all logging frameworks and capture systems, making it useful for:
+    - Pre-logging framework initialization debugging
+    - When pytest's capture is interfering
+    - When the logging system itself might be broken
+  - **Use `apathetic_logging.make_safe_trace(icon)`** to create custom trace functions with specific icons for easier visual scanning (e.g., `trace = make_safe_trace("🔍")` then use `trace("label", value)`)
+  - **Enable `safe_trace()` output** by setting the `SAFE_TRACE` environment variable:
+    ```bash
+    SAFE_TRACE=1 poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
+    ```
+    Or combine with `LOG_LEVEL=test`:
+    ```bash
+    LOG_LEVEL=test SAFE_TRACE=1 poetry run poe test:pytest:installed tests/path/to/test.py::test_name -xvs
+    ```
 
 # Claude Extra
 

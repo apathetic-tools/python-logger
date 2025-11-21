@@ -39,7 +39,7 @@ This format is designed for **complex changes** that require careful planning an
 
 ## Using the Template
 
-**For AI assistants**: When creating a new plan document, start by copying `.plans/_template.md` and filling in the structure. The template provides:
+**For AI assistants**: When creating a new plan document, start by copying `.ai/templates/plan_feature.tmpl.md` and filling in the structure. The template provides:
 - All required phases with proper structure
 - Quick reference checklist pre-populated
 - Standard phase actions and checkpoints
@@ -133,7 +133,7 @@ Each plan document must be organized into **phases**. Phases should be clearly m
 **Always the very last phase (after Final Verification).**
 
 - Review the plan execution process
-- Recommend improvements to `.plans/_format.md` (don't implement, just recommend)
+- Recommend improvements to `.ai/workflows/plan_feature.md` (don't implement, just recommend)
 - Recommend changes to `.ai/rules/` and `.ai/commands/` that would reduce problems (don't implement, just recommend)
 - Document what worked well and what didn't
 - These recommendations help improve the format and AI guidance for future plans
@@ -272,7 +272,7 @@ Why this change is needed.
 
 ## Phase N+1: Process Improvement Recommendations
 - [ ] Review plan execution
-- [ ] Recommend _format.md improvements
+- [ ] Recommend plan_feature.md improvements
 - [ ] Recommend .ai/rules and .ai/commands changes
 - [ ] Document lessons learned
 ```
