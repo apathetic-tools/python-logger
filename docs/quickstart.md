@@ -54,8 +54,8 @@ python my_app.py
 #### 2. Programmatically
 
 ```python
-logger.setLevel("debug")  # Case-insensitive
-logger.setLevel(logging.DEBUG)  # Or use logging constants
+logger.set_level("debug")  # Case-insensitive
+logger.set_level(logging.DEBUG)  # Or use logging constants
 ```
 
 #### 3. Using Context Manager
@@ -160,11 +160,29 @@ def main():
     logger = get_logger()
     
     # Logger will automatically use args.log_level
-    logger.determine_log_level(args=args)
-    logger.setLevel(logger.determine_log_level(args=args))
+    level = logger.determine_log_level(args=args)
+    logger.set_level(level)
     
     logger.info("CLI tool started")
 ```
+
+## Drop-in Replacement for stdlib logging
+
+Apathetic Python Logger can be used as a drop-in replacement for Python's standard library `logging` module:
+
+```python
+# Instead of: import logging
+import apathetic_logging as logging
+
+# Works just like stdlib logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("my_app")  # Note: getLogger is CamelCase in stdlib
+logger.info("Hello, world!")
+logger.debug("Debug message")
+logger.warning("Warning message")
+```
+
+> **Note:** When using `get_logger(None)`, the logger name is now auto-inferred from the calling module instead of returning the root logger. To get the root logger, use `get_logger("")` instead. See [Breaking Changes]({{ '/api' | relative_url }}#breaking-changes) for details.
 
 ## Next Steps
 

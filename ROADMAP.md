@@ -24,6 +24,7 @@ Exploring bundling options for generating the single-file release:
 - Deploy action when I tag a release should create a release and attach it to the tagged release.
 
 ## 🔌 API
+let get_logger() provide the log level, both exact and minimum
 
 
 ## 📚 Documentation

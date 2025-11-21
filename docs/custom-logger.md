@@ -161,7 +161,7 @@ def main():
     # Set log level from command-line arguments
     # The logger's determine_log_level() method will handle this
     log_level = logger.determine_log_level(args=args)
-    logger.setLevel(log_level)
+    logger.set_level(log_level)
     
     # Use the logger
     logger.info("Application started")
@@ -204,7 +204,7 @@ python myapp.py
 
 ```python
 logger = get_app_logger()
-logger.setLevel("debug")
+logger.set_level("debug")
 ```
 
 ## Extending the Custom Logger

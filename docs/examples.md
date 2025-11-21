@@ -37,9 +37,9 @@ def main():
     
     # Set log level from arguments
     if args.verbose:
-        logger.setLevel("debug")
+        logger.set_level("debug")
     else:
-        logger.setLevel(args.log_level)
+        logger.set_level(args.log_level)
     
     # Use the logger
     logger.info("Application started")
@@ -160,7 +160,7 @@ def main():
     
     # Determine log level from args, env, or default
     level = logger.determine_log_level(args=args)
-    logger.setLevel(level)
+    logger.set_level(level)
     
     logger.info("CLI tool started")
     logger.debug("Debug mode enabled")
@@ -219,7 +219,7 @@ from apathetic_logging import get_logger, register_logger
 def logger():
     register_logger("test_app")
     logger = get_logger()
-    logger.setLevel("debug")  # Verbose for tests
+    logger.set_level("debug")  # Verbose for tests
     return logger
 
 def test_operation(logger):
@@ -240,7 +240,7 @@ register_logger("my_app")
 logger = get_logger()
 
 # Enable silent mode
-logger.setLevel("silent")
+logger.set_level("silent")
 
 # These won't be shown
 logger.info("This won't show")
@@ -248,7 +248,7 @@ logger.error("This won't show either")
 logger.critical("Even this won't show")
 
 # Re-enable logging
-logger.setLevel("info")
+logger.set_level("info")
 logger.info("Now this will show")
 ```
 
@@ -323,7 +323,7 @@ from apathetic_logging import get_logger, register_logger
 
 register_logger("my_app")
 logger = get_logger()
-logger.setLevel("trace")  # Most verbose
+logger.set_level("trace")  # Most verbose
 
 # This won't downgrade to debug (trace is more verbose)
 with logger.use_level("debug", minimum=True):
@@ -331,7 +331,7 @@ with logger.use_level("debug", minimum=True):
     logger.debug("This will also show")
 
 # But if current level is info, this will upgrade to debug
-logger.setLevel("info")
+logger.set_level("info")
 with logger.use_level("debug", minimum=True):
     logger.debug("This will show (upgraded from info to debug)")
 ```

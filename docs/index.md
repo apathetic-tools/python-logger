@@ -12,14 +12,16 @@ permalink: /
 *Apathetic Python Logger* provides a lightweight, dependency-free logging solution designed for CLI tools. It extends Python's standard library `logging` module with colorized output, dual-stream handling (stdout/stderr), extra logging levels, and seamless integration with Apathetic Tools projects.
 
 ## Features
-
-- 🎨 **Colorized output** — Automatic color detection with TTY support
-- 🔄 **Dual-stream handling** — Smart routing to stdout/stderr
 - 🪶 **Zero dependencies** — Uses only Python's standard library
-- 🏷️ **Tag-based formatting** — Clean, readable log tags with emoji support
+- 🔄 **Drop-in replacement** — Can be used as a drop-in replacement for stdlib `logging`
+- 🐍 **Dual API** — Both snake_case (recommended) and CamelCase APIs available
+- 🔄 **Dual-stream handling** — Smart routing to stdout/stderr
 - 📊 **Extra logging levels** — TEST, TRACE, DETAIL, MINIMAL, and SILENT levels for fine-grained control
-- 🔧 **CLI-friendly** — Designed for command-line applications
+- 🏷️ **Tag-based formatting** — Clean, readable log tags with emoji support
+- 🎨 **Colorized output** — Automatic color detection with TTY support
+- 🔧 **CLI-friendly** — Designed with command-line applications in mind
 - 🧩 **Apathetic Tools integration** — Works seamlessly with serger and other Apathetic Tools
+
 
 ## Quick Example
 

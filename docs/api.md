@@ -8,7 +8,13 @@ permalink: /api/
 
 Complete API documentation for Apathetic Python Logger.
 
-## Core Functions
+> **Note:** This library provides both **snake_case** (recommended, PEP 8 compliant) and **CamelCase** APIs. The snake_case API is documented first and recommended for new code. The CamelCase API is available for compatibility and is documented at the end of this page.
+>
+> For information about breaking changes, see the [Breaking Changes](#breaking-changes) section.
+
+## New and Modified Functions (snake_case)
+
+These functions are new to Apathetic Python Logger or have modified behavior compared to stdlib logging.
 
 ### `get_logger(logger_name: str | None = None) -> Logger`
 
@@ -16,11 +22,13 @@ Return the registered logger instance.
 
 Uses Python's built-in logging registry (`logging.getLogger()`) to retrieve the logger. If no logger name is provided, uses the registered logger name or attempts to auto-infer the logger name from the calling module's top-level package.
 
+> **Breaking Change:** When `logger_name` is `None`, the logger name is now **auto-inferred** from the calling module instead of returning the root logger. To get the root logger, use `get_logger("")` instead. See [Breaking Changes](#breaking-changes) for details.
+
 **Parameters:**
-- `logger_name` (str | None): Optional logger name. If not provided, uses the registered logger name or auto-infers from the calling module.
+- `logger_name` (str | None): Optional logger name. If not provided, uses the registered logger name or auto-infers from the calling module. Use `""` to get the root logger.
 
 **Returns:**
-- The logger instance from `logging.getLogger()` (as `apathetic_logging` type)
+- The logger instance from `logging.getLogger()` (as `apathetic_logging.Logger` type)
 
 **Raises:**
 - `RuntimeError`: If no logger name is provided and no logger name has been registered and auto-inference fails.
@@ -35,6 +43,32 @@ logger = get_logger()  # Gets "my_app" logger
 
 # Or specify logger name directly
 logger = get_logger("my_app")  # Gets "my_app" logger
+
+# To get root logger (use "" instead of None)
+logger = get_logger("")  # Returns root logger
+```
+
+### `get_logger_of_type(name: str | None, class_type: type[Logger], skip_frames: int = 1, *args: Any, **kwargs: Any) -> Logger`
+
+Get a logger of the specified type, creating it if necessary.
+
+**Parameters:**
+- `name` (str | None): The name of the logger to get. If None, auto-infers from the calling module. Use `""` for root logger.
+- `class_type`: The logger class type to use.
+- `skip_frames` (int): Number of frames to skip when inferring logger name (default: 1).
+- `*args`, `**kwargs`: Additional arguments (for future-proofing)
+
+**Returns:**
+- A logger instance of the specified type
+
+**Example:**
+```python
+from apathetic_logging import Logger, get_logger_of_type
+
+class AppLogger(Logger):
+    pass
+
+logger = get_logger_of_type("my_app", AppLogger)
 ```
 
 ### `register_logger(logger_name: str | None = None, logger_class: type[Logger] | None = None) -> None`
@@ -116,16 +150,106 @@ except Exception:
     safe_log("Critical error: logging system may be broken")
 ```
 
+### `safe_trace(label: str, *args: Any, icon: str = "🧪") -> None`
+
+Debug tracing function for test development. Only active when `TEST_TRACE` environment variable is set.
+
+**Parameters:**
+- `label` (str): Trace label
+- `*args`: Additional arguments to trace
+- `icon` (str): Icon to use (default: `"🧪"`)
+
+### `make_safe_trace(icon: str = "🧪") -> Callable`
+
+Create a test trace function with a custom icon.
+
+**Parameters:**
+- `icon` (str): Icon to use
+
+**Returns:**
+- `Callable`: Test trace function
+
+### `has_logger(logger_name: str) -> bool`
+
+Check if a logger exists in the logging manager's registry.
+
+**Parameters:**
+- `logger_name` (str): The name of the logger to check
+
+**Returns:**
+- `bool`: True if the logger exists, False otherwise
+
+### `remove_logger(logger_name: str) -> None`
+
+Remove a logger from the logging manager's registry.
+
+**Parameters:**
+- `logger_name` (str): The name of the logger to remove
+
+### `resolve_logger_name(logger_name: str | None, *, check_registry: bool = True, skip_frames: int = 1) -> str`
+
+Resolve logger name with optional inference from caller's frame.
+
+**Parameters:**
+- `logger_name` (str | None): Explicit logger name, or None to infer
+- `check_registry` (bool): If True, check registry before inferring (default: True)
+- `skip_frames` (int): Number of frames to skip (default: 1)
+
+**Returns:**
+- `str`: Resolved logger name (never None)
+
+**Raises:**
+- `RuntimeError`: If logger name cannot be resolved
+
+## Wrapped stdlib Functions (snake_case)
+
+These functions are direct wrappers of Python's standard library `logging` module functions, provided with snake_case naming for PEP 8 compliance. They behave identically to their stdlib counterparts.
+
+### Configuration Functions
+
+- `basic_config(*args: Any, **kwargs: Any) -> None` — Wrapper for `logging.basicConfig()`
+- `add_level_name(level: int, level_name: str) -> None` — Wrapper for `logging.addLevelName()`
+- `get_level_name(level: int) -> str` — Wrapper for `logging.getLevelName()`
+- `get_level_names_mapping() -> dict[int, str]` — Wrapper for `logging.getLevelNamesMapping()`
+- `get_logger_class() -> type[logging.Logger]` — Wrapper for `logging.getLoggerClass()`
+- `set_logger_class(klass: type[logging.Logger]) -> None` — Wrapper for `logging.setLoggerClass()`
+- `get_log_record_factory() -> Callable` — Wrapper for `logging.getLogRecordFactory()`
+- `set_log_record_factory(factory: Callable) -> None` — Wrapper for `logging.setLogRecordFactory()`
+- `shutdown() -> None` — Wrapper for `logging.shutdown()`
+- `disable(level: int) -> None` — Wrapper for `logging.disable()`
+- `capture_warnings(capture: bool) -> None` — Wrapper for `logging.captureWarnings()`
+
+### Module-Level Logging Functions
+
+- `critical(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.critical()`
+- `debug(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.debug()`
+- `error(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.error()`
+- `exception(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.exception()`
+- `fatal(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.fatal()`
+- `info(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.info()`
+- `log(level: int, msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.log()`
+- `warn(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.warn()`
+- `warning(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.warning()`
+
+### Utility Functions
+
+- `get_handler_by_name(name: str) -> logging.Handler | None` — Wrapper for `logging.getHandlerByName()`
+- `get_handler_names() -> list[str]` — Wrapper for `logging.getHandlerNames()`
+- `make_log_record(name: str, level: int, fn: str, lno: int, msg: str, args: tuple, exc_info: Any) -> logging.LogRecord` — Wrapper for `logging.makeLogRecord()`
+- `currentframe(*args: Any, **kwargs: Any) -> FrameType | None` — Wrapper for `logging.currentframe()`
+
+For detailed documentation on these functions, see the [Python logging module documentation](https://docs.python.org/3/library/logging.html).
+
 ## Classes
 
-### `apathetic_logging`
+### `Logger`
 
 Logger class for all Apathetic tools. Extends Python's standard `logging.Logger`.
 
 #### Constructor
 
 ```python
-ApatheticLogging(
+Logger(
     name: str,
     level: int = logging.NOTSET,
     *,
@@ -140,7 +264,7 @@ ApatheticLogging(
 
 #### Methods
 
-##### `setLevel(level: int | str) -> None`
+##### `set_level(level: int | str) -> None`
 
 Set the logging level. Accepts both string names (case-insensitive) and numeric values.
 
@@ -149,8 +273,8 @@ Set the logging level. Accepts both string names (case-insensitive) and numeric 
 
 **Example:**
 ```python
-logger.setLevel("debug")
-logger.setLevel(logging.DEBUG)
+logger.set_level("debug")
+logger.set_level(logging.DEBUG)
 ```
 
 ##### `determine_log_level(*, args: argparse.Namespace | None = None, root_log_level: str | None = None) -> str`
@@ -173,7 +297,7 @@ parser.add_argument("--log-level", default="info")
 args = parser.parse_args()
 
 level = logger.determine_log_level(args=args)
-logger.setLevel(level)
+logger.set_level(level)
 ```
 
 ##### `determine_color_enabled() -> bool` (classmethod)
@@ -193,7 +317,7 @@ Checks:
 Extend Python's logging module with TRACE and SILENT levels.
 
 This method:
-- Sets `apathetic_logging` as the default logger class
+- Sets `apathetic_logging.Logger` as the default logger class
 - Adds `TRACE` and `SILENT` level names
 - Adds `logging.TRACE` and `logging.SILENT` constants
 
@@ -299,7 +423,7 @@ Return the current effective level name (read-only).
 
 **Example:**
 ```python
-logger.setLevel("debug")
+logger.set_level("debug")
 print(logger.level_name)  # "DEBUG"
 ```
 
@@ -402,3 +526,79 @@ Create a test trace function with a custom icon.
 
 Boolean flag indicating if test tracing is enabled (checks `TEST_TRACE` environment variable).
 
+## Breaking Changes
+
+This section documents breaking changes that may affect existing code when upgrading.
+
+### Logger Name Auto-Inference
+
+**Changed in:** Current version
+
+**Affected Function:** `get_logger(logger_name=None)`
+
+When `get_logger(None)` is called, the logger name is now **auto-inferred** from the calling module's `__package__` attribute instead of returning the root logger.
+
+**Migration:**
+- **Old behavior:** `get_logger(None)` returned the root logger
+- **New behavior:** `get_logger(None)` auto-infers the logger name from the calling module
+- **To get root logger:** Use `get_logger("")` instead
+
+**Example:**
+```python
+# Old (no longer works as before)
+logger = get_logger(None)  # Now auto-infers name, doesn't return root
+
+# New (to get root logger)
+logger = get_logger("")  # Returns root logger
+```
+
+**Why this change:** Auto-inference makes it easier to use the logger without explicitly registering a name, while still allowing explicit root logger access via `""`.
+
+## CamelCase API Reference
+
+The CamelCase API provides compatibility with existing codebases and follows the naming conventions of Python's standard library `logging` module. All functions behave identically to their snake_case counterparts.
+
+### New and Modified Functions (CamelCase)
+
+- `getLogger(name: str | None = None) -> Logger` — Same as `get_logger()`
+- `getLoggerOfType(name: str | None, class_type: type[Logger], skip_frames: int = 1, *args: Any, **kwargs: Any) -> Logger` — Same as `get_logger_of_type()`
+- `registerLogger(logger_name: str | None = None, logger_class: type[Logger] | None = None) -> None` — Same as `register_logger()`
+- `registerLogLevelEnvVars(env_vars: list[str]) -> None` — Same as `register_log_level_env_vars()`
+- `registerDefaultLogLevel(default_level: str) -> None` — Same as `register_default_log_level()`
+- `safeLog(msg: str) -> None` — Same as `safe_log()`
+- `safeTrace(label: str, *args: Any, icon: str = "🧪") -> None` — Same as `safe_trace()`
+- `makeSafeTrace(icon: str = "🧪") -> Callable` — Same as `make_safe_trace()`
+- `hasLogger(logger_name: str) -> bool` — Same as `has_logger()`
+- `removeLogger(logger_name: str) -> None` — Same as `remove_logger()`
+- `resolveLoggerName(logger_name: str | None, *, check_registry: bool = True, skip_frames: int = 1) -> str` — Same as `resolve_logger_name()`
+
+### Wrapped stdlib Functions (CamelCase)
+
+All standard library `logging` module functions are available with their original CamelCase names:
+
+- `basicConfig(*args: Any, **kwargs: Any) -> None` — Wrapper for `logging.basicConfig()`
+- `addLevelName(level: int, level_name: str) -> None` — Wrapper for `logging.addLevelName()`
+- `getLevelName(level: int) -> str` — Wrapper for `logging.getLevelName()`
+- `getLevelNamesMapping() -> dict[int, str]` — Wrapper for `logging.getLevelNamesMapping()`
+- `getLoggerClass() -> type[logging.Logger]` — Wrapper for `logging.getLoggerClass()`
+- `setLoggerClass(klass: type[logging.Logger]) -> None` — Wrapper for `logging.setLoggerClass()`
+- `getLogRecordFactory() -> Callable` — Wrapper for `logging.getLogRecordFactory()`
+- `setLogRecordFactory(factory: Callable) -> None` — Wrapper for `logging.setLogRecordFactory()`
+- `shutdown() -> None` — Wrapper for `logging.shutdown()`
+- `disable(level: int) -> None` — Wrapper for `logging.disable()`
+- `captureWarnings(capture: bool) -> None` — Wrapper for `logging.captureWarnings()`
+- `critical(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.critical()`
+- `debug(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.debug()`
+- `error(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.error()`
+- `exception(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.exception()`
+- `fatal(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.fatal()`
+- `info(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.info()`
+- `log(level: int, msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.log()`
+- `warn(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.warn()`
+- `warning(msg: str, *args: Any, **kwargs: Any) -> None` — Wrapper for `logging.warning()`
+- `getHandlerByName(name: str) -> logging.Handler | None` — Wrapper for `logging.getHandlerByName()`
+- `getHandlerNames() -> list[str]` — Wrapper for `logging.getHandlerNames()`
+- `makeLogRecord(name: str, level: int, fn: str, lno: int, msg: str, args: tuple, exc_info: Any) -> logging.LogRecord` — Wrapper for `logging.makeLogRecord()`
+- `currentframe(*args: Any, **kwargs: Any) -> FrameType | None` — Wrapper for `logging.currentframe()`
+
+For detailed documentation, see the corresponding snake_case functions above or the [Python logging module documentation](https://docs.python.org/3/library/logging.html).
