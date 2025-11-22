@@ -16,6 +16,7 @@ import apathetic_logging.logging_utils as mod_logging_utils
 import apathetic_logging.registry_data as mod_registry_data
 from tests.utils.level_validation import validate_test_level
 from tests.utils.patch_everywhere import patch_everywhere
+from tests.utils.version_info_mock import create_version_info
 
 
 MIN_PYTHON_VERSION = (
@@ -101,7 +102,11 @@ def test_module_std_snake_function(  # noqa: PLR0915
         original_target = _registry.registered_internal_target_python_version
         _registry.registered_internal_target_python_version = older_version
         # Also mock runtime version in logging_utils
-        monkeypatch.setattr(mod_logging_utils.sys, "version_info", older_version)  # type: ignore[attr-defined]
+        monkeypatch.setattr(
+            mod_logging_utils.sys,  # type: ignore[attr-defined]
+            "version_info",
+            create_version_info(older_version[0], older_version[1], 0),
+        )
         try:
             with pytest.raises(NotImplementedError):
                 snake_func(*args, **kwargs)
@@ -116,7 +121,11 @@ def test_module_std_snake_function(  # noqa: PLR0915
         _registry = mod_registry_data.ApatheticLogging_Internal_RegistryData
         original_target = _registry.registered_internal_target_python_version
         _registry.registered_internal_target_python_version = min_version
-        monkeypatch.setattr(mod_logging_utils.sys, "version_info", min_version)  # type: ignore[attr-defined]
+        monkeypatch.setattr(
+            mod_logging_utils.sys,  # type: ignore[attr-defined]
+            "version_info",
+            create_version_info(min_version[0], min_version[1], 0),
+        )
         try:
             # Use patch_everywhere with create_if_missing=True for missing functions
             module_name, func_name_in_module = mock_target.rsplit(".", 1)

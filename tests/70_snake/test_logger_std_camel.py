@@ -4,15 +4,18 @@
 from __future__ import annotations
 
 import logging
+import sys
 from contextlib import suppress
 from unittest.mock import MagicMock
 
 import pytest
 
 import apathetic_logging as mod_alogs
+import apathetic_logging.logging_utils as mod_logging_utils
 import apathetic_logging.registry_data as mod_registry_data
 from tests.utils.level_validation import validate_test_level
 from tests.utils.patch_everywhere import patch_everywhere
+from tests.utils.version_info_mock import create_version_info
 
 
 # Safe test level value (26 is between MINIMAL=25 and WARNING=30)
@@ -90,6 +93,13 @@ def test_module_std_camel_function(
     ):
         # Set target version to at least min_version to allow the function to work
         _registry.registered_internal_target_python_version = min_version
+        # Also mock runtime version if we're on an older Python version
+        if sys.version_info < min_version:
+            monkeypatch.setattr(
+                mod_logging_utils.sys,  # type: ignore[attr-defined]
+                "version_info",
+                create_version_info(min_version[0], min_version[1], 0),
+            )
     try:
         # Use patch_everywhere with create_if_missing=True to handle missing functions
         module_name, func_name_in_module = mock_target.rsplit(".", 1)
