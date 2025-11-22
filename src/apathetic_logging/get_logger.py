@@ -273,12 +273,8 @@ class ApatheticLogging_Internal_GetLogger:  # noqa: N801  # pyright: ignore[repo
             register_name = register_name_raw  # type: ignore[assignment]
 
         # extend logging module
-        if extend:
-            # Check for camelCase first, then snake_case for compatibility
-            if hasattr(class_type, "extendLoggingModule"):
-                class_type.extendLoggingModule()  # type: ignore[attr-defined]
-            elif hasattr(class_type, "extend_logging_module"):
-                class_type.extend_logging_module()  # type: ignore[attr-defined]
+        if extend and hasattr(class_type, "extendLoggingModule"):
+            class_type.extendLoggingModule()  # type: ignore[attr-defined]
 
         # Get or create logger of the correct type
         logger = ApatheticLogging_Internal_GetLogger._getOrCreateLoggerOfType(

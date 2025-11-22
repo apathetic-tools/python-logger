@@ -38,7 +38,7 @@ from .tag_formatter import (
 class ApatheticLogging_Internal_LoggerCore(logging.Logger):  # noqa: N801  # pyright: ignore[reportUnusedClass]
     """Core Logger implementation for all Apathetic tools.
 
-    This class contains the core Logger implementation without snake_case mixins.
+    This class contains the core Logger implementation.
     It provides all the custom methods and functionality for apathetic logging.
     """
 

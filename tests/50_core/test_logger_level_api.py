@@ -127,61 +127,6 @@ def test_get_effective_level_name_method(direct_logger: Logger) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Tests for Snake_case Properties
-# ---------------------------------------------------------------------------
-
-
-def test_level_name_snake_case_property(direct_logger: Logger) -> None:
-    """level_name property should wrap levelName."""
-    direct_logger.setLevel("INFO")
-    assert direct_logger.level_name == "INFO"
-    assert direct_logger.level_name == direct_logger.levelName
-
-
-def test_effective_level_snake_case_property(direct_logger: Logger) -> None:
-    """effective_level property should wrap effectiveLevel."""
-    direct_logger.setLevel("WARNING")
-    assert direct_logger.effective_level == logging.WARNING
-    assert direct_logger.effective_level == direct_logger.effectiveLevel
-
-
-def test_effective_level_name_snake_case_property(direct_logger: Logger) -> None:
-    """effective_level_name property should wrap effectiveLevelName."""
-    direct_logger.setLevel("DEBUG")
-    assert direct_logger.effective_level_name == "DEBUG"
-    assert direct_logger.effective_level_name == direct_logger.effectiveLevelName
-
-
-# ---------------------------------------------------------------------------
-# Tests for Snake_case Methods
-# ---------------------------------------------------------------------------
-
-
-def test_get_level_snake_case_method(direct_logger: Logger) -> None:
-    """get_level() should wrap getLevel()."""
-    direct_logger.setLevel("ERROR")
-    assert direct_logger.get_level() == logging.ERROR
-    assert direct_logger.get_level() == direct_logger.getLevel()
-
-
-def test_get_level_name_snake_case_method(direct_logger: Logger) -> None:
-    """get_level_name() should wrap getLevelName()."""
-    direct_logger.setLevel("DETAIL")
-    assert direct_logger.get_level_name() == "DETAIL"
-    assert direct_logger.get_level_name() == direct_logger.getLevelName()
-
-
-def test_get_effective_level_name_snake_case_method(direct_logger: Logger) -> None:
-    """get_effective_level_name() should wrap getEffectiveLevelName()."""
-    direct_logger.setLevel("MINIMAL")
-    assert direct_logger.get_effective_level_name() == "MINIMAL"
-    assert (
-        direct_logger.get_effective_level_name()
-        == direct_logger.getEffectiveLevelName()
-    )
-
-
-# ---------------------------------------------------------------------------
 # Integration Tests
 # ---------------------------------------------------------------------------
 
@@ -202,28 +147,8 @@ def test_all_apis_consistent(direct_logger: Logger) -> None:
     effective_level_method = direct_logger.getEffectiveLevel()
     effective_level_name_method = direct_logger.getEffectiveLevelName()
 
-    # Snake_case properties
-    level_name_snake = direct_logger.level_name
-    effective_level_snake = direct_logger.effective_level
-    effective_level_name_snake = direct_logger.effective_level_name
-
-    # Snake_case methods
-    level_snake_method = direct_logger.get_level()
-    level_name_snake_method = direct_logger.get_level_name()
-    effective_level_name_snake_method = direct_logger.get_effective_level_name()
-
     # Verify consistency
-    assert level_prop == level_method == level_snake_method
-    assert (
-        level_name_prop
-        == level_name_method
-        == level_name_snake
-        == level_name_snake_method
-    )
-    assert effective_level_prop == effective_level_method == effective_level_snake
-    assert (
-        effective_level_name_prop
-        == effective_level_name_method
-        == effective_level_name_snake
-        == effective_level_name_snake_method
-    )
+    assert level_prop == level_method
+    assert level_name_prop == level_name_method
+    assert effective_level_prop == effective_level_method
+    assert effective_level_name_prop == effective_level_name_method

@@ -22,14 +22,8 @@ from .get_logger import (
 from .logger_namespace import (
     ApatheticLogging_Internal_Logger,
 )
-from .logging_lib_snake import (
-    ApatheticLogging_Internal_LibSnakeCase,
-)
 from .logging_std_camel import (
     ApatheticLogging_Internal_StdCamelCase,
-)
-from .logging_std_snake import (
-    ApatheticLogging_Internal_StdSnakeCase,
 )
 from .logging_utils import (
     ApatheticLogging_Internal_LoggingUtils,
@@ -61,9 +55,7 @@ class apathetic_logging(  # noqa: N801
     ApatheticLogging_Internal_RegistryData,
     ApatheticLogging_Internal_SafeLogging,
     ApatheticLogging_Internal_TagFormatter,
-    ApatheticLogging_Internal_StdCamelCase,  # keep third last
-    ApatheticLogging_Internal_LibSnakeCase,  # keep second last
-    ApatheticLogging_Internal_StdSnakeCase,  # keep last
+    ApatheticLogging_Internal_StdCamelCase,  # keep last
 ):
     """Namespace for apathetic logging functionality.
 
@@ -76,13 +68,13 @@ class apathetic_logging(  # noqa: N801
     - ``DualStreamHandler`` → ``ApatheticLogging_Internal_DualStreamHandler``
 
     **Static Methods:**
-    - ``get_logger()`` → ``ApatheticLogging_Internal_GetLogger``
-    - ``register_default_log_level()`` → ``ApatheticLogging_Internal_Registry``
-    - ``register_log_level_env_vars()`` → ``ApatheticLogging_Internal_Registry``
-    - ``register_logger()`` → ``ApatheticLogging_Internal_Registry``
-    - ``safe_log()`` → ``ApatheticLogging_Internal_SafeLogging``
-    - ``safe_trace()`` → ``ApatheticLogging_Internal_SafeLogging``
-    - ``make_safe_trace()`` → ``ApatheticLogging_Internal_SafeLogging``
+    - ``getLogger()`` → ``ApatheticLogging_Internal_GetLogger``
+    - ``registerDefaultLogLevel()`` → ``ApatheticLogging_Internal_Registry``
+    - ``registerLogLevelEnvVars()`` → ``ApatheticLogging_Internal_Registry``
+    - ``registerLogger()`` → ``ApatheticLogging_Internal_Registry``
+    - ``safeLog()`` → ``ApatheticLogging_Internal_SafeLogging``
+    - ``safeTrace()`` → ``ApatheticLogging_Internal_SafeLogging``
+    - ``makeSafeTrace()`` → ``ApatheticLogging_Internal_SafeLogging``
 
     **Constants:**
     - ``DEFAULT_APATHETIC_LOG_LEVEL`` → ``ApatheticLogging_Internal_Constants``

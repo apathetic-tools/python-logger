@@ -118,19 +118,3 @@ def test_get_level_number_unknown_level_raises() -> None:
 # ---------------------------------------------------------------------------
 # Tests for snake_case wrappers
 # ---------------------------------------------------------------------------
-
-
-def test_get_level_name_snake_case() -> None:
-    """get_level_name() should work the same as getLevelName()."""
-    assert mod_alogs.get_level_name(logging.DEBUG) == "DEBUG"
-    assert mod_alogs.get_level_name(UNKNOWN_LEVEL) == f"Level {UNKNOWN_LEVEL}"
-    with pytest.raises(ValueError, match=r"Unknown log level: 999"):
-        mod_alogs.get_level_name(UNKNOWN_LEVEL, strict=True)
-
-
-def test_get_level_number_snake_case() -> None:
-    """get_level_number() should work the same as getLevelNumber()."""
-    assert mod_alogs.get_level_number("DEBUG") == logging.DEBUG
-    assert mod_alogs.get_level_number(logging.INFO) == logging.INFO
-    with pytest.raises(ValueError, match=r"Unknown log level: 'UNKNOWN'"):
-        mod_alogs.get_level_number("UNKNOWN")

@@ -4,6 +4,21 @@
 A record of design experiments and ideas that were explored but intentionally not pursued.
 
 
+## 🐍 Snake_case API
+<a id="rej02"></a>*REJ 02 — 2025-01-XX*
+
+### Context
+Originally planned to provide a snake_case API as the primary interface, with camelCase in a compatibility namespace. The goal was to provide a more Pythonic API while maintaining stdlib compatibility.
+
+### Reason for Rejection
+- **Complexity vs. value**: Maintaining dual APIs (snake_case and camelCase) with proper inheritance support requires bidirectional wrappers, which is complex and brittle
+- **Inheritance issues**: If users override camelCase methods, internal snake_case calls won't use the override. If users override snake_case, internal camelCase calls won't use it. logging.Logger only uses camelCase interally. Proper bidirectional routing adds significant complexity
+- **Scope creep**: The library is intended for apatehtic tools first, and this is not a feature we need and would take away time on primary projects.
+
+### Decision
+Stick with camelCase only, inherit directly from `logging.Logger`, maintain original function signatures, use compatibility mode for internal breaking changes or value-add features that significantly change behavior.
+
+
 ## ⚡ Level Registry for Performance Optimization
 <a id="rej01"></a>*REJ 01 — 2025-11-20*
 

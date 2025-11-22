@@ -212,11 +212,8 @@ class ApatheticLogging_Internal_Registry:  # noqa: N801  # pyright: ignore[repor
 
         if logger_class is not None:
             # extendLoggingModule will call setLoggerClass for those that support it
-            # Check for camelCase first, then snake_case for compatibility
             if hasattr(logger_class, "extendLoggingModule"):
                 logger_class.extendLoggingModule()  # type: ignore[attr-defined]
-            elif hasattr(logger_class, "extend_logging_module"):
-                logger_class.extend_logging_module()  # type: ignore[attr-defined]
             else:
                 # stdlib unwrapped
                 logging.setLoggerClass(logger_class)

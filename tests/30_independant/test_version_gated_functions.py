@@ -20,14 +20,6 @@ VERSION_GATED_FUNCTIONS: list[
 ] = [
     # Python 3.11+ functions
     (
-        "get_level_names_mapping",
-        (),
-        {},
-        (3, 11),
-        {10: "DEBUG", 20: "INFO"},
-        "requires Python 3.11",
-    ),
-    (
         "getLevelNamesMapping",
         (),
         {},
@@ -37,27 +29,11 @@ VERSION_GATED_FUNCTIONS: list[
     ),
     # Python 3.12+ functions
     (
-        "get_handler_by_name",
-        ("test",),
-        {},
-        (3, 12),
-        None,
-        "requires Python 3.12",
-    ),
-    (
         "getHandlerByName",
         ("test",),
         {},
         (3, 12),
         None,
-        "requires Python 3.12",
-    ),
-    (
-        "get_handler_names",
-        (),
-        {},
-        (3, 12),
-        ["handler1", "handler2"],
         "requires Python 3.12",
     ),
     (
@@ -138,14 +114,8 @@ def test_version_gated_function_works_when_target_sufficient(
 
     try:
         # Determine the underlying stdlib function name
-        # snake_case functions map to camelCase stdlib functions
+        # camelCase functions map directly to stdlib functions
         stdlib_func_name = func_name
-        if func_name == "get_level_names_mapping":
-            stdlib_func_name = "getLevelNamesMapping"
-        elif func_name == "get_handler_by_name":
-            stdlib_func_name = "getHandlerByName"
-        elif func_name == "get_handler_names":
-            stdlib_func_name = "getHandlerNames"
 
         # Mock the underlying function
         def mock_func(*_args: Any, **_kwargs: Any) -> Any:

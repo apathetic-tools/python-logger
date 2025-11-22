@@ -72,7 +72,13 @@ else:
 addLevelName = apathetic_logging.addLevelName
 basicConfig = apathetic_logging.basicConfig
 captureWarnings = apathetic_logging.captureWarnings
+critical = apathetic_logging.critical
 currentframe = apathetic_logging.currentframe
+debug = apathetic_logging.debug
+disable = apathetic_logging.disable
+error = apathetic_logging.error
+exception = apathetic_logging.exception
+fatal = apathetic_logging.fatal
 getHandlerByName = apathetic_logging.getHandlerByName
 getHandlerNames = apathetic_logging.getHandlerNames
 getLevelName = apathetic_logging.getLevelName
@@ -80,9 +86,14 @@ getLevelNamesMapping = apathetic_logging.getLevelNamesMapping
 getLogRecordFactory = apathetic_logging.getLogRecordFactory
 getLogger = apathetic_logging.getLogger
 getLoggerClass = apathetic_logging.getLoggerClass
+info = apathetic_logging.info
+log = apathetic_logging.log
 makeLogRecord = apathetic_logging.makeLogRecord
 setLogRecordFactory = apathetic_logging.setLogRecordFactory
 setLoggerClass = apathetic_logging.setLoggerClass
+shutdown = apathetic_logging.shutdown
+warn = apathetic_logging.warn
+warning = apathetic_logging.warning
 
 # Functions (camelCase - library functions)
 getDefaultLogLevel = apathetic_logging.getDefaultLogLevel
@@ -105,55 +116,6 @@ registerTargetPythonVersion = apathetic_logging.registerTargetPythonVersion
 removeLogger = apathetic_logging.removeLogger
 safeLog = apathetic_logging.safeLog
 
-# Functions (snake_case - stdlib wrappers)
-add_level_name = apathetic_logging.add_level_name
-basic_config = apathetic_logging.basic_config
-capture_warnings = apathetic_logging.capture_warnings
-critical = apathetic_logging.critical
-currentframe = apathetic_logging.currentframe
-debug = apathetic_logging.debug
-disable = apathetic_logging.disable
-error = apathetic_logging.error
-exception = apathetic_logging.exception
-fatal = apathetic_logging.fatal
-get_handler_by_name = apathetic_logging.get_handler_by_name
-get_handler_names = apathetic_logging.get_handler_names
-get_level_name = apathetic_logging.get_level_name
-get_level_names_mapping = apathetic_logging.get_level_names_mapping
-get_logger = apathetic_logging.get_logger
-get_logger_class = apathetic_logging.get_logger_class
-get_log_record_factory = apathetic_logging.get_log_record_factory
-info = apathetic_logging.info
-log = apathetic_logging.log
-make_log_record = apathetic_logging.make_log_record
-set_logger_class = apathetic_logging.set_logger_class
-set_log_record_factory = apathetic_logging.set_log_record_factory
-shutdown = apathetic_logging.shutdown
-warn = apathetic_logging.warn
-warning = apathetic_logging.warning
-
-# Functions (snake_case - library wrappers)
-get_default_log_level = apathetic_logging.get_default_log_level
-get_compatibility_mode = apathetic_logging.get_compatibility_mode
-get_default_logger_name = apathetic_logging.get_default_logger_name
-get_default_propagate = apathetic_logging.get_default_propagate
-get_level_number = apathetic_logging.get_level_number
-get_log_level_env_vars = apathetic_logging.get_log_level_env_vars
-get_logger_of_type = apathetic_logging.get_logger_of_type
-get_registered_logger_name = apathetic_logging.get_registered_logger_name
-get_target_python_version = apathetic_logging.get_target_python_version
-has_logger = apathetic_logging.has_logger
-make_safe_trace = apathetic_logging.make_safe_trace
-register_default_log_level = apathetic_logging.register_default_log_level
-register_log_level_env_vars = apathetic_logging.register_log_level_env_vars
-register_logger = apathetic_logging.register_logger
-register_compatibility_mode = apathetic_logging.register_compatibility_mode
-register_propagate = apathetic_logging.register_propagate
-register_target_python_version = apathetic_logging.register_target_python_version
-remove_logger = apathetic_logging.remove_logger
-safe_log = apathetic_logging.safe_log
-safe_trace = apathetic_logging.safe_trace
-
 
 __all__ = [
     "DEFAULT_APATHETIC_LOG_LEVEL",
@@ -172,12 +134,9 @@ __all__ = [
     "Logger",
     "TagFormatter",
     "addLevelName",
-    "add_level_name",
     "apathetic_logging",
     "basicConfig",
-    "basic_config",
     "captureWarnings",
-    "capture_warnings",
     "critical",
     "currentframe",
     "debug",
@@ -201,52 +160,22 @@ __all__ = [
     "getLoggerOfType",
     "getRegisteredLoggerName",
     "getTargetPythonVersion",
-    "get_compatibility_mode",
-    "get_default_log_level",
-    "get_default_logger_name",
-    "get_default_propagate",
-    "get_handler_by_name",
-    "get_handler_names",
-    "get_level_name",
-    "get_level_names_mapping",
-    "get_level_number",
-    "get_log_level_env_vars",
-    "get_log_record_factory",
-    "get_logger",
-    "get_logger_class",
-    "get_logger_of_type",
-    "get_registered_logger_name",
-    "get_target_python_version",
     "hasLogger",
-    "has_logger",
     "info",
     "log",
     "makeLogRecord",
     "makeSafeTrace",
-    "make_log_record",
-    "make_safe_trace",
     "registerCompatibilityMode",
     "registerDefaultLogLevel",
     "registerLogLevelEnvVars",
     "registerLogger",
     "registerPropagate",
     "registerTargetPythonVersion",
-    "register_compatibility_mode",
-    "register_default_log_level",
-    "register_log_level_env_vars",
-    "register_logger",
-    "register_propagate",
-    "register_target_python_version",
     "removeLogger",
-    "remove_logger",
     "safeLog",
     "safeTrace",
-    "safe_log",
-    "safe_trace",
     "setLogRecordFactory",
     "setLoggerClass",
-    "set_log_record_factory",
-    "set_logger_class",
     "shutdown",
     "warn",
     "warning",

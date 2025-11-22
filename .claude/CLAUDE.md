@@ -133,35 +133,6 @@ error_message = (
 
 **Single files**: `ruff format/check/check --fix <file>`, `pytest <file>::<test>` (add `RUNTIME_MODE=singlefile` for singlefile mode).
 
-# Python Src Dir
-
-# Snake Case Wrapper Synchronization
-
-When modifying camelCase functions/methods, update their snake_case wrappers to match.
-
-**Library wrappers** (`logging_lib_snake.py`, `logger_lib_snake.py`): Must match camelCase versions in parameters, return type, docstring, and function call.
-
-**Stdlib wrappers** (`logging_std_camel.py` ↔ `logging_std_snake.py`): Must be kept in sync with each other - same functions, same signatures, same behavior.
-
-**Must match**:
-- Parameters (positional, keyword-only, defaults)
-- Return type annotation
-- Docstring (if behavior changed)
-- Function call (pass all parameters correctly)
-
-**Example**:
-```python
-# camelCase
-def registerLogger(name: str | None = None, *, version: tuple[int, int] | None = None) -> None:
-    ...
-
-# snake_case - must match
-def register_logger(name: str | None = None, *, version: tuple[int, int] | None = None) -> None:
-    ApatheticLogging_Internal_Registry.registerLogger(name, version=version)
-```
-
-**Checklist**: Find wrapper → Update params/return/docstring → Update call → Test
-
 # Type Checking
 
 ### Type Checking and Linting Best Practices

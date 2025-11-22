@@ -1,5 +1,5 @@
 # tests/30_independant/test_get_default_logger_name.py
-"""Test getDefaultLoggerName and get_default_logger_name functions."""
+"""Test getDefaultLoggerName function."""
 
 from __future__ import annotations
 
@@ -13,7 +13,6 @@ def test_get_default_logger_name_returns_explicit_name() -> None:
     """Test that getDefaultLoggerName returns explicit name when provided."""
     # Explicit name should always be returned
     assert mod_alogs.getDefaultLoggerName("myapp") == "myapp"
-    assert mod_alogs.get_default_logger_name("myapp") == "myapp"
     assert mod_alogs.getDefaultLoggerName("") == ""  # Root logger
 
 
@@ -26,7 +25,6 @@ def test_get_default_logger_name_returns_registered_when_available() -> None:
     # Register a name
     mod_alogs.registerLogger("myapp")
     assert mod_alogs.getDefaultLoggerName() == "myapp"
-    assert mod_alogs.get_default_logger_name() == "myapp"
 
     # Reset
     _registry.registered_internal_logger_name = None
@@ -70,7 +68,7 @@ def test_get_default_logger_name_register_parameter() -> None:
     # If inference succeeded, check it wasn't stored
     if inferred is not None:
         # The inferred value should not be in registry (register=False)
-        registered = mod_alogs.get_registered_logger_name()
+        registered = mod_alogs.getRegisteredLoggerName()
         # If register=False worked, registered should be None (not stored)
         assert registered != inferred or registered is None
 
@@ -81,7 +79,7 @@ def test_get_default_logger_name_register_parameter() -> None:
     )
     if inferred is not None:
         # Should be stored now
-        assert mod_alogs.get_registered_logger_name() == inferred
+        assert mod_alogs.getRegisteredLoggerName() == inferred
 
     # Reset
     _registry.registered_internal_logger_name = None
@@ -117,7 +115,7 @@ def test_get_default_logger_name_check_registry_parameter() -> None:
 
     # Register a name
     mod_alogs.registerLogger("registered")
-    assert mod_alogs.get_registered_logger_name() == "registered"
+    assert mod_alogs.getRegisteredLoggerName() == "registered"
 
     # With check_registry=True (default), should return registered name
     assert mod_alogs.getDefaultLoggerName(check_registry=True) == "registered"
@@ -127,29 +125,6 @@ def test_get_default_logger_name_check_registry_parameter() -> None:
     result = mod_alogs.getDefaultLoggerName(check_registry=False, infer=True)
     # Result depends on whether inference succeeds
     assert result is None or isinstance(result, str)
-
-    # Reset
-    _registry.registered_internal_logger_name = None
-
-
-def test_get_default_logger_name_both_naming_conventions() -> None:
-    """Test that both camelCase and snake_case functions work identically."""
-    # Reset registry
-    _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-    _registry.registered_internal_logger_name = None
-
-    # Both should return same value for explicit name
-    assert mod_alogs.getDefaultLoggerName("test") == mod_alogs.get_default_logger_name(
-        "test"
-    )
-
-    # Register and both should return same value
-    mod_alogs.registerLogger("myapp")
-    assert (
-        mod_alogs.getDefaultLoggerName()
-        == mod_alogs.get_default_logger_name()
-        == "myapp"
-    )
 
     # Reset
     _registry.registered_internal_logger_name = None

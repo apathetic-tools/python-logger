@@ -13,13 +13,13 @@ Get up and running with Apathetic Python Logger in minutes.
 The simplest way to use Apathetic Python Logger is to register a logger name and get a logger instance:
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
 # Register your logger
-register_logger("my_app")
+registerLogger("my_app")
 
 # Get the logger instance
-logger = get_logger()
+logger = getLogger()
 
 # Start logging!
 logger.info("Application started")
@@ -54,8 +54,8 @@ python my_app.py
 #### 2. Programmatically
 
 ```python
-logger.set_level("debug")  # Case-insensitive
-logger.set_level(logging.DEBUG)  # Or use logging constants
+logger.setLevel("debug")  # Case-insensitive
+logger.setLevel(logging.DEBUG)  # Or use logging constants
 ```
 
 #### 3. Using Context Manager
@@ -63,7 +63,7 @@ logger.set_level(logging.DEBUG)  # Or use logging constants
 Temporarily change the log level for a specific block:
 
 ```python
-with logger.use_level("debug"):
+with logger.useLevel("debug"):
     logger.debug("This will be shown")
     logger.trace("This will also be shown if trace is enabled")
 ```
@@ -117,8 +117,8 @@ This ensures proper separation of output and error streams, which is important f
 Log at different levels dynamically:
 
 ```python
-logger.log_dynamic("warning", "This is a warning")
-logger.log_dynamic(logging.ERROR, "This is an error")
+logger.logDynamic("warning", "This is a warning")
+logger.logDynamic(logging.ERROR, "This is an error")
 ```
 
 ### Conditional Exception Logging
@@ -129,7 +129,7 @@ Only show full tracebacks when debug mode is enabled:
 try:
     risky_operation()
 except Exception:
-    logger.error_if_not_debug("Operation failed")
+    logger.errorIfNotDebug("Operation failed")
     # Full traceback only shown if debug/trace is enabled
 ```
 
@@ -139,7 +139,7 @@ Use a context manager to temporarily change log levels:
 
 ```python
 # Only set level if it's more verbose (won't downgrade from trace to debug)
-with logger.use_level("debug", minimum=True):
+with logger.useLevel("debug", minimum=True):
     logger.debug("This will be shown")
 ```
 
@@ -149,19 +149,19 @@ For command-line applications, you can integrate with `argparse`:
 
 ```python
 import argparse
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--log-level", default="info")
     args = parser.parse_args()
     
-    register_logger("my_cli")
-    logger = get_logger()
+    registerLogger("my_cli")
+    logger = getLogger()
     
     # Logger will automatically use args.log_level
-    level = logger.determine_log_level(args=args)
-    logger.set_level(level)
+    level = logger.determineLogLevel(args=args)
+    logger.setLevel(level)
     
     logger.info("CLI tool started")
 ```
@@ -182,7 +182,7 @@ logger.debug("Debug message")
 logger.warning("Warning message")
 ```
 
-> **Note:** When using `get_logger(None)`, the logger name is now auto-inferred from the calling module instead of returning the root logger. To get the root logger, use `get_logger("")` instead. See [Breaking Changes]({{ '/api' | relative_url }}#breaking-changes) for details.
+> **Note:** When using `getLogger(None)`, the logger name is now auto-inferred from the calling module instead of returning the root logger. To get the root logger, use `getLogger("")` instead. See [Breaking Changes]({{ '/api' | relative_url }}#breaking-changes) for details.
 
 ## Next Steps
 

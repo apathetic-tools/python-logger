@@ -102,7 +102,7 @@ def test_register_logger_snake_case_with_compatibility_mode() -> None:
 
     try:
         # --- execute ---
-        mod_alogs.register_logger("test_package", compatibility_mode=True)
+        mod_alogs.registerLogger("test_package", compatibility_mode=True)
 
         # --- verify ---
         assert _registry.registered_internal_compatibility_mode is True

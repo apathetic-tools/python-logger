@@ -14,7 +14,7 @@ permalink: /
 ## Features
 - 🪶 **Zero dependencies** — Uses only Python's standard library
 - 🔄 **Drop-in replacement** — Can be used as a drop-in replacement for stdlib `logging`
-- 🐍 **Dual API** — Both snake_case (recommended) and CamelCase APIs available
+- 🐍 **stdlib-compatible** — Uses camelCase naming to match Python's standard library `logging` module
 - 🔄 **Dual-stream handling** — Smart routing to stdout/stderr
 - 📊 **Extra logging levels** — TEST, TRACE, DETAIL, MINIMAL, and SILENT levels for fine-grained control
 - 🏷️ **Tag-based formatting** — Clean, readable log tags with emoji support
@@ -26,13 +26,13 @@ permalink: /
 ## Quick Example
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
 # Register your logger
-register_logger("my_app")
+registerLogger("my_app")
 
 # Get the logger instance
-logger = get_logger()
+logger = getLogger()
 
 # Use it!
 logger.info("Hello, world!")

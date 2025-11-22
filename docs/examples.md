@@ -18,7 +18,7 @@ A complete example of a command-line application using Apathetic Python Logger:
 
 import argparse
 import sys
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
 def main():
     parser = argparse.ArgumentParser(description="Example CLI tool")
@@ -32,14 +32,14 @@ def main():
     args = parser.parse_args()
     
     # Register logger
-    register_logger("example_cli")
-    logger = get_logger()
+    registerLogger("example_cli")
+    logger = getLogger()
     
     # Set log level from arguments
     if args.verbose:
-        logger.set_level("debug")
+        logger.setLevel("debug")
     else:
-        logger.set_level(args.log_level)
+        logger.setLevel(args.log_level)
     
     # Use the logger
     logger.info("Application started")
@@ -50,7 +50,7 @@ def main():
         result = process_data()
         logger.info(f"Processing complete: {result}")
     except Exception:
-        logger.error_if_not_debug("Processing failed")
+        logger.errorIfNotDebug("Processing failed")
         sys.exit(1)
 
 def process_data():
@@ -66,16 +66,16 @@ if __name__ == "__main__":
 Temporarily increase verbosity for specific operations:
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 # Normal operation
 logger.info("Starting operation")
 
 # Temporarily enable debug for a specific block
-with logger.use_level("debug"):
+with logger.useLevel("debug"):
     logger.debug("Detailed step 1")
     logger.debug("Detailed step 2")
     logger.trace("Very detailed trace")
@@ -89,10 +89,10 @@ logger.info("Operation complete")
 Show full tracebacks only in debug mode:
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 def risky_operation():
     """An operation that might fail."""
@@ -102,7 +102,7 @@ try:
     risky_operation()
 except Exception:
     # Full traceback only if debug/trace is enabled
-    logger.error_if_not_debug("Risky operation failed")
+    logger.errorIfNotDebug("Risky operation failed")
     # In production (info level), users see: "❌ Risky operation failed"
     # In development (debug level), users see full traceback
 ```
@@ -113,20 +113,20 @@ Register custom environment variables for log level:
 
 ```python
 from apathetic_logging import (
-    get_logger,
-    register_logger,
-    register_log_level_env_vars,
-    register_default_log_level,
+    getLogger,
+    registerLogger,
+    registerLogLevelEnvVars,
+    registerDefaultLogLevel,
 )
 
 # Use custom environment variable names
-register_log_level_env_vars(["MYAPP_LOG_LEVEL", "APP_LOG_LEVEL", "LOG_LEVEL"])
+registerLogLevelEnvVars(["MYAPP_LOG_LEVEL", "APP_LOG_LEVEL", "LOG_LEVEL"])
 
 # Set a custom default
-register_default_log_level("warning")
+registerDefaultLogLevel("warning")
 
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 # Logger will check MYAPP_LOG_LEVEL, then APP_LOG_LEVEL, then LOG_LEVEL
 # If none are set, defaults to "warning"
@@ -139,7 +139,7 @@ Seamless integration with argparse for CLI tools:
 
 ```python
 import argparse
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
 def create_parser():
     parser = argparse.ArgumentParser()
@@ -155,12 +155,12 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
     
-    register_logger("my_cli")
-    logger = get_logger()
+    registerLogger("my_cli")
+    logger = getLogger()
     
     # Determine log level from args, env, or default
-    level = logger.determine_log_level(args=args)
-    logger.set_level(level)
+    level = logger.determineLogLevel(args=args)
+    logger.setLevel(level)
     
     logger.info("CLI tool started")
     logger.debug("Debug mode enabled")
@@ -171,21 +171,21 @@ def main():
 Log at different levels dynamically:
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 # Log at different levels based on conditions
 def log_result(success: bool, message: str):
     if success:
-        logger.log_dynamic("info", message)
+        logger.logDynamic("info", message)
     else:
-        logger.log_dynamic("error", message)
+        logger.logDynamic("error", message)
 
 # Or use numeric levels
 import logging
-logger.log_dynamic(logging.WARNING, "This is a warning")
+logger.logDynamic(logging.WARNING, "This is a warning")
 ```
 
 ## Color Customization
@@ -213,13 +213,13 @@ Example of using the logger in tests:
 
 ```python
 import pytest
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
 @pytest.fixture
 def logger():
-    register_logger("test_app")
-    logger = get_logger()
-    logger.set_level("debug")  # Verbose for tests
+    registerLogger("test_app")
+    logger = getLogger()
+    logger.setLevel("debug")  # Verbose for tests
     return logger
 
 def test_operation(logger):
@@ -234,13 +234,13 @@ def test_operation(logger):
 Completely disable logging:
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 # Enable silent mode
-logger.set_level("silent")
+logger.setLevel("silent")
 
 # These won't be shown
 logger.info("This won't show")
@@ -248,7 +248,7 @@ logger.error("This won't show either")
 logger.critical("Even this won't show")
 
 # Re-enable logging
-logger.set_level("info")
+logger.setLevel("info")
 logger.info("Now this will show")
 ```
 
@@ -258,23 +258,23 @@ Using the logger across multiple modules:
 
 ```main.py```
 ```python
-from apathetic_logging import register_logger
+from apathetic_logging import registerLogger
 import module_a
 import module_b
 
 # Register once at application entry point
-register_logger("my_app")
+registerLogger("my_app")
 
-# Modules can now use get_logger()
+# Modules can now use getLogger()
 module_a.do_something()
 module_b.do_something_else()
 ```
 
 ```module_a.py```
 ```python
-from apathetic_logging import get_logger
+from apathetic_logging import getLogger
 
-logger = get_logger()  # Gets the "my_app" logger
+logger = getLogger()  # Gets the "my_app" logger
 
 def do_something():
     logger.info("Module A doing something")
@@ -282,9 +282,9 @@ def do_something():
 
 ```module_b.py```
 ```python
-from apathetic_logging import get_logger
+from apathetic_logging import getLogger
 
-logger = get_logger()  # Gets the same "my_app" logger
+logger = getLogger()  # Gets the same "my_app" logger
 
 def do_something_else():
     logger.info("Module B doing something else")
@@ -292,25 +292,25 @@ def do_something_else():
 
 ## Error Handling with Safe Logging
 
-Use `safe_log` for critical error reporting:
+Use `safeLog` for critical error reporting:
 
 ```python
-from apathetic_logging import safe_log, get_logger, register_logger
+from apathetic_logging import safeLog, getLogger, registerLogger
 
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 def critical_operation():
     try:
         # Some operation that might break logging
         pass
     except Exception as e:
-        # If normal logging fails, use safe_log
+        # If normal logging fails, use safeLog
         try:
             logger.critical(f"Critical error: {e}")
         except Exception:
-            # Fallback to safe_log which never fails
-            safe_log(f"CRITICAL: {e}")
+            # Fallback to safeLog which never fails
+            safeLog(f"CRITICAL: {e}")
         raise
 ```
 
@@ -319,20 +319,20 @@ def critical_operation():
 Only increase verbosity, never decrease:
 
 ```python
-from apathetic_logging import get_logger, register_logger
+from apathetic_logging import getLogger, registerLogger
 
-register_logger("my_app")
-logger = get_logger()
-logger.set_level("trace")  # Most verbose
+registerLogger("my_app")
+logger = getLogger()
+logger.setLevel("trace")  # Most verbose
 
 # This won't downgrade to debug (trace is more verbose)
-with logger.use_level("debug", minimum=True):
+with logger.useLevel("debug", minimum=True):
     logger.trace("This will still show (trace is more verbose)")
     logger.debug("This will also show")
 
 # But if current level is info, this will upgrade to debug
-logger.set_level("info")
-with logger.use_level("debug", minimum=True):
+logger.setLevel("info")
+with logger.useLevel("debug", minimum=True):
     logger.debug("This will show (upgraded from info to debug)")
 ```
 
@@ -342,25 +342,25 @@ When developing on a newer Python version (e.g., 3.12) but targeting an older ve
 
 ```python
 from apathetic_logging import (
-    register_logger,
-    register_target_python_version,
-    get_logger,
+    registerLogger,
+    registerTargetPythonVersion,
+    getLogger,
 )
 
 # Register your target Python version
 # This ensures functions requiring 3.11+ will raise errors
 # even if you're running on 3.12
-register_target_python_version((3, 10))
+registerTargetPythonVersion((3, 10))
 
 # Register logger
-register_logger("my_app")
-logger = get_logger()
+registerLogger("my_app")
+logger = getLogger()
 
 # Now if you try to use a 3.11+ function, it will raise
 # even though you're running on 3.12
 try:
-    from apathetic_logging import get_level_names_mapping
-    mapping = get_level_names_mapping()  # Raises NotImplementedError on 3.10 target
+    from apathetic_logging import getLevelNamesMapping
+    mapping = getLevelNamesMapping()  # Raises NotImplementedError on 3.10 target
 except NotImplementedError as e:
     logger.warning(f"Function not available: {e}")
     # Error message will suggest raising target version if needed
@@ -373,10 +373,10 @@ except NotImplementedError as e:
 
 **Example with convenience parameters:**
 ```python
-from apathetic_logging import register_logger
+from apathetic_logging import registerLogger
 
 # Configure everything at once
-register_logger(
+registerLogger(
     "my_app",
     target_python_version=(3, 10),  # Target Python 3.10
     log_level_env_vars=["MYAPP_LOG_LEVEL", "LOG_LEVEL"],

@@ -62,12 +62,12 @@ def test_register_compatibility_mode_accepts_boolean_values(
 
 
 def test_register_compatibility_mode_snake_case() -> None:
-    """register_compatibility_mode() snake_case should work identically."""
+    """registerCompatibilityMode() should work."""
     # --- setup ---
     compatibility_mode = True
 
     # --- execute ---
-    mod_alogs.register_compatibility_mode(compatibility_mode=compatibility_mode)
+    mod_alogs.registerCompatibilityMode(compatibility_mode=compatibility_mode)
 
     # --- verify ---
     _registry = mod_registry.ApatheticLogging_Internal_RegistryData
