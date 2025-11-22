@@ -60,7 +60,27 @@ def patch_everywhere(  # noqa: PLR0912
     mod_name = getattr(mod_env, "__name__", type(mod_env).__name__)
 
     # Patch in the defining module
-    mp.setattr(mod_env, func_name, replacement_func)
+    # For modules, if the attribute doesn't exist and create_if_missing=True,
+    # we need to create it manually first, then use monkeypatch to track it
+    if not func_existed and isinstance(mod_env, ModuleType):
+        # Manually create the attribute on the module's __dict__
+        # This is necessary because monkeypatch.setattr may fail if the attribute
+        # doesn't exist on a module
+        mod_env.__dict__[func_name] = replacement_func
+        # Now register with monkeypatch for cleanup on undo
+        # Since the attribute now exists, setattr should work
+        mp.setattr(mod_env, func_name, replacement_func)
+    else:
+        try:
+            mp.setattr(mod_env, func_name, replacement_func)
+        except AttributeError:
+            # If setattr fails because attribute doesn't exist on a module,
+            # create it manually and try again
+            if isinstance(mod_env, ModuleType) and create_if_missing:
+                mod_env.__dict__[func_name] = replacement_func
+                mp.setattr(mod_env, func_name, replacement_func)
+            else:
+                raise
     if func_existed:
         safe_trace(f"Patched {mod_name}.{func_name}")
     else:

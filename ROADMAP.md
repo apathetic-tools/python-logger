@@ -28,8 +28,9 @@ Exploring bundling options for generating the single-file release:
   - Default to off (current behavior: raises `ValueError`)
   - When enabled, could return `None` instead of raising
   - Allows legacy code to opt-in to lenient behavior while maintaining strict defaults
+  - consider making the .level and .levelName the effective properties instead of the explicit ones when not backwards compatible.
 - consider differentiation between "level" and "effectiveLevel" in our functions (which we don't do much of)
-- consider making the .level and .levelName the effective properties instead of the explicit ones when not backwards compatible.
+
 
 ## 📚 Documentation
 - header is not stickied
