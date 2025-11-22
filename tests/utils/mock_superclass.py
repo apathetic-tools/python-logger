@@ -6,7 +6,7 @@ from __future__ import annotations
 import sys
 from contextlib import suppress
 from typing import Any
-from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -18,6 +18,7 @@ def create_mock_superclass_test(
     camel_case_method_name: str,
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that a mixin's snake_case method calls parent's camelCase via super().
 
@@ -35,6 +36,7 @@ def create_mock_superclass_test(
             (e.g., "addFilter")
         args: Arguments to pass to the snake_case method
         kwargs: Keyword arguments to pass to the snake_case method
+        monkeypatch: pytest.MonkeyPatch fixture for patching
 
     Raises:
         AssertionError: If the camelCase method was not called as expected
@@ -85,34 +87,33 @@ def create_mock_superclass_test(
     )
 
     # Mock the base class method (what super() resolves to)
-    with mock.patch.object(
-        MockBaseClass, camel_case_method_name, wraps=camel_method_unbound
-    ) as mock_method:
-        # Call the snake_case method on our test instance
-        # Some methods may raise (e.g., invalid arguments)
-        # That's okay - we just want to verify the mock was called
-        with suppress(Exception):
-            snake_method(*args, **kwargs)
+    mock_method = MagicMock(wraps=camel_method_unbound)
+    monkeypatch.setattr(MockBaseClass, camel_case_method_name, mock_method)
+    # Call the snake_case method on our test instance
+    # Some methods may raise (e.g., invalid arguments)
+    # That's okay - we just want to verify the mock was called
+    with suppress(Exception):
+        snake_method(*args, **kwargs)
 
-        # Verify the underlying method was called
-        # For super() calls, this verifies the parent method was invoked
-        # When called via super(), the method is bound, so self is implicit
-        # The mock receives just the args (self is already bound)
-        # This is a "happy path" test - we just verify the method was called
-        # (exact argument matching is less important than verifying the call happened)
-        assert mock_method.called, (
-            f"{camel_case_method_name} was not called by {method_name}"
-        )
-        # If we have simple args/kwargs, try to verify them more precisely
-        # But don't fail if the method has defaults that fill in extra args
-        if args and not kwargs:
-            # For positional-only calls, check the first few args match
-            call_args = mock_method.call_args
-            if call_args:
-                call_args_pos, _ = call_args
-                # Verify at least the first arg matches (if we have args)
-                if call_args_pos and len(call_args_pos) >= len(args):
-                    assert call_args_pos[: len(args)] == args, (
-                        f"Args don't match: expected {args}, "
-                        f"got {call_args_pos[: len(args)]}"
-                    )
+    # Verify the underlying method was called
+    # For super() calls, this verifies the parent method was invoked
+    # When called via super(), the method is bound, so self is implicit
+    # The mock receives just the args (self is already bound)
+    # This is a "happy path" test - we just verify the method was called
+    # (exact argument matching is less important than verifying the call happened)
+    assert mock_method.called, (
+        f"{camel_case_method_name} was not called by {method_name}"
+    )
+    # If we have simple args/kwargs, try to verify them more precisely
+    # But don't fail if the method has defaults that fill in extra args
+    if args and not kwargs:
+        # For positional-only calls, check the first few args match
+        call_args = mock_method.call_args
+        if call_args:
+            call_args_pos, _ = call_args
+            # Verify at least the first arg matches (if we have args)
+            if call_args_pos and len(call_args_pos) >= len(args):
+                assert call_args_pos[: len(args)] == args, (
+                    f"Args don't match: expected {args}, "
+                    f"got {call_args_pos[: len(args)]}"
+                )

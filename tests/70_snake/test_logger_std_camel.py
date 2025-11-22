@@ -4,15 +4,15 @@
 from __future__ import annotations
 
 import logging
-import sys
 from contextlib import suppress
-from unittest.mock import patch
+from unittest.mock import MagicMock
 
 import pytest
 
 import apathetic_logging as mod_alogs
 import apathetic_logging.registry_data as mod_registry_data
 from tests.utils.level_validation import validate_test_level
+from tests.utils.patch_everywhere import patch_everywhere
 
 
 # Safe test level value (26 is between MINIMAL=25 and WARNING=30)
@@ -69,6 +69,7 @@ def test_module_std_camel_function(
     kwargs: dict[str, object],
     mock_target: str,
     min_version: tuple[int, int] | None,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test module-level stdlib camelCase functions call camelCase function.
 
@@ -81,17 +82,6 @@ def test_module_std_camel_function(
         f"Function {func_name} not found on apathetic_logging"
     )
 
-    # Check if the underlying function exists before trying to patch it
-    # Some functions don't exist in Python 3.10
-    # (e.g., getLevelNamesMapping, getHandlerNames, getHandlerByName)
-    module_name, func_name_in_module = mock_target.rsplit(".", 1)
-    if module_name == "logging" and not hasattr(logging, func_name_in_module):
-        py_version = f"{sys.version_info[0]}.{sys.version_info[1]}"
-        pytest.skip(
-            f"{func_name} requires {func_name_in_module} which doesn't exist "
-            f"in logging module on Python {py_version}"
-        )
-
     # Ensure target version is set appropriately if this function has a min version
     _registry = mod_registry_data.ApatheticLogging_Internal_RegistryData
     original_target = _registry.registered_internal_target_python_version
@@ -101,19 +91,32 @@ def test_module_std_camel_function(
         # Set target version to at least min_version to allow the function to work
         _registry.registered_internal_target_python_version = min_version
     try:
-        # Mock the underlying stdlib function
-        with patch(mock_target) as mock_func:
-            # Call the camelCase function
-            # Some functions may raise (e.g., if logging is already configured)
-            # That's okay - we just want to verify the mock was called
-            with suppress(Exception):
-                camel_func(*args, **kwargs)
+        # Use patch_everywhere with create_if_missing=True to handle missing functions
+        module_name, func_name_in_module = mock_target.rsplit(".", 1)
+        mock_func = MagicMock()
+        if module_name == "logging":
+            patch_everywhere(
+                monkeypatch,
+                logging,
+                func_name_in_module,
+                mock_func,
+                create_if_missing=True,
+            )
+        else:
+            # For non-logging modules, use standard patching
+            pytest.skip(f"Unsupported module: {module_name}")
+        # Call the camelCase function
+        # Some functions may raise (e.g., if logging is already configured)
+        # That's okay - we just want to verify the mock was called
+        with suppress(Exception):
+            camel_func(*args, **kwargs)
 
-            # Verify the underlying function was called
-            mock_func.assert_called_once_with(*args, **kwargs)
+        # Verify the underlying function was called
+        mock_func.assert_called_once_with(*args, **kwargs)
     finally:
         if min_version is not None:
             _registry.registered_internal_target_python_version = original_target
+        monkeypatch.undo()
 
 
 def test_module_std_camel_function_exists() -> None:

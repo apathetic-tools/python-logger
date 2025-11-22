@@ -1,10 +1,11 @@
 # tests/50_core/test_get_logger.py
 """Tests for get_logger function."""
 
+import inspect
 import logging
 import sys
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -27,7 +28,7 @@ def test_get_logger_with_registered_name() -> None:
     # unless it was explicitly created as one, but it should still have the name
 
 
-def test_get_logger_raises_when_not_registered() -> None:
+def test_get_logger_raises_when_not_registered(monkeypatch: pytest.MonkeyPatch) -> None:
     """get_logger() should raise RuntimeError when name not registered."""
     # --- setup ---
     # Mock frame to not have __package__ so inference fails
@@ -36,30 +37,32 @@ def test_get_logger_raises_when_not_registered() -> None:
     # skip_frames=3: initial frame.f_back, then 3 iterations
     # So we need: frame -> f_back (get_logger_of_type) -> f_back (get_logger)
     # -> f_back (caller) -> f_back (one more level)
-    with patch("inspect.currentframe") as mock_frame:
-        frame: Any = type(sys)("frame")
-        get_logger_of_type_frame: Any = type(sys)("get_logger_of_type_frame")
-        get_logger_frame: Any = type(sys)("get_logger_frame")
-        caller_frame: Any = type(sys)("caller_frame")
-        final_frame: Any = type(sys)("final_frame")
+    frame: Any = type(sys)("frame")
+    get_logger_of_type_frame: Any = type(sys)("get_logger_of_type_frame")
+    get_logger_frame: Any = type(sys)("get_logger_frame")
+    caller_frame: Any = type(sys)("caller_frame")
+    final_frame: Any = type(sys)("final_frame")
 
-        frame.f_back = get_logger_of_type_frame
-        get_logger_of_type_frame.f_back = get_logger_frame
-        get_logger_frame.f_back = caller_frame
-        caller_frame.f_back = final_frame
-        final_frame.f_globals = {}  # No __package__
-        mock_frame.return_value = frame
+    frame.f_back = get_logger_of_type_frame
+    get_logger_of_type_frame.f_back = get_logger_frame
+    get_logger_frame.f_back = caller_frame
+    caller_frame.f_back = final_frame
+    final_frame.f_globals = {}  # No __package__
+    mock_frame = MagicMock(return_value=frame)
+    monkeypatch.setattr(inspect, "currentframe", mock_frame)
 
-        try:
-            # --- execute and verify ---
-            with pytest.raises(RuntimeError, match="Cannot auto-infer logger name"):
-                mod_alogs.getLogger()
-        finally:
-            # Clean up frame reference
-            del frame
+    try:
+        # --- execute and verify ---
+        with pytest.raises(RuntimeError, match="Cannot auto-infer logger name"):
+            mod_alogs.getLogger()
+    finally:
+        # Clean up frame reference
+        del frame
 
 
-def test_get_logger_auto_infers_from_caller_package() -> None:
+def test_get_logger_auto_infers_from_caller_package(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """get_logger() should auto-infer logger name from caller's __package__.
 
     Note: This test must carefully construct an identical callstack to mimic
@@ -71,39 +74,38 @@ def test_get_logger_auto_infers_from_caller_package() -> None:
     fake_module.__package__ = "test_package.submodule"
     fake_globals = {"__package__": "test_package.submodule"}
 
-    # --- execute ---
-    with patch("inspect.currentframe") as mock_frame:
-        # Mock the frame to return our fake caller
-        # Frame chain from resolve_logger_name:
-        # resolve_logger_name -> get_logger_of_type -> get_logger -> actual caller
-        # skip_frames=3: initial frame.f_back, then 3 iterations
-        # So we need: frame -> f_back (get_logger_of_type) -> f_back (get_logger)
-        # -> f_back (caller) -> f_back (one more level)
-        frame: Any = type(sys)("frame")
-        get_logger_of_type_frame: Any = type(sys)("get_logger_of_type_frame")
-        get_logger_frame: Any = type(sys)("get_logger_frame")
-        caller_frame: Any = type(sys)("caller_frame")
-        final_frame: Any = type(sys)("final_frame")
+    # Mock the frame to return our fake caller
+    # Frame chain from resolve_logger_name:
+    # resolve_logger_name -> get_logger_of_type -> get_logger -> actual caller
+    # skip_frames=3: initial frame.f_back, then 3 iterations
+    # So we need: frame -> f_back (get_logger_of_type) -> f_back (get_logger)
+    # -> f_back (caller) -> f_back (one more level)
+    frame: Any = type(sys)("frame")
+    get_logger_of_type_frame: Any = type(sys)("get_logger_of_type_frame")
+    get_logger_frame: Any = type(sys)("get_logger_frame")
+    caller_frame: Any = type(sys)("caller_frame")
+    final_frame: Any = type(sys)("final_frame")
 
-        frame.f_back = get_logger_of_type_frame
-        get_logger_of_type_frame.f_back = get_logger_frame
-        get_logger_frame.f_back = caller_frame
-        caller_frame.f_back = final_frame
-        final_frame.f_globals = fake_globals
-        mock_frame.return_value = frame
+    frame.f_back = get_logger_of_type_frame
+    get_logger_of_type_frame.f_back = get_logger_frame
+    get_logger_frame.f_back = caller_frame
+    caller_frame.f_back = final_frame
+    final_frame.f_globals = fake_globals
+    mock_frame = MagicMock(return_value=frame)
+    monkeypatch.setattr(inspect, "currentframe", mock_frame)
 
-        try:
-            result = mod_alogs.getLogger()
-            # --- verify ---
-            assert result.name == "test_package"
-            _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-            assert _registry.registered_internal_logger_name == "test_package"
-        except RuntimeError:
-            # If auto-inference fails, that's also acceptable behavior
-            pass
-        finally:
-            # Clean up frame reference
-            del frame
+    try:
+        result = mod_alogs.getLogger()
+        # --- verify ---
+        assert result.name == "test_package"
+        _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+        assert _registry.registered_internal_logger_name == "test_package"
+    except RuntimeError:
+        # If auto-inference fails, that's also acceptable behavior
+        pass
+    finally:
+        # Clean up frame reference
+        del frame
 
 
 def test_get_logger_uses_existing_logger_instance() -> None:

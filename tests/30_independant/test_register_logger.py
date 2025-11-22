@@ -1,10 +1,11 @@
 # tests/30_independant/test_register_logger.py
 """Tests for register_logger function."""
 
+import inspect
 import logging
 import sys
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -38,80 +39,86 @@ def test_register_logger_overwrites_previous() -> None:
     assert _registry.registered_internal_logger_name == "new_name"
 
 
-def test_register_logger_auto_infer_from_package() -> None:
+def test_register_logger_auto_infer_from_package(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """register_logger() should auto-infer from __package__ when None."""
     # --- setup ---
     # Mock frame to have __package__ in caller's globals
     # Frame chain: register_logger -> resolve_logger_name -> _infer_from_frame
     # skip_frames=1 means we skip 1 frame from frame.f_back, so we need:
     # frame -> frame.f_back (register_logger) -> frame.f_back.f_back (caller)
-    with patch("inspect.currentframe") as mock_frame:
-        frame: Any = type(sys)("frame")
-        frame.f_back = type(sys)("register_logger_frame")
-        frame.f_back.f_back = type(sys)("caller_frame")
-        frame.f_back.f_back.f_globals = {"__package__": "test_package.submodule"}
-        mock_frame.return_value = frame
+    frame: Any = type(sys)("frame")
+    frame.f_back = type(sys)("register_logger_frame")
+    frame.f_back.f_back = type(sys)("caller_frame")
+    frame.f_back.f_back.f_globals = {"__package__": "test_package.submodule"}
+    mock_frame = MagicMock(return_value=frame)
+    monkeypatch.setattr(inspect, "currentframe", mock_frame)
 
-        try:
-            # --- execute ---
-            mod_alogs.registerLogger()
+    try:
+        # --- execute ---
+        mod_alogs.registerLogger()
 
-            # --- verify ---
-            _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-            assert _registry.registered_internal_logger_name == "test_package"
-        finally:
-            # Clean up frame reference
-            del frame
+        # --- verify ---
+        _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+        assert _registry.registered_internal_logger_name == "test_package"
+    finally:
+        # Clean up frame reference
+        del frame
 
 
-def test_register_logger_auto_infer_single_package() -> None:
+def test_register_logger_auto_infer_single_package(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """register_logger() should handle single-level package."""
     # --- setup ---
     # Mock frame to have __package__ in caller's globals
     # Frame chain: register_logger -> resolve_logger_name -> _infer_from_frame
     # skip_frames=1 means we skip 1 frame from frame.f_back, so we need:
     # frame -> frame.f_back (register_logger) -> frame.f_back.f_back (caller)
-    with patch("inspect.currentframe") as mock_frame:
-        frame: Any = type(sys)("frame")
-        frame.f_back = type(sys)("register_logger_frame")
-        frame.f_back.f_back = type(sys)("caller_frame")
-        frame.f_back.f_back.f_globals = {"__package__": "singlepackage"}
-        mock_frame.return_value = frame
+    frame: Any = type(sys)("frame")
+    frame.f_back = type(sys)("register_logger_frame")
+    frame.f_back.f_back = type(sys)("caller_frame")
+    frame.f_back.f_back.f_globals = {"__package__": "singlepackage"}
+    mock_frame = MagicMock(return_value=frame)
+    monkeypatch.setattr(inspect, "currentframe", mock_frame)
 
-        try:
-            # --- execute ---
-            mod_alogs.registerLogger()
+    try:
+        # --- execute ---
+        mod_alogs.registerLogger()
 
-            # --- verify ---
-            _registry = mod_registry.ApatheticLogging_Internal_RegistryData
-            assert _registry.registered_internal_logger_name == "singlepackage"
-        finally:
-            # Clean up frame reference
-            del frame
+        # --- verify ---
+        _registry = mod_registry.ApatheticLogging_Internal_RegistryData
+        assert _registry.registered_internal_logger_name == "singlepackage"
+    finally:
+        # Clean up frame reference
+        del frame
 
 
-def test_register_logger_auto_infer_fails_without_package() -> None:
+def test_register_logger_auto_infer_fails_without_package(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """register_logger() should raise RuntimeError if __package__ missing."""
     # --- setup ---
     # Mock frame to not have __package__ in caller's globals
     # Frame chain: register_logger -> resolve_logger_name -> _infer_from_frame
     # skip_frames=1 means we skip 1 frame from frame.f_back, so we need:
     # frame -> frame.f_back (register_logger) -> frame.f_back.f_back (caller)
-    with patch("inspect.currentframe") as mock_frame:
-        frame: Any = type(sys)("frame")
-        frame.f_back = type(sys)("register_logger_frame")
-        frame.f_back.f_back = type(sys)("caller_frame")
-        # No __package__ in caller's globals
-        frame.f_back.f_back.f_globals = {}
-        mock_frame.return_value = frame
+    frame: Any = type(sys)("frame")
+    frame.f_back = type(sys)("register_logger_frame")
+    frame.f_back.f_back = type(sys)("caller_frame")
+    # No __package__ in caller's globals
+    frame.f_back.f_back.f_globals = {}
+    mock_frame = MagicMock(return_value=frame)
+    monkeypatch.setattr(inspect, "currentframe", mock_frame)
 
-        try:
-            # --- execute and verify ---
-            with pytest.raises(RuntimeError, match="Cannot auto-infer logger name"):
-                mod_alogs.registerLogger()
-        finally:
-            # Clean up frame reference
-            del frame
+    try:
+        # --- execute and verify ---
+        with pytest.raises(RuntimeError, match="Cannot auto-infer logger name"):
+            mod_alogs.registerLogger()
+    finally:
+        # Clean up frame reference
+        del frame
 
 
 def test_register_logger_extends_logging_module() -> None:

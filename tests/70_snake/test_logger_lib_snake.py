@@ -7,7 +7,7 @@ import logging
 from contextlib import suppress
 from types import MethodType
 from typing import TYPE_CHECKING
-from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -55,6 +55,7 @@ def test_logger_lib_snake_method(  # noqa: PLR0912
     args: tuple[object, ...],
     kwargs: dict[str, object],
     camel_case_method_name: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test Logger instance library snake_case methods call camelCase method.
 
@@ -107,51 +108,46 @@ def test_logger_lib_snake_method(  # noqa: PLR0912
             )
 
             camel_method = getattr(logger_core_class, camel_case_method_name)
-            with mock.patch.object(
-                logger_core_class,
-                camel_case_method_name,
-                wraps=camel_method,
-            ) as mock_method:
-                # Call the snake_case method (can call on instance or class)
-                with suppress(Exception):
-                    snake_method(*args, **kwargs)
+            mock_method = MagicMock(wraps=camel_method)
+            monkeypatch.setattr(logger_core_class, camel_case_method_name, mock_method)
+            # Call the snake_case method (can call on instance or class)
+            with suppress(Exception):
+                snake_method(*args, **kwargs)
 
-                # Verify the underlying method was called
-                mock_method.assert_called_once_with(*args, **kwargs)
+            # Verify the underlying method was called
+            mock_method.assert_called_once_with(*args, **kwargs)
         else:
             camel_method = getattr(mod_alogs.Logger, camel_case_method_name)
-            with mock.patch.object(
-                mod_alogs.Logger, camel_case_method_name, wraps=camel_method
-            ) as mock_method:
-                # Call the snake_case method (can call on instance or class)
-                with suppress(Exception):
-                    snake_method(*args, **kwargs)
+            mock_method = MagicMock(wraps=camel_method)
+            monkeypatch.setattr(mod_alogs.Logger, camel_case_method_name, mock_method)
+            # Call the snake_case method (can call on instance or class)
+            with suppress(Exception):
+                snake_method(*args, **kwargs)
 
-                # Verify the underlying method was called
-                mock_method.assert_called_once_with(*args, **kwargs)
+            # Verify the underlying method was called
+            mock_method.assert_called_once_with(*args, **kwargs)
     else:
         # For instance methods, patch on the instance
         camel_method = getattr(direct_logger, camel_case_method_name)
-        with mock.patch.object(
-            direct_logger, camel_case_method_name, wraps=camel_method
-        ) as mock_method:
-            # Call the snake_case method
-            # Special handling for context managers (use_level)
-            if method_name == "use_level":
-                # Context managers need to be used with 'with' statement
-                with suppress(Exception), snake_method(*args, **kwargs):
-                    pass  # Enter and exit the context
-            else:
-                with suppress(Exception):
-                    snake_method(*args, **kwargs)
+        mock_method = MagicMock(wraps=camel_method)
+        monkeypatch.setattr(direct_logger, camel_case_method_name, mock_method)
+        # Call the snake_case method
+        # Special handling for context managers (use_level)
+        if method_name == "use_level":
+            # Context managers need to be used with 'with' statement
+            with suppress(Exception), snake_method(*args, **kwargs):
+                pass  # Enter and exit the context
+        else:
+            with suppress(Exception):
+                snake_method(*args, **kwargs)
 
-            # Verify the underlying method was called
-            # Some wrappers modify kwargs (e.g., error_if_not_debug adds stacklevel)
-            expected_kwargs = kwargs.copy()
-            if method_name in ("error_if_not_debug", "critical_if_not_debug"):
-                # These wrappers add stacklevel=3 to account for the wrapper frame
-                expected_kwargs["stacklevel"] = 3
-            mock_method.assert_called_once_with(*args, **expected_kwargs)
+        # Verify the underlying method was called
+        # Some wrappers modify kwargs (e.g., error_if_not_debug adds stacklevel)
+        expected_kwargs = kwargs.copy()
+        if method_name in ("error_if_not_debug", "critical_if_not_debug"):
+            # These wrappers add stacklevel=3 to account for the wrapper frame
+            expected_kwargs["stacklevel"] = 3
+        mock_method.assert_called_once_with(*args, **expected_kwargs)
 
 
 def test_logger_lib_snake_method_exists(

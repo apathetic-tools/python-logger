@@ -22,7 +22,6 @@ Exploring bundling options for generating the single-file release:
 - Deploy action when I tag a release should create a release and attach it to the tagged release.
 
 ## 🔌 API
-- let getLogger/get_logger/getLoggerOfType/get_logger_of_type() provide the log level using keyword arguments, both exact log level (set the log level on the logger to this) and minimum (make the logger have at least this log level if it doesn't already)
 - **Compatibility mode for `getLevelNumber()` unknown level handling**
   - it does really mess with our type system since the return type becomes ambiguous, may not be worth it?
   - Add a registration/configuration option for backwards-compatible behavior when `getLevelNumber()` encounters unknown levels

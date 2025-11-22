@@ -58,6 +58,7 @@ def test_logger_std_snake_method(
     args: tuple[object, ...],
     kwargs: dict[str, object],
     camel_case_method_name: str,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test Logger instance stdlib snake_case methods call camelCase method.
 
@@ -72,6 +73,7 @@ def test_logger_std_snake_method(
         camel_case_method_name=camel_case_method_name,
         args=args,
         kwargs=kwargs,
+        monkeypatch=monkeypatch,
     )
 
 

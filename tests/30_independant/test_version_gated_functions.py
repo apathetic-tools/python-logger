@@ -146,11 +146,16 @@ def test_version_gated_function_works_when_target_sufficient(
         elif func_name == "get_handler_names":
             stdlib_func_name = "getHandlerNames"
 
-        # Mock the underlying function if it doesn't exist
+        # Mock the underlying function
         def mock_func(*_args: Any, **_kwargs: Any) -> Any:
             return mock_return_value
 
-        patch_everywhere(monkeypatch, logging, stdlib_func_name, mock_func)
+        # Use create_if_missing=True to allow patching functions that don't exist
+        # (e.g., Python 3.11+ functions on Python 3.10)
+        # monkeypatch will automatically clean up created attributes on undo
+        patch_everywhere(
+            monkeypatch, logging, stdlib_func_name, mock_func, create_if_missing=True
+        )
         func = getattr(mod_alogs, func_name)
         # --- execute ---
         result = func(*args, **kwargs)
