@@ -27,7 +27,7 @@ Exploring bundling options for generating the single-file release:
   - it does really mess with our type system since the return type becomes ambiguous, may not be worth it?
   - Add a registration/configuration option for backwards-compatible behavior when `getLevelNumber()` encounters unknown levels
   - Default to off (current behavior: raises `ValueError`)
-  - When enabled, could return a constant (e.g., `UNKNOWN_LEVEL = 999`) or `None` instead of raising
+  - When enabled, could return `None` instead of raising
   - Allows legacy code to opt-in to lenient behavior while maintaining strict defaults
 - consider differentiation between "level" and "effectiveLevel" in our functions (which we don't do much of)
 - consider making the .level and .levelName the effective properties instead of the explicit ones when not backwards compatible.

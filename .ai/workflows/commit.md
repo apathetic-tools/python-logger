@@ -94,17 +94,21 @@ docs(ai-rules): update code quality rules with comprehensive guidelines
 
 Before making a regular commit, check for checkpoint commits since the last regular commit:
 
-1. Find the last commit that is NOT a checkpoint:
+1. Find the last commit that is NOT a checkpoint (subject line doesn't start with "checkpoint("):
    ```bash
-   LAST_REGULAR=$(git log --oneline --format="%H" --grep="checkpoint" --invert-grep -1)
+   LAST_REGULAR=$(git log --format="%H|%s" | awk -F'|' '$2 !~ /^checkpoint\(/ {print $1; exit}')
    ```
 
-2. Check for checkpoint commits between that and HEAD:
+2. Check for checkpoint commits between that and HEAD (subject line starts with "checkpoint("):
    ```bash
-   git log --oneline --grep="checkpoint" ${LAST_REGULAR}..HEAD
+   git log --format="%H|%s" ${LAST_REGULAR}..HEAD | awk -F'|' '$2 ~ /^checkpoint\(/ {print $1, $2}'
    ```
 
-3. If checkpoint commits are found, ask the user: "I see [N] checkpoint commit(s). Squash with this commit?" and wait for response.
+3. Count the checkpoint commits and if any are found, ask the user: "I see [N] checkpoint commit(s). Squash with this commit?" and wait for response.
 
-**Important**: Do NOT use `git log --grep="checkpoint"` alone, as this searches all history, not just commits since the last regular commit.
+**Important**: 
+- Checkpoint commits have the format `checkpoint(scope): brief description` in the subject line
+- The check must examine the subject line only (not the commit message body), as commits may mention "checkpoint" in the body without being checkpoint commits
+- Do NOT use `git log --grep="checkpoint"` alone, as it searches the entire message (including body) and will incorrectly match commits that mention "checkpoint" in the body but are not checkpoint commits
+- The awk approach uses a pipe delimiter to separate hash from subject, then matches the subject line pattern `^checkpoint\(` to identify checkpoint commits
 

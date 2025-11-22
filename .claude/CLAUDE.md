@@ -34,10 +34,12 @@ For complex features, refactors, API changes, or multi-phase work, use the plan 
 
 **Before regular commit**: Check for checkpoint commits since last regular commit using:
 ```bash
-LAST_REGULAR=$(git log --oneline --format="%H" --grep="checkpoint" --invert-grep -1)
-git log --oneline --grep="checkpoint" ${LAST_REGULAR}..HEAD
+LAST_REGULAR=$(git log --format="%H|%s" | awk -F'|' '$2 !~ /^checkpoint\(/ {print $1; exit}')
+git log --format="%H|%s" ${LAST_REGULAR}..HEAD | awk -F'|' '$2 ~ /^checkpoint\(/ {print $1, $2}'
 ```
-This finds the last commit that is NOT a checkpoint, then checks for checkpoint commits between that and HEAD. If checkpoint commits are found, ask: "I see [N] checkpoint commit(s). Squash with this commit?" and wait for response. If yes, squash via rebase/reset; if no, proceed.
+This finds the last commit that is NOT a checkpoint (subject doesn't start with "checkpoint("), then checks for checkpoint commits between that and HEAD. If checkpoint commits are found, ask: "I see [N] checkpoint commit(s). Squash with this commit?" and wait for response. If yes, squash via rebase/reset; if no, proceed.
+
+**Important**: The check must examine the subject line only (not the commit message body), as commits may mention "checkpoint" in the body without being checkpoint commits.
 
 # Project Overview
 
